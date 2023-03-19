@@ -13,24 +13,34 @@ localparam  SIZE4       = 3'd2  ,
             SIZE32      = 3'd5  ,
             SIZE64      = 3'd6  ;
 
-integer fp_r, fp_w, rd_i, rd_j, rd_k, wr_i, wr_j, wr_k;
+integer fp_r, fp_w, rd_i, rd_j, rd_k, rd_l, wr_i, wr_j, wr_k;
 
 //system input
     reg                                 clk                 ;
     reg                                 reset               ;
 //input parameter       
-    reg             [2 : 0]             cu_width_log2       ;
-    reg             [2 : 0]             cu_height_log2      ;
-    reg             [6 : 0]             qp                  ;
-    reg             [2 : 0]             ch_type             ;
-    reg             [0 : 0]             is_intra            ;
-    reg     signed  [63: 0]             lambda              ;
-    reg             [3 : 0]             bit_depth           ;
     reg             [21: 0]             q_value             ;
     reg             [4 : 0]             q_bits              ;
+
+    reg             [2 : 0]             cu_width_log2       ;
+    reg             [2 : 0]             cu_height_log2      ;
+    reg             [2 : 0]             ch_type             ;
+    reg     signed  [63: 0]             err_scale           ;
+    reg     signed  [63: 0]             lambda              ;
+
+    reg             [6 : 0]             qp                  ;
+    reg             [0 : 0]             is_intra            ;
+    reg             [3 : 0]             bit_depth           ;
+
+
 //input data
     reg                                 i_valid;
-    reg     signed  [BIT_DEPTH - 1 : 0] i_data[0 : 31]      ;
+    reg     signed  [BIT_DEPTH - 1 : 0] i_data          [0 : 31]        ;
+    reg             [31: 0]             rdoq_est_cbf    [0 :  2][0 :  1];//pending
+    reg             [31: 0]             rdoq_est_last   [0 :  1][0 :  5][0 : 11][0 : 1];//pending
+    reg             [31: 0]             rdoq_est_level  [0 : 23][0 :  1];//pending
+
+
 //output parameter 
     wire            [3 : 0]             final_X             ;
     wire            [3 : 0]             final_y             ;
@@ -42,6 +52,7 @@ integer fp_r, fp_w, rd_i, rd_j, rd_k, wr_i, wr_j, wr_k;
     reg     signed  [BIT_DEPTH - 1 : 0] rd_data[0 : 63]     ;
     reg     signed  [OUT_WIDTH - 1 : 0] wr_data[0 : 63]     ;
 
+    reg             [31: 0]             rdoq_data           ;
 
 rdoq_top #(
     .IN_WIDTH               (BIT_DEPTH      ),
@@ -52,16 +63,22 @@ rdoq_top #(
     .rst_n                  (reset          ),
 
     //input block information
-    .cu_width_log2          (cu_width_log2  ),//the value is between 2 and 4
-    .cu_height_log2         (cu_height_log2 ),//the value is between 2 and 4
     .q_value                (q_value        ),
     .q_bits                 (q_bits         ),
 
-    .qp                     (qp             ),
+    .cu_width_log2          (cu_width_log2  ),//the value is between 2 and 4
+    .cu_height_log2         (cu_height_log2 ),//the value is between 2 and 4
     .ch_type                (ch_type        ),//Y_C 0; U_C 1; Y_C 2;
-    .is_intra               (is_intra       ),
+    .err_scale              (err_scale      ),
     .lambda                 (lambda         ),
-    .bit_depth              (bit_depth      ),
+
+    //.qp                     (qp             ),
+    //.is_intra               (is_intra       ),
+    //.bit_depth              (bit_depth      ),
+
+    .rdoq_est_cbf           (rdoq_est_cbf   ),
+    .rdoq_est_last          (rdoq_est_last  ),
+    .rdoq_est_level         (rdoq_est_level ),
 
     //input block data
     .i_valid                (i_valid        ),
@@ -93,26 +110,82 @@ initial begin
     is_intra        =   1 'd0;
     lambda          =   64'd0;
     bit_depth       =   4 'd0;
-    q_value         =   22'd69;
-    q_bits          =   5 'd15;
+    q_value         =   22'd0;
+    q_bits          =   5 'd0;
     i_valid         =       0;
     
     for (rd_i = 0; rd_i < 32; rd_i = rd_i + 1) begin
         i_data[rd_i] = 0;
     end
+    for (rd_i = 0; rd_i < 3; rd_i = rd_i + 1) begin
+        for(rd_j = 0; rd_j < 2; rd_j = rd_j + 1)begin
+            rdoq_est_cbf[rd_i][rd_j] = 0;
+        end
+    end
+    for (rd_i = 0; rd_i < 2; rd_i = rd_i + 1) begin
+        for(rd_j = 0; rd_j < 6; rd_j = rd_j + 1)begin
+            for(rd_k = 0; rd_k < 12; rd_k = rd_k + 1)begin
+                for(rd_l = 0; rd_l < 2; rd_l = rd_l + 1)begin
+                    rdoq_est_last[rd_i][rd_j][rd_k][rd_l] = 0;
+                end
+            end
+        end
+    end
+    for (rd_i = 0; rd_i < 24; rd_i = rd_i + 1) begin
+        for(rd_j = 0; rd_j < 2; rd_j = rd_j + 1)begin
+            rdoq_est_level[rd_i][rd_j] = 0;
+        end
+    end
     #2;
     reset = 1;
     //Start
     //16x16
-    i_valid = 1;
+    i_valid         =   1               ;
+
+    q_value         =   22'd69          ;
+    q_bits          =   5 'd15          ;
+
     cu_width_log2   =   SIZE16          ;
     cu_height_log2  =   SIZE16          ;
-    qp              =   7 'd63          ;
     ch_type         =   Y_C             ;
-    is_intra        =   1 'd1           ;
+    err_scale       =   64'd62245902    ;
     lambda          =   64'd10131659    ;
+
+    qp              =   7 'd63          ;
+    is_intra        =   1 'd1           ;
     bit_depth       =   4 'd10          ;
-    fp_r = $fopen("../../../../../result/origin_data/origin_data_16x16.txt", "r");
+    fp_r = $fopen("../../../../../result/origin_data/rdoq_est_cbf/est_cbf_16x16.txt", "r");
+        for (rd_i = 0; rd_i < 3; rd_i = rd_i + 1) begin
+            for(rd_j = 0; rd_j < 2; rd_j = rd_j + 1)begin
+                $fscanf(fp_r, "%d ", rdoq_data);
+                rdoq_est_cbf[rd_i][rd_j] = rdoq_data;
+            end
+        end
+    $fclose(fp_r);
+    
+    fp_r = $fopen("../../../../../result/origin_data/rdoq_est_last/est_last_16x16.txt", "r");
+        for (rd_i = 0; rd_i < 2; rd_i = rd_i + 1) begin
+            for(rd_j = 0; rd_j < 6; rd_j = rd_j + 1)begin
+                for(rd_k = 0; rd_k < 12; rd_k = rd_k + 1)begin
+                    for(rd_l = 0; rd_l < 2; rd_l = rd_l + 1)begin
+                        $fscanf(fp_r, "%d ", rdoq_data);
+                        rdoq_est_last[rd_i][rd_j][rd_k][rd_l] = rdoq_data;
+                    end
+                end
+            end
+        end
+    $fclose(fp_r);
+    
+    fp_r = $fopen("../../../../../result/origin_data/rdoq_est_level/est_level_16x16.txt", "r");
+        for (rd_i = 0; rd_i < 24; rd_i = rd_i + 1) begin
+            for(rd_j = 0; rd_j < 2; rd_j = rd_j + 1)begin
+                $fscanf(fp_r, "%d ", rdoq_data);
+                rdoq_est_level[rd_i][rd_j] = rdoq_data;
+            end
+        end
+    $fclose(fp_r);
+
+    fp_r = $fopen("../../../../../result/origin_data/src/origin_data_16x16.txt", "r");
     for (rd_i = 0; rd_i < 16; rd_i = rd_i + 1) begin
         $fscanf(fp_r, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
             rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ], rd_data[4 ], rd_data[5 ], rd_data[6 ], rd_data[7 ],
@@ -139,7 +212,7 @@ initial begin
     is_intra        =   1 'd1           ;
     lambda          =   64'd10131659    ;
     bit_depth       =   4 'd10          ;
-    fp_r = $fopen("../../../../../result/origin_data/origin_data_8x8.txt", "r");
+    fp_r = $fopen("../../../../../result/origin_data/src/origin_data_8x8.txt", "r");
     for (rd_i = 0; rd_i < 8; rd_i = rd_i + 1) begin
         $fscanf(fp_r, "%d %d %d %d %d %d %d %d", 
             rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ], rd_data[4 ], rd_data[5 ], rd_data[6 ], rd_data[7 ]);
@@ -164,7 +237,7 @@ initial begin
     is_intra        =   1 'd1           ;
     lambda          =   64'd10131659    ;
     bit_depth       =   4 'd10          ;
-    fp_r = $fopen("../../../../../result/origin_data/origin_data_4x4.txt", "r");
+    fp_r = $fopen("../../../../../result/origin_data/src/origin_data_4x4.txt", "r");
     for (rd_i = 0; rd_i < 4; rd_i = rd_i + 1) begin
         $fscanf(fp_r, "%d %d %d %d", rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ]);
 
@@ -189,7 +262,7 @@ initial begin
     is_intra        =   1 'd1           ;
     lambda          =   64'd10131659    ;
     bit_depth       =   4 'd10          ;
-    fp_r = $fopen("../../../../../result/origin_data/origin_data_32x32.txt", "r");
+    fp_r = $fopen("../../../../../result/origin_data/src/origin_data_32x32.txt", "r");
     for (rd_i = 0; rd_i < 32; rd_i = rd_i + 1) begin
         $fscanf(fp_r, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
             rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ], rd_data[4 ], rd_data[5 ], rd_data[6 ], rd_data[7 ], 
@@ -217,7 +290,7 @@ initial begin
     is_intra        =   1 'd1           ;
     lambda          =   64'd10131659    ;
     bit_depth       =   4 'd10          ;
-    fp_r = $fopen("../../../../../result/origin_data/origin_data_64x64.txt", "r");
+    fp_r = $fopen("../../../../../result/origin_data/src/origin_data_64x64.txt", "r");
     for (rd_i = 0; rd_i < 128; rd_i = rd_i + 1) begin
         $fscanf(fp_r, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
             rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ], rd_data[4 ], rd_data[5 ], rd_data[6 ], rd_data[7 ], 
@@ -245,7 +318,7 @@ initial begin
     #2;
     #8; //delay 279 clk
     //16x16
-    fp_w = $fopen("../../../../../result/pq_fpga_coeff/pq_fpga_16x16.txt", "w");
+    fp_w = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_16x16.txt", "w");
     for (wr_j = 0; wr_j < 16; wr_j = wr_j + 1) begin
         for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
             wr_data[wr_k] = o_data[wr_k];
@@ -258,7 +331,7 @@ initial begin
     $fclose(fp_w);
 /*
     //32x32
-    fp_w = $fopen("../../../../../result/fpga_coeff/dct2/fpga_coeff_dct2_32x32.txt", "w");
+    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_32x32.txt", "w");
     for (wr_i = 0; wr_i < 32; wr_i = wr_i + 1) begin
         for (wr_j = 0; wr_j < 2; wr_j = wr_j + 1) begin
             for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
@@ -272,7 +345,7 @@ initial begin
     end
     $fclose(fp_w);
     //16x16
-    fp_w = $fopen("../../../../../result/fpga_coeff/dct2/fpga_coeff_dct2_16x16.txt", "w");
+    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_16x16.txt", "w");
     for (wr_i = 0; wr_i < 16; wr_i = wr_i + 1) begin
         for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
             for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
@@ -285,7 +358,7 @@ initial begin
     end
     $fclose(fp_w);
     //8x8
-    fp_w = $fopen("../../../../../result/fpga_coeff/dct2/fpga_coeff_dct2_8x8.txt", "w");
+    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_8x8.txt", "w");
     for (wr_i = 0; wr_i < 4; wr_i = wr_i + 1) begin
         for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
             for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
@@ -300,7 +373,7 @@ initial begin
     end
     $fclose(fp_w);
     //4x4
-    fp_w = $fopen("../../../../../result/fpga_coeff/dct2/fpga_coeff_dct2_4x4.txt", "w"); 
+    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_4x4.txt", "w"); 
     for (wr_i = 0; wr_i < 1; wr_i = wr_i + 1) begin
         for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
             for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
@@ -315,7 +388,7 @@ initial begin
     end
     $fclose(fp_w);
     //32x64
-    fp_w = $fopen("../../../../../result/fpga_coeff/dct2/fpga_coeff_dct2_32x64.txt", "w");
+    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_32x64.txt", "w");
     for (wr_i = 0; wr_i < 64; wr_i = wr_i + 1) begin
         for (wr_j = 0; wr_j < 2; wr_j = wr_j + 1) begin
             for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
@@ -329,7 +402,7 @@ initial begin
     end
     $fclose(fp_w);
     //64x32
-    fp_w = $fopen("../../../../../result/fpga_coeff/dct2/fpga_coeff_dct2_64x32.txt", "w");
+    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_64x32.txt", "w");
     for (wr_i = 0; wr_i < 32; wr_i = wr_i + 1) begin
         for (wr_j = 0; wr_j < 4; wr_j = wr_j + 1) begin
             for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
@@ -345,7 +418,7 @@ initial begin
     end
     $fclose(fp_w);
     //4x16
-    fp_w = $fopen("../../../../../result/fpga_coeff/dct2/fpga_coeff_dct2_4x16.txt", "w"); 
+    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_4x16.txt", "w"); 
     for (wr_i = 0; wr_i < 4; wr_i = wr_i + 1) begin
         for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
             for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
@@ -360,7 +433,7 @@ initial begin
     end
     $fclose(fp_w);
     //64x8
-    fp_w = $fopen("../../../../../result/fpga_coeff/dct2/fpga_coeff_dct2_64x8.txt", "w");
+    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_64x8.txt", "w");
     for (wr_i = 0; wr_i < 8; wr_i = wr_i + 1) begin
         for (wr_j = 0; wr_j < 4; wr_j = wr_j + 1) begin
             for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
@@ -376,7 +449,7 @@ initial begin
     end
     $fclose(fp_w);
     //8x4
-    fp_w = $fopen("../../../../../result/fpga_coeff/dct2/fpga_coeff_dct2_8x4.txt", "w");
+    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_8x4.txt", "w");
     for (wr_i = 0; wr_i < 2; wr_i = wr_i + 1) begin
         for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
             for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
@@ -391,7 +464,7 @@ initial begin
     end
     $fclose(fp_w);
     //32x8
-    fp_w = $fopen("../../../../../result/fpga_coeff/dct2/fpga_coeff_dct2_32x8.txt", "w");
+    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_32x8.txt", "w");
     for (wr_i = 0; wr_i < 8; wr_i = wr_i + 1) begin
         for (wr_j = 0; wr_j < 2; wr_j = wr_j + 1) begin
             for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
@@ -405,7 +478,7 @@ initial begin
     end
     $fclose(fp_w);
     //8x32
-    fp_w = $fopen("../../../../../result/fpga_coeff/dct2/fpga_coeff_dct2_8x32.txt", "w");
+    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_8x32.txt", "w");
     for (wr_i = 0; wr_i < 16; wr_i = wr_i + 1) begin
         for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
             for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
@@ -420,7 +493,7 @@ initial begin
     end
     $fclose(fp_w);
     //32x4
-    fp_w = $fopen("../../../../../result/fpga_coeff/dct2/fpga_coeff_dct2_32x4.txt", "w");
+    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_32x4.txt", "w");
     for (wr_i = 0; wr_i < 4; wr_i = wr_i + 1) begin
         for (wr_j = 0; wr_j < 2; wr_j = wr_j + 1) begin
             for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
@@ -434,7 +507,7 @@ initial begin
     end
     $fclose(fp_w);
     //16x32
-    fp_w = $fopen("../../../../../result/fpga_coeff/dct2/fpga_coeff_dct2_16x32.txt", "w");
+    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_16x32.txt", "w");
     for (wr_i = 0; wr_i < 32; wr_i = wr_i + 1) begin
         for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
             for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
@@ -447,7 +520,7 @@ initial begin
     end
     $fclose(fp_w);
     //16x64
-    fp_w = $fopen("../../../../../result/fpga_coeff/dct2/fpga_coeff_dct2_16x64.txt", "w");
+    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_16x64.txt", "w");
     for (wr_i = 0; wr_i < 64; wr_i = wr_i + 1) begin
         for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
             for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
@@ -461,7 +534,7 @@ initial begin
     $fclose(fp_w);
     #256;
     //64x64
-    fp_w = $fopen("../../../../../result/fpga_coeff/dct2/fpga_coeff_dct2_64x64.txt", "w");
+    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_64x64.txt", "w");
     for (wr_i = 0; wr_i < 32; wr_i = wr_i + 1) begin
         for (wr_j = 0; wr_j < 4; wr_j = wr_j + 1) begin
             for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin

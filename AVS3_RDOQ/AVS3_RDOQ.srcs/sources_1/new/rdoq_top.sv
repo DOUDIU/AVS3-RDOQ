@@ -7,16 +7,22 @@ module rdoq_top#(
     input                                   rst_n                   ,
 
 //input block information
-    input           [2 : 0]                 cu_width_log2           ,//the value is between 2 and 6
-    input           [2 : 0]                 cu_height_log2          ,//the value is between 2 and 6
     input           [21: 0]                 q_value                 ,
     input           [4 : 0]                 q_bits                  ,
 
-    input           [6 : 0]                 qp                      ,
+    input           [2 : 0]                 cu_width_log2           ,//the value is between 2 and 6
+    input           [2 : 0]                 cu_height_log2          ,//the value is between 2 and 6
     input           [2 : 0]                 ch_type                 ,//Y_C 0; U_C 1; Y_C 2;
-    input           [0 : 0]                 is_intra                ,
+    input   signed  [63: 0]                 err_scale               ,
     input   signed  [63: 0]                 lambda                  ,
+    
+    input           [6 : 0]                 qp                      ,
+    input           [0 : 0]                 is_intra                ,
     input           [3 : 0]                 bit_depth               ,
+    
+    input           [31: 0]                 rdoq_est_cbf    [0 :  2][0 :  1],//pending
+    input           [31: 0]                 rdoq_est_last   [0 :  1][0 :  5][0 : 11][0 : 1],//pending
+    input           [31: 0]                 rdoq_est_level  [0 : 23][0 :  1],//pending
 
 //input block data
     input                                   i_valid                 ,
@@ -32,73 +38,96 @@ module rdoq_top#(
 );
 
 //wire definition
-wire            [13: 0]     scale                   ;
-wire            [2 : 0]     ns_shift                ;
-wire            [7 : 0]     ns_scale                ;
-wire            [6 : 0]     ns_offset               ;
-wire            [2 : 0]     log2_size               ;
-wire            [3 : 0]     tr_shift                ;
-wire            [0 : 0]     ctx_last                ;
-wire    signed  [63: 0]     err_scale               ;
+wire            [13: 0]     scale                           ;
+wire            [2 : 0]     ns_shift                        ;
+wire            [7 : 0]     ns_scale                        ;
+wire            [6 : 0]     ns_offset                       ;
+wire            [2 : 0]     log2_size                       ;
+wire            [3 : 0]     tr_shift                        ;
+wire            [0 : 0]     ctx_last                        ;
 
-wire    signed  [15: 0]     pre_quant_coef  [31: 0] ;
-wire                        pre_quant_valid         ;
+wire    signed  [15: 0]     pre_quant_coef          [31: 0] ;
+wire                        pre_quant_valid                 ;
+wire            [2 : 0]     pre_quant_width_log2            ;
+wire            [2 : 0]     pre_quant_height_log2           ;
+wire            [2 : 0]     pre_quant_ch_type               ;
+wire    signed  [63: 0]     pre_quant_level_double  [31: 0] ;
+wire            [4 : 0]     pre_quant_q_bits                ;
+wire    signed  [29: 0]     pre_quant_err_scale             ;
+wire    signed  [63: 0]     pre_quant_lambda                ;
+wire            [31: 0]     pre_quant_rdoq_est_cbf    [0 :  2][0 :  1];//pending
+wire            [31: 0]     pre_quant_rdoq_est_last   [0 :  1][0 :  5][0 : 11][0 : 1];//pending
+wire            [31: 0]     pre_quant_rdoq_est_level  [0 : 23][0 :  1];//pending
+
+    pre_quant u_pre_quant(
+        //system clk and rest
+        .clk                    (clk                        ),
+        .rst_n                  (rst_n                      ),
+
+        //input parameter   
+        .q_value                (q_value                    ),
+        .q_bits                 (q_bits                     ),
+
+        .i_width_log2           (cu_width_log2              ),      
+        .i_height_log2          (cu_height_log2             ),   
+        .i_ch_type              (ch_type                    ),  
+        .i_q_bits               (q_bits                     ),
+        .i_err_scale            (err_scale                  ),
+        .i_lambda               (lambda                     ),
+
+        .i_rdoq_est_cbf         (rdoq_est_cbf               ),
+        .i_rdoq_est_last        (rdoq_est_last              ),
+        .i_rdoq_est_level       (rdoq_est_level             ),
+
+        //input data    
+        .i_valid                (i_valid                    ),
+        .i_data                 (src_coef                   ),
+
+        //output parameter
+        .o_width_log2           (pre_quant_width_log2       ),
+        .o_height_log2          (pre_quant_height_log2      ),
+        .o_ch_type              (pre_quant_ch_type          ),
+        .o_q_bits               (pre_quant_q_bits           ),
+        .o_err_scale            (pre_quant_err_scale        ),
+        .o_lambda               (pre_quant_lambda           ),
+
+        .o_rdoq_est_cbf         (pre_quant_rdoq_est_cbf     ),
+        .o_rdoq_est_last        (pre_quant_rdoq_est_last    ),
+        .o_rdoq_est_level       (pre_quant_rdoq_est_level   ),
+        //output data
+        .o_valid                (pre_quant_valid            ),
+        .o_level_double         (pre_quant_level_double     ),
+        .o_data                 (pre_quant_coef             )
+    );
 
 
-//module instance
-/*parameter_initial u_parameter_initial (
-    //system clk and rest
-    .clk                    (clk               ),
-    .rst_n                  (rst_n             ),
+    ocd u_ocd(      
+    //system clk and rest       
+        .clk                    (clk                        ),
+        .rst_n                  (rst_n                      ),
 
-    //input parameter
-    .cu_width_log2          (cu_width_log2     ),//the value is between 2 and 6
-    .cu_height_log2         (cu_height_log2    ),//the value is between 2 and 6
-    .qp                     (qp                ),
-    .ch_type                (ch_type           ),//Y_C 0; U_C 1; V_C 2;
-    .is_intra               (is_intra          ),
-    .lambda                 (lambda            ),
-    .bit_depth              (bit_depth         ),
-
-    //output parameter
-    .scale                  (scale             ),
-    .ns_shift               (ns_shift          ),
-    .ns_scale               (ns_scale          ),
-    .ns_offset              (ns_offset         ),            
-    .q_value                (q_value           ),
-    .log2_size              (log2_size         ),
-    .tr_shift               (tr_shift          ),
-    .q_bits                 (q_bits            ),
-    .ctx_last               (ctx_last          ),
-    .err_scale              (err_scale         )
-);
-*/
-
-pre_quant #(
-    .IN_WIDTH               (16                 ),
-    .OUT_WIDTH              (16                 )
-)u_pre_quant(
-    //system clk and rest
-    .clk                    (clk                ),
-    .rst_n                  (rst_n              ),
-
-    //input parameter
-    .q_value                (q_value            ),
-    .q_bits                 (q_bits             ),
+    //input parameter       
+        .i_width_log2           (pre_quant_width_log2       ),      
+        .i_height_log2          (pre_quant_height_log2      ),   
+        .i_ch_type              (pre_quant_ch_type          ),
+        .i_q_bits               (pre_quant_q_bits           ),
+        .i_err_scale            (pre_quant_err_scale        ),
+        .i_lambda               (pre_quant_lambda           ),
     
-    //input data
-    .i_valid                (i_valid            ),
-    .i_data                 (src_coef           ),
+        .i_rdoq_est_cbf         (pre_quant_rdoq_est_cbf     ),
+        .i_rdoq_est_last        (pre_quant_rdoq_est_last    ),
+        .i_rdoq_est_level       (pre_quant_rdoq_est_level   ),
+    //input data                
+        .i_valid                (pre_quant_valid            ),
+        .i_level_double         (pre_quant_level_double     ),
+        .i_data                 (pre_quant_coef             ),
 
-    //output parameter
+    //output parameter      
 
-    //output data
-    .o_valid                (pre_quant_valid    ),
-    .o_data                 (dst_coef           )
-);
-
-
-
+    //output data       
+        .o_valid                (o_valid                    ),
+        .o_data                 (dst_coef                   )
+    );
 
 
 
