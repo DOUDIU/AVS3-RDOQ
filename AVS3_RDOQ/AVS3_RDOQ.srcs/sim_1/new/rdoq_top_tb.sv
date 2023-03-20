@@ -2,8 +2,6 @@
 
 module rdoq_top_tb();
 
-localparam  BIT_DEPTH   = 16    ,
-            OUT_WIDTH   = 16    ;
 localparam  Y_C         = 3'd0  ,
             U_C         = 3'd1  ,
             V_C         = 3'd2  ;
@@ -34,30 +32,28 @@ integer fp_r, fp_w, rd_i, rd_j, rd_k, rd_l, wr_i, wr_j, wr_k;
 
 
 //input data
-    reg                                 i_valid;
-    reg     signed  [BIT_DEPTH - 1 : 0] i_data          [0 : 31]        ;
-    reg             [31: 0]             rdoq_est_cbf    [0 :  2][0 :  1];//pending
-    reg             [31: 0]             rdoq_est_last   [0 :  1][0 :  5][0 : 11][0 : 1];//pending
-    reg             [31: 0]             rdoq_est_level  [0 : 23][0 :  1];//pending
+    reg                         i_valid;
+    reg     signed  [15: 0]     i_data          [0 : 31]        ;
+    reg             [31: 0]     rdoq_est_cbf    [0 :  2][0 :  1];//pending
+    reg             [31: 0]     rdoq_est_last   [0 :  1][0 :  5][0 : 11][0 : 1];//pending
+    reg             [31: 0]     rdoq_est_level  [0 : 23][0 :  1];//pending
+    reg             [31: 0]     rdoq_est_run    [0 : 23][0 :  1];//pending
 
 
 //output parameter 
-    wire            [3 : 0]             final_X             ;
-    wire            [3 : 0]             final_y             ;
-//output coeff
-    wire                                o_valid             ;
-    wire    signed  [OUT_WIDTH - 1 : 0] o_data[0 : 31]      ;
+    wire            [3 : 0]     final_X             ;
+    wire            [3 : 0]     final_y             ;
+//output coeff  
+    wire                        o_valid             ;
+    wire    signed  [15: 0]     o_data  [0 : 31]    ;
 
-//txt rd/wr
-    reg     signed  [BIT_DEPTH - 1 : 0] rd_data[0 : 63]     ;
-    reg     signed  [OUT_WIDTH - 1 : 0] wr_data[0 : 63]     ;
+//txt rd/wr 
+    reg     signed  [15: 0]     rd_data [0 : 63]    ;
+    reg     signed  [15: 0]     wr_data [0 : 63]    ;
 
-    reg             [31: 0]             rdoq_data           ;
+    reg             [31: 0]     rdoq_data           ;
 
-rdoq_top #(
-    .IN_WIDTH               (BIT_DEPTH      ),
-    .OUT_WIDTH              (OUT_WIDTH      )
-)u_rdoq_top(
+rdoq_top u_rdoq_top(
     //system clk and rest
     .clk                    (clk            ),
     .rst_n                  (reset          ),
@@ -79,6 +75,7 @@ rdoq_top #(
     .rdoq_est_cbf           (rdoq_est_cbf   ),
     .rdoq_est_last          (rdoq_est_last  ),
     .rdoq_est_level         (rdoq_est_level ),
+    .rdoq_est_run           (rdoq_est_run   ),
 
     //input block data
     .i_valid                (i_valid        ),
@@ -136,6 +133,11 @@ initial begin
             rdoq_est_level[rd_i][rd_j] = 0;
         end
     end
+    for (rd_i = 0; rd_i < 24; rd_i = rd_i + 1) begin
+        for(rd_j = 0; rd_j < 2; rd_j = rd_j + 1)begin
+            rdoq_est_run[rd_i][rd_j] = 0;
+        end
+    end
     #2;
     reset = 1;
     //Start
@@ -181,6 +183,15 @@ initial begin
             for(rd_j = 0; rd_j < 2; rd_j = rd_j + 1)begin
                 $fscanf(fp_r, "%d ", rdoq_data);
                 rdoq_est_level[rd_i][rd_j] = rdoq_data;
+            end
+        end
+    $fclose(fp_r);
+
+    fp_r = $fopen("../../../../../result/origin_data/rdoq_est_run/est_run_16x16.txt", "r");
+        for (rd_i = 0; rd_i < 24; rd_i = rd_i + 1) begin
+            for(rd_j = 0; rd_j < 2; rd_j = rd_j + 1)begin
+                $fscanf(fp_r, "%d ", rdoq_data);
+                rdoq_est_run[rd_i][rd_j] = rdoq_data;
             end
         end
     $fclose(fp_r);
@@ -314,249 +325,11 @@ end
 
 
 //write
-initial begin 
-    #2;
-    #8; //delay 279 clk
-    //16x16
-    fp_w = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_16x16.txt", "w");
-    for (wr_j = 0; wr_j < 16; wr_j = wr_j + 1) begin
-        for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-            wr_data[wr_k] = o_data[wr_k];
-        end
-        #2;
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], 
-            wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-    end
-    $fclose(fp_w);
-/*
-    //32x32
-    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_32x32.txt", "w");
-    for (wr_i = 0; wr_i < 32; wr_i = wr_i + 1) begin
-        for (wr_j = 0; wr_j < 2; wr_j = wr_j + 1) begin
-            for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-                wr_data[wr_k + wr_j * 16] = o_data[wr_k];
-            end
-            #2;
-        end
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15], 
-            wr_data[16], wr_data[17], wr_data[18], wr_data[19], wr_data[20], wr_data[21], wr_data[22], wr_data[23], wr_data[24], wr_data[25], wr_data[26], wr_data[27], wr_data[28], wr_data[29], wr_data[30], wr_data[31]);
-    end
-    $fclose(fp_w);
-    //16x16
-    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_16x16.txt", "w");
-    for (wr_i = 0; wr_i < 16; wr_i = wr_i + 1) begin
-        for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
-            for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-                wr_data[wr_k + wr_j * 16] = o_data[wr_k];
-            end
-            #2;
-        end
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-    end
-    $fclose(fp_w);
-    //8x8
-    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_8x8.txt", "w");
-    for (wr_i = 0; wr_i < 4; wr_i = wr_i + 1) begin
-        for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
-            for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-                wr_data[wr_k + wr_j * 16] = o_data[wr_k];
-            end
-            #2;
-        end
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ]);
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-    end
-    $fclose(fp_w);
-    //4x4
-    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_4x4.txt", "w"); 
-    for (wr_i = 0; wr_i < 1; wr_i = wr_i + 1) begin
-        for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
-            for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-                wr_data[wr_k + wr_j * 16] = o_data[wr_k];
-            end
-            #2;
-        end
-        $fwrite(fp_w, "%6d %6d %6d %6d\n", wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ]);
-        $fwrite(fp_w, "%6d %6d %6d %6d\n", wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ]);
-        $fwrite(fp_w, "%6d %6d %6d %6d\n", wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11]);
-        $fwrite(fp_w, "%6d %6d %6d %6d\n", wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-    end
-    $fclose(fp_w);
-    //32x64
-    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_32x64.txt", "w");
-    for (wr_i = 0; wr_i < 64; wr_i = wr_i + 1) begin
-        for (wr_j = 0; wr_j < 2; wr_j = wr_j + 1) begin
-            for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-                wr_data[wr_k + wr_j * 16] = o_data[wr_k];
-            end
-            #2;
-        end
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15], 
-            wr_data[16], wr_data[17], wr_data[18], wr_data[19], wr_data[20], wr_data[21], wr_data[22], wr_data[23], wr_data[24], wr_data[25], wr_data[26], wr_data[27], wr_data[28], wr_data[29], wr_data[30], wr_data[31]);
-    end
-    $fclose(fp_w);
-    //64x32
-    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_64x32.txt", "w");
-    for (wr_i = 0; wr_i < 32; wr_i = wr_i + 1) begin
-        for (wr_j = 0; wr_j < 4; wr_j = wr_j + 1) begin
-            for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-                wr_data[wr_k + wr_j * 16] = o_data[wr_k];
-            end
-            #2;
-        end
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15], 
-            wr_data[16], wr_data[17], wr_data[18], wr_data[19], wr_data[20], wr_data[21], wr_data[22], wr_data[23], wr_data[24], wr_data[25], wr_data[26], wr_data[27], wr_data[28], wr_data[29], wr_data[30], wr_data[31], 
-            wr_data[32], wr_data[33], wr_data[34], wr_data[35], wr_data[36], wr_data[37], wr_data[38], wr_data[39], wr_data[40], wr_data[41], wr_data[42], wr_data[43], wr_data[44], wr_data[45], wr_data[46], wr_data[47], 
-            wr_data[48], wr_data[49], wr_data[50], wr_data[51], wr_data[52], wr_data[53], wr_data[54], wr_data[55], wr_data[56], wr_data[57], wr_data[58], wr_data[59], wr_data[60], wr_data[61], wr_data[62], wr_data[63]);
-    end
-    $fclose(fp_w);
-    //4x16
-    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_4x16.txt", "w"); 
-    for (wr_i = 0; wr_i < 4; wr_i = wr_i + 1) begin
-        for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
-            for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-                wr_data[wr_k + wr_j * 16] = o_data[wr_k];
-            end
-            #2;
-        end
-        $fwrite(fp_w, "%6d %6d %6d %6d\n", wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ]);
-        $fwrite(fp_w, "%6d %6d %6d %6d\n", wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ]);
-        $fwrite(fp_w, "%6d %6d %6d %6d\n", wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11]);
-        $fwrite(fp_w, "%6d %6d %6d %6d\n", wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-    end
-    $fclose(fp_w);
-    //64x8
-    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_64x8.txt", "w");
-    for (wr_i = 0; wr_i < 8; wr_i = wr_i + 1) begin
-        for (wr_j = 0; wr_j < 4; wr_j = wr_j + 1) begin
-            for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-                wr_data[wr_k + wr_j * 16] = o_data[wr_k];
-            end
-            #2;
-        end
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15], 
-            wr_data[16], wr_data[17], wr_data[18], wr_data[19], wr_data[20], wr_data[21], wr_data[22], wr_data[23], wr_data[24], wr_data[25], wr_data[26], wr_data[27], wr_data[28], wr_data[29], wr_data[30], wr_data[31], 
-            wr_data[32], wr_data[33], wr_data[34], wr_data[35], wr_data[36], wr_data[37], wr_data[38], wr_data[39], wr_data[40], wr_data[41], wr_data[42], wr_data[43], wr_data[44], wr_data[45], wr_data[46], wr_data[47], 
-            wr_data[48], wr_data[49], wr_data[50], wr_data[51], wr_data[52], wr_data[53], wr_data[54], wr_data[55], wr_data[56], wr_data[57], wr_data[58], wr_data[59], wr_data[60], wr_data[61], wr_data[62], wr_data[63]);
-    end
-    $fclose(fp_w);
-    //8x4
-    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_8x4.txt", "w");
-    for (wr_i = 0; wr_i < 2; wr_i = wr_i + 1) begin
-        for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
-            for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-                wr_data[wr_k + wr_j * 16] = o_data[wr_k];
-            end
-            #2;
-        end
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ]);
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-    end
-    $fclose(fp_w);
-    //32x8
-    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_32x8.txt", "w");
-    for (wr_i = 0; wr_i < 8; wr_i = wr_i + 1) begin
-        for (wr_j = 0; wr_j < 2; wr_j = wr_j + 1) begin
-            for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-                wr_data[wr_k + wr_j * 16] = o_data[wr_k];
-            end
-            #2;
-        end
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15], 
-            wr_data[16], wr_data[17], wr_data[18], wr_data[19], wr_data[20], wr_data[21], wr_data[22], wr_data[23], wr_data[24], wr_data[25], wr_data[26], wr_data[27], wr_data[28], wr_data[29], wr_data[30], wr_data[31]);
-    end
-    $fclose(fp_w);
-    //8x32
-    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_8x32.txt", "w");
-    for (wr_i = 0; wr_i < 16; wr_i = wr_i + 1) begin
-        for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
-            for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-                wr_data[wr_k + wr_j * 16] = o_data[wr_k];
-            end
-            #2;
-        end
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ]);
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-    end
-    $fclose(fp_w);
-    //32x4
-    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_32x4.txt", "w");
-    for (wr_i = 0; wr_i < 4; wr_i = wr_i + 1) begin
-        for (wr_j = 0; wr_j < 2; wr_j = wr_j + 1) begin
-            for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-                wr_data[wr_k + wr_j * 16] = o_data[wr_k];
-            end
-            #2;
-        end
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15], 
-            wr_data[16], wr_data[17], wr_data[18], wr_data[19], wr_data[20], wr_data[21], wr_data[22], wr_data[23], wr_data[24], wr_data[25], wr_data[26], wr_data[27], wr_data[28], wr_data[29], wr_data[30], wr_data[31]);
-    end
-    $fclose(fp_w);
-    //16x32
-    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_16x32.txt", "w");
-    for (wr_i = 0; wr_i < 32; wr_i = wr_i + 1) begin
-        for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
-            for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-                wr_data[wr_k + wr_j * 16] = o_data[wr_k];
-            end
-            #2;
-        end
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-    end
-    $fclose(fp_w);
-    //16x64
-    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_16x64.txt", "w");
-    for (wr_i = 0; wr_i < 64; wr_i = wr_i + 1) begin
-        for (wr_j = 0; wr_j < 1; wr_j = wr_j + 1) begin
-            for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-                wr_data[wr_k + wr_j * 16] = o_data[wr_k];
-            end
-            #2;
-        end
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-    end
-    $fclose(fp_w);
-    #256;
-    //64x64
-    fp_w = $fopen("../../../../../result/src/fpga_coeff/dct2/fpga_coeff_dct2_64x64.txt", "w");
-    for (wr_i = 0; wr_i < 32; wr_i = wr_i + 1) begin
-        for (wr_j = 0; wr_j < 4; wr_j = wr_j + 1) begin
-            for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-                wr_data[wr_k + wr_j * 16] = o_data[wr_k];
-            end
-            #2;
-        end
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15], 
-            wr_data[16], wr_data[17], wr_data[18], wr_data[19], wr_data[20], wr_data[21], wr_data[22], wr_data[23], wr_data[24], wr_data[25], wr_data[26], wr_data[27], wr_data[28], wr_data[29], wr_data[30], wr_data[31], 
-            wr_data[32], wr_data[33], wr_data[34], wr_data[35], wr_data[36], wr_data[37], wr_data[38], wr_data[39], wr_data[40], wr_data[41], wr_data[42], wr_data[43], wr_data[44], wr_data[45], wr_data[46], wr_data[47], 
-            wr_data[48], wr_data[49], wr_data[50], wr_data[51], wr_data[52], wr_data[53], wr_data[54], wr_data[55], wr_data[56], wr_data[57], wr_data[58], wr_data[59], wr_data[60], wr_data[61], wr_data[62], wr_data[63]);
-    end
-    for (wr_i = 0; wr_i < 32; wr_i = wr_i + 1) begin
-        $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d\n", 
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-    end
-    $fclose(fp_w);
-*/
-end
+
+
+
+
+
+
 
 endmodule
