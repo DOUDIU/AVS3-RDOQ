@@ -292,34 +292,7 @@ initial begin
     for (rd_i = 0; rd_i < 32; rd_i = rd_i + 1) begin
         i_data[rd_i] = 0;
     end
-    //64x64
-    i_valid = 1;
-    cu_width_log2   =   SIZE64          ;
-    cu_height_log2  =   SIZE64          ;
-    qp              =   7 'd63          ;
-    ch_type         =   Y_C             ;
-    is_intra        =   1 'd1           ;
-    lambda          =   64'd10131659    ;
-    bit_depth       =   4 'd10          ;
-    fp_r = $fopen("../../../../../result/origin_data/src/origin_data_64x64.txt", "r");
-    for (rd_i = 0; rd_i < 128; rd_i = rd_i + 1) begin
-        $fscanf(fp_r, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
-            rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ], rd_data[4 ], rd_data[5 ], rd_data[6 ], rd_data[7 ], 
-            rd_data[8 ], rd_data[9 ], rd_data[10], rd_data[11], rd_data[12], rd_data[13], rd_data[14], rd_data[15], 
-            rd_data[16], rd_data[17], rd_data[18], rd_data[19], rd_data[20], rd_data[21], rd_data[22], rd_data[23], 
-            rd_data[24], rd_data[25], rd_data[26], rd_data[27], rd_data[28], rd_data[29], rd_data[30], rd_data[31]);
-            
-        for (rd_k = 0; rd_k < 32; rd_k = rd_k + 1) begin
-            i_data[rd_k] = rd_data[rd_k];
-        end
-        #2;
-        i_valid = 0; 
-    end
-    $fclose(fp_r);
 
-    for (rd_i = 0; rd_i < 32; rd_i = rd_i + 1) begin
-        i_data[rd_i] = 0;
-    end
 
 end
 

@@ -127,8 +127,10 @@ wire            [31: 0]     pre_quant_rdoq_est_run      [0 : 23][0 :  1]        
     //output parameter      
 
     //output data       
-        .o_valid                (o_valid                    ),
-        .o_data                 (dst_coef                   )
+        .o_valid                (   ),
+        .tmp_dst_coef           (   ),
+        .coded_cost             (   ),
+        .uncoded_cost           (   )
     );
 
 
