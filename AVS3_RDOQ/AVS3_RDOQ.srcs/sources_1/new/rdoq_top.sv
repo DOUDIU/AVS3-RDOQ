@@ -21,6 +21,8 @@ module rdoq_top(
     input           [31: 0]     rdoq_est_last   [0 :  1][0 :  5][0 : 11][0 : 1] ,//pending
     input           [31: 0]     rdoq_est_level  [0 : 23][0 :  1]                ,//pending
     input           [31: 0]     rdoq_est_run    [0 : 23][0 :  1]                ,//pending
+    input           [9 : 0]     left_pos        [0 : 31]                        ,//the max value is 1023
+    input           [9 : 0]     bottom_pos      [0 : 31]                        ,//the max value is 1023
 
 //input block data
     input                       i_valid                                         ,
@@ -57,6 +59,16 @@ wire            [31: 0]     pre_quant_rdoq_est_cbf      [0 :  2][0 :  1]        
 wire            [31: 0]     pre_quant_rdoq_est_last     [0 :  1][0 :  5][0 : 11][0 : 1] ;//pending
 wire            [31: 0]     pre_quant_rdoq_est_level    [0 : 23][0 :  1]                ;//pending
 wire            [31: 0]     pre_quant_rdoq_est_run      [0 : 23][0 :  1]                ;//pending
+wire            [9 : 0]     pre_quant_left_pos          [0 : 31]                        ;
+wire            [9 : 0]     pre_quant_bottom_pos        [0 : 31]                        ;
+
+
+wire                        ocd_valid                                                   ;
+wire            [15 : 0]    ocd_level_opt               [0 : 31]                        ;
+wire                        ocd_tmp_dst_coef_sign       [0 : 31]                        ;//the sign of tmp_dst_coef 1- 0+
+wire    signed  [63 : 0]    ocd_d64_cost_last_zero      [0 : 31]                        ;
+wire    signed  [63 : 0]    ocd_d64_cost_last_one       [0 : 31]                        ; 
+wire    signed  [63 : 0]    ocd_base_cost_buffer_tmp    [0 : 31]                        ;
 
     pre_quant u_pre_quant(
         //system clk and rest
@@ -78,6 +90,8 @@ wire            [31: 0]     pre_quant_rdoq_est_run      [0 : 23][0 :  1]        
         .i_rdoq_est_last        (rdoq_est_last              ),
         .i_rdoq_est_level       (rdoq_est_level             ),
         .i_rdoq_est_run         (rdoq_est_run               ),
+        .i_left_pos             (left_pos                   ),
+        .i_bottom_pos           (bottom_pos                 ),
 
         //input data    
         .i_valid                (i_valid                    ),
@@ -95,6 +109,9 @@ wire            [31: 0]     pre_quant_rdoq_est_run      [0 : 23][0 :  1]        
         .o_rdoq_est_last        (pre_quant_rdoq_est_last    ),
         .o_rdoq_est_level       (pre_quant_rdoq_est_level   ),
         .o_rdoq_est_run         (pre_quant_rdoq_est_run     ),
+        .o_left_pos             (pre_quant_left_pos         ),
+        .o_bottom_pos           (pre_quant_bottom_pos       ),
+
         //output data
         .o_valid                (pre_quant_valid            ),
         .o_level_double         (pre_quant_level_double     ),
@@ -119,6 +136,10 @@ wire            [31: 0]     pre_quant_rdoq_est_run      [0 : 23][0 :  1]        
         .i_rdoq_est_last        (pre_quant_rdoq_est_last    ),
         .i_rdoq_est_level       (pre_quant_rdoq_est_level   ),
         .i_rdoq_est_run         (pre_quant_rdoq_est_run     ),
+        .i_left_pos             (pre_quant_left_pos         ),
+        .i_bottom_pos           (pre_quant_bottom_pos       ),
+
+
     //input data                
         .i_valid                (pre_quant_valid            ),
         .i_level_double         (pre_quant_level_double     ),
@@ -127,13 +148,35 @@ wire            [31: 0]     pre_quant_rdoq_est_run      [0 : 23][0 :  1]        
     //output parameter      
 
     //output data       
-        .o_valid                (   ),
-        .tmp_dst_coef           (   ),
-        .coded_cost             (   ),
-        .uncoded_cost           (   )
+        .o_valid                (ocd_valid                  ),
+        .o_level_opt            (ocd_level_opt              ),
+        .o_tmp_dst_coef_sign    (ocd_tmp_dst_coef_sign      ),
+        .o_d64_cost_last_zero   (ocd_d64_cost_last_zero     ),
+        .o_d64_cost_last_one    (ocd_d64_cost_last_one      ),
+        .o_base_cost_buffer_tmp (ocd_base_cost_buffer_tmp   )
     );
 
 
 
 
 endmodule
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -11,7 +11,7 @@ localparam  SIZE4       = 3'd2  ,
             SIZE32      = 3'd5  ,
             SIZE64      = 3'd6  ;
 
-integer fp_r, fp_w, rd_i, rd_j, rd_k, rd_l, wr_i, wr_j, wr_k;
+integer fp_r, fp_w, rd_i, rd_j, rd_k, rd_l, wr_i, wr_j, wr_k, rd_z, rd_y;
 
 //system input
     reg                                 clk                 ;
@@ -34,6 +34,8 @@ integer fp_r, fp_w, rd_i, rd_j, rd_k, rd_l, wr_i, wr_j, wr_k;
 //input data
     reg                         i_valid;
     reg     signed  [15: 0]     i_data          [0 : 31]        ;
+    reg             [9 : 0]     left_pos        [0 : 31]        ;
+    reg             [9 : 0]     bottom_pos      [0 : 31]        ;
     reg             [31: 0]     rdoq_est_cbf    [0 :  2][0 :  1];//pending
     reg             [31: 0]     rdoq_est_last   [0 :  1][0 :  5][0 : 11][0 : 1];//pending
     reg             [31: 0]     rdoq_est_level  [0 : 23][0 :  1];//pending
@@ -76,6 +78,8 @@ rdoq_top u_rdoq_top(
     .rdoq_est_last          (rdoq_est_last  ),
     .rdoq_est_level         (rdoq_est_level ),
     .rdoq_est_run           (rdoq_est_run   ),
+    .left_pos               (left_pos       ),
+    .bottom_pos             (bottom_pos     ),
 
     //input block data
     .i_valid                (i_valid        ),
@@ -111,9 +115,18 @@ initial begin
     q_bits          =   5 'd0;
     i_valid         =       0;
     
+
+        
     for (rd_i = 0; rd_i < 32; rd_i = rd_i + 1) begin
         i_data[rd_i] = 0;
     end
+    for (rd_z = 0; rd_z < 32; rd_z = rd_z + 1) begin
+        left_pos[rd_z] = 0;
+    end
+    for (rd_y = 0; rd_y < 32; rd_y = rd_y + 1) begin
+        bottom_pos[rd_y] = 0;
+    end
+
     for (rd_i = 0; rd_i < 3; rd_i = rd_i + 1) begin
         for(rd_j = 0; rd_j < 2; rd_j = rd_j + 1)begin
             rdoq_est_cbf[rd_i][rd_j] = 0;
@@ -196,6 +209,27 @@ initial begin
         end
     $fclose(fp_r);
 
+    fp_r = $fopen("../../../../../result/origin_data/left_pos/left_pos.txt", "r");
+        $fscanf(fp_r, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
+            rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ], rd_data[4 ], rd_data[5 ], rd_data[6 ], rd_data[7 ],
+            rd_data[8 ], rd_data[9 ], rd_data[10], rd_data[11], rd_data[12], rd_data[13], rd_data[14], rd_data[15]);
+
+        for (rd_k = 0; rd_k < 16; rd_k = rd_k + 1) begin
+            left_pos[rd_k] = rd_data[rd_k];
+        end
+    $fclose(fp_r);
+
+    fp_r = $fopen("../../../../../result/origin_data/bottom_pos/bottom_pos.txt", "r");
+        $fscanf(fp_r, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
+            rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ], rd_data[4 ], rd_data[5 ], rd_data[6 ], rd_data[7 ],
+            rd_data[8 ], rd_data[9 ], rd_data[10], rd_data[11], rd_data[12], rd_data[13], rd_data[14], rd_data[15]);
+
+        for (rd_k = 0; rd_k < 16; rd_k = rd_k + 1) begin
+            bottom_pos[rd_k] = rd_data[rd_k];
+        end
+    $fclose(fp_r);
+
+
     fp_r = $fopen("../../../../../result/origin_data/src/origin_data_16x16.txt", "r");
     for (rd_i = 0; rd_i < 16; rd_i = rd_i + 1) begin
         $fscanf(fp_r, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
@@ -209,6 +243,8 @@ initial begin
             i_valid = 0;
     end
     $fclose(fp_r);
+
+
 
 
     for (rd_i = 0; rd_i < 32; rd_i = rd_i + 1) begin

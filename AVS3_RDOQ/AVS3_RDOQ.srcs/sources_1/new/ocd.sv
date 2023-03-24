@@ -1,33 +1,39 @@
 module ocd(      
 //system clk and rest       
-    input                       clk                                                 ,
-    input                       rst_n                                               ,
+    input                       clk                                                     ,
+    input                       rst_n                                                   ,
 
-//input parameter                               
-    input           [2 : 0]     i_width_log2                                        ,//the value is between 2 and 6
-    input           [2 : 0]     i_height_log2                                       ,//the value is between 2 and 6
-    input           [2 : 0]     i_ch_type                                           ,//Y_C 0; U_C 1; V_C 2;
-    input           [4 : 0]     i_q_bits                                            ,
-    input   signed  [29: 0]     i_err_scale                                         ,
-    input   signed  [63: 0]     i_lambda                                            ,
+//input parameter                                   
+    input           [2 : 0]     i_width_log2                                            ,//the value is between 2 and 6
+    input           [2 : 0]     i_height_log2                                           ,//the value is between 2 and 6
+    input           [2 : 0]     i_ch_type                                               ,//Y_C 0; U_C 1; V_C 2;
+    input           [4 : 0]     i_q_bits                                                ,
+    input   signed  [29: 0]     i_err_scale                                             ,
+    input   signed  [63: 0]     i_lambda                                                ,
     
-    input           [31: 0]     i_rdoq_est_cbf      [0 :  2][0 :  1]                ,//pending
-    input           [31: 0]     i_rdoq_est_last     [0 :  1][0 :  5][0 : 11][0 : 1] ,//pending
-    input           [31: 0]     i_rdoq_est_level    [0 : 23][0 :  1]                ,//pending
-    input           [31: 0]     i_rdoq_est_run      [0 : 23][0 :  1]                ,//pending
+    input           [31: 0]     i_rdoq_est_cbf          [0 :  2][0 :  1]                ,//pending
+    input           [31: 0]     i_rdoq_est_last         [0 :  1][0 :  5][0 : 11][0 : 1] ,//pending
+    input           [31: 0]     i_rdoq_est_level        [0 : 23][0 :  1]                ,//pending
+    input           [31: 0]     i_rdoq_est_run          [0 : 23][0 :  1]                ,//pending
+    input           [9 : 0]     i_left_pos              [0 : 31]                        ,//the max value is 1023
+    input           [9 : 0]     i_bottom_pos            [0 : 31]                        ,//the max value is 1023
 
-//input data                    
-    input                       i_valid                                             ,
-    input   signed  [63: 0]     i_level_double      [0 : 31]                        ,
-    input   signed  [15: 0]     i_data              [0 : 31]                        ,
+//input data                        
+    input                       i_valid                                                 ,
+    input   signed  [63: 0]     i_level_double          [0 : 31]                        ,
+    input   signed  [15: 0]     i_data                  [0 : 31]                        ,
                         
 //output parameter                      
+    output          [2 : 0]     o_width_log2                                            ,//the value is between 2 and 6
+    output          [2 : 0]     o_height_log2                                           ,//the value is between 2 and 6
                         
 //output data                       
-    output                      o_valid                                             ,
-    output  signed  [15 : 0]    tmp_dst_coef        [0 : 31]                        ,
-    output  signed  [63 : 0]    coded_cost          [0 : 31]                        ,
-    output  signed  [63 : 0]    uncoded_cost        [0 : 31]                        
+    output                      o_valid                                                 ,
+    output          [15 : 0]    o_level_opt             [0 : 31]                        ,
+    output                      o_tmp_dst_coef_sign     [0 : 31]                        ,//the sign of tmp_dst_coef 1- 0+
+    output  signed  [63 : 0]    o_d64_cost_last_zero    [0 : 31]                        ,
+    output  signed  [63 : 0]    o_d64_cost_last_one     [0 : 31]                        , 
+    output  signed  [63 : 0]    o_base_cost_buffer_tmp  [0 : 31]                        
 );
 
 //parameter definition
@@ -51,7 +57,11 @@ reg     signed  [63 : 0]    i_level_double_d2   [0 : 31]                        
 reg             [15 : 0]    temp_coef_abs_d2    [0 : 31]                                ;
 reg             [15 : 0]    temp_coef_abs_d3    [0 : 31]                                ;
 reg                         temp_coef_sign_d2   [0 : 31]                                ;
-reg                         temp_coef_sign_d3   [0 : 31]                                ;
+
+
+reg             [9 : 0]     left_pos            [0 : 31]                                ;//the max value is 1023
+reg             [9 : 0]     i_bottom_pos_d1     [0 : 31]                                ;//the max value is 1023
+reg             [9 : 0]     left_pos_tem        [0 : 31]                                ;//shift operation after the calculation of scan position
 
 reg             [31 : 0]    pre_level           [0 : 31]                                ;
 reg             [15 : 0]    run                 [0 : 31]                                ;
@@ -90,13 +100,15 @@ wire                        temp_coef_sign_d1   [0 : 31]                        
 wire            [4  : 0]    ctx_run             [0 : 31]                                ;
 wire            [4  : 0]    ctx_level           [0 : 31]                                ;
 wire    signed  [63 : 0]    i64Delta            [0 :  1][0 : 31]                        ;
+wire            [9 : 0]     scan_pos            [0 : 31]                                ;//zigzag scan position of each row
 
+
+wire    signed  [63 : 0]    uncoded_cost        [0 : 31]                                ;
+wire    signed  [63 : 0]    coded_cost          [0 : 31]                                ;
 
 //assignment
 
 
-
-//tem
 
 
 
@@ -236,17 +248,20 @@ wire    signed  [63 : 0]    i64Delta            [0 :  1][0 : 31]                
         end
     end
 
+    //delay one cycle
     always@(posedge clk or negedge rst_n)begin
        if(!rst_n) begin
             for(i = 0; i < 32; i = i + 1)begin
-                i_data_d1[i]            <=  0;
-                i_level_double_d1[i]    <=  0;
+                i_data_d1[i]            <=      0;
+                i_level_double_d1[i]    <=      0;
+                i_bottom_pos_d1[i]      <=      0;
             end
        end
        else begin
             for(i = 0; i < 32; i = i + 1)begin
-                i_data_d1[i]            <=  i_data[i];
-                i_level_double_d1[i]    <=  i_level_double[i];
+                i_data_d1[i]            <=      i_data[i]           ;
+                i_level_double_d1[i]    <=      i_level_double[i]   ;
+                i_bottom_pos_d1[i]      <=      i_bottom_pos[i]     ;
             end
        end
     end
@@ -271,7 +286,212 @@ wire    signed  [63 : 0]    i64Delta            [0 :  1][0 : 31]                
     endgenerate
 
 
-//pipe 2
+
+//pipe 2 pre_level 需与 level_opt 同时算出
+
+//scan position shift
+    generate
+        for(o = 1; o < 32; o = o + 1)begin
+            assign  left_pos_tem[o - 1]    =    left_pos[o];
+        end
+        assign  left_pos_tem[31]     =  left_pos[31];
+    endgenerate
+
+/*
+    always@(*)begin
+        for(i = 2; i < 32; i = i + 2)begin
+            left_pos_tem[i - 1]     <=  left_pos[i];
+        end
+        
+        for(i = 1 ; i < 3; i = i + 2)begin
+            left_pos_tem[i - 1]     <=  left_pos[i];
+        end
+        for(i = 5 ; i < 7; i = i + 2)begin
+            left_pos_tem[i - 1]     <=  left_pos[i];
+        end
+        for(i = 9 ; i < 15; i = i + 2)begin
+            left_pos_tem[i - 1]     <=  left_pos[i];
+        end            
+        for(i = 17; i < 31; i = i + 2)begin
+            left_pos_tem[i - 1]     <=  left_pos[i];
+        end
+        case(i_height_log2_d[0])
+            3'd2    : begin    
+                    for(i = 1 ; i < 4; i = i + 1)begin
+                        left_pos_tem[i - 1]     <=  left_pos[i];
+                    end
+                    left_pos_tem[3 ]    <=  left_pos_tem[3 ];
+                    for(i = 4 ; i < 32; i = i + 1)begin
+                        left_pos_tem[i]         <=  0;
+                    end
+                end
+            3'd3    : begin
+                    for(i = 1 ; i < 8; i = i + 1)begin
+                        left_pos_tem[i - 1]     <=  left_pos[i];
+                    end
+                    left_pos_tem[7 ]    <=  left_pos_tem[7 ];
+                    for(i = 8 ; i < 32; i = i + 1)begin
+                        left_pos_tem[i]         <=  0;
+                    end
+                end
+            3'd4    : begin
+                    for(i = 1 ; i < 16; i = i + 1)begin
+                        left_pos_tem[i - 1]     <=  left_pos[i];
+                    end
+                    left_pos_tem[15]    <=  left_pos_tem[15];
+                    for(i = 16 ; i < 32; i = i + 1)begin
+                        left_pos_tem[i]         <=  0;
+                    end
+                end
+            3'd5    : begin
+                    for(i = 1 ; i < 32; i = i + 1)begin
+                        left_pos_tem[i - 1]     <=  left_pos[i];
+                    end
+                    left_pos_tem[31]    <=  left_pos_tem[31];
+                end
+            default : begin
+                    for(i = 0 ; i < 32; i = i + 1)begin
+                        left_pos_tem[i]         <=  0;
+                    end
+                end
+        endcase 
+    end
+*/
+
+    always@(posedge clk or negedge rst_n)begin
+        if(!rst_n) begin
+            for(i = 0; i < 32; i = i + 1)begin
+                left_pos[i]        <=      0;
+            end
+        end
+        if(column_cnt[0]) begin
+            for(i = 0; i < 32; i = i + 2)begin
+                left_pos[i]     <=  left_pos_tem[i] - 1;
+            end
+            
+            for(i = 1; i < 3; i = i + 2)begin
+                left_pos[i]     <=  left_pos_tem[i] + 1;
+            end
+            for(i = 5; i < 7; i = i + 2)begin
+                left_pos[i]     <=  left_pos_tem[i] + 1;
+            end
+            for(i = 9; i < 15; i = i + 2)begin
+                left_pos[i]     <=  left_pos_tem[i] + 1;
+            end            
+            for(i = 17; i < 31; i = i + 2)begin
+                left_pos[i]     <=  left_pos_tem[i] + 1;
+            end
+            //determine the value of the last row 
+            case(i_height_log2_d[0])
+                3'd2    : begin    
+                        left_pos[3 ]    <=  i_bottom_pos_d1[column_cnt];
+                        left_pos[7 ]    <=  0;//pending, not used
+                        left_pos[15]    <=  0;//pending, not used
+                        left_pos[31]    <=  0;//pending, not used
+                    end
+                3'd3    : begin
+                        left_pos[3 ]    <=  left_pos_tem[3 ] + 1;
+                        left_pos[7 ]    <=  i_bottom_pos_d1[column_cnt];
+                        left_pos[15]    <=  0;//pending, not used
+                        left_pos[31]    <=  0;//pending, not used
+
+                    end
+                3'd4    : begin
+                        left_pos[3 ]    <=  left_pos_tem[3 ] + 1;
+                        left_pos[7 ]    <=  left_pos_tem[7 ] + 1;
+                        left_pos[15]    <=  i_bottom_pos_d1[column_cnt];
+                        left_pos[31]    <=  0;//pending, not used
+
+                    end
+                3'd5    : begin
+                        left_pos[3 ]    <=  left_pos_tem[3 ] + 1;
+                        left_pos[7 ]    <=  left_pos_tem[7 ] + 1;
+                        left_pos[15]    <=  left_pos_tem[15] + 1;
+                        left_pos[31]    <=  i_bottom_pos_d1[column_cnt];
+
+                    end
+                default : begin
+                        left_pos[3 ]    <=  0;
+                        left_pos[7 ]    <=  0;
+                        left_pos[15]    <=  0;
+                        left_pos[31]    <=  0;
+                    end
+            endcase
+        end
+        else begin
+            if(column_cnt == 0)begin
+                for(i = 0; i < 32; i = i + 1)begin
+                    left_pos[i]     <=  i_left_pos[i];
+                end
+            end
+            else begin
+                for(i = 0; i < 32; i = i + 2)begin
+                    left_pos[i]     <=  left_pos_tem[i] + 1;
+                end
+
+                for(i = 1; i < 3; i = i + 2)begin
+                    left_pos[i]     <=  left_pos_tem[i] - 1;
+                end
+                for(i = 5; i < 7; i = i + 2)begin
+                    left_pos[i]     <=  left_pos_tem[i] - 1;
+                end
+                for(i = 9; i < 15; i = i + 2)begin
+                    left_pos[i]     <=  left_pos_tem[i] - 1;
+                end            
+                for(i = 17; i < 31; i = i + 2)begin
+                    left_pos[i]     <=  left_pos_tem[i] - 1;
+                end
+                //determine the value of the last row 
+                case(i_height_log2_d[0])
+                    3'd2    : begin    
+                            left_pos[3 ]    <=  i_bottom_pos_d1[column_cnt];
+                            left_pos[7 ]    <=  0;//pending, not used
+                            left_pos[15]    <=  0;//pending, not used
+                            left_pos[31]    <=  0;//pending, not used
+                        end
+                    3'd3    : begin
+                            left_pos[3 ]    <=  left_pos_tem[3 ] - 1;
+                            left_pos[7 ]    <=  i_bottom_pos_d1[column_cnt];
+                            left_pos[15]    <=  0;//pending, not used
+                            left_pos[31]    <=  0;//pending, not used
+
+                        end
+                    3'd4    : begin
+                            left_pos[3 ]    <=  left_pos_tem[3 ] - 1;
+                            left_pos[7 ]    <=  left_pos_tem[7 ] - 1;
+                            left_pos[15]    <=  i_bottom_pos_d1[column_cnt];
+                            left_pos[31]    <=  0;//pending, not used
+
+                        end
+                    3'd5    : begin
+                            left_pos[3 ]    <=  left_pos_tem[3 ] - 1;
+                            left_pos[7 ]    <=  left_pos_tem[7 ] - 1;
+                            left_pos[15]    <=  left_pos_tem[15] - 1;
+                            left_pos[31]    <=  i_bottom_pos_d1[column_cnt];
+
+                        end
+                    default : begin
+                            left_pos[3 ]    <=  0;
+                            left_pos[7 ]    <=  0;
+                            left_pos[15]    <=  0;
+                            left_pos[31]    <=  0;
+                        end
+                endcase
+
+            end
+        end
+    end
+
+    //assign scan position with zigzag order
+    generate
+        for(o = 0; o < 32; o = o + 1)begin
+            assign  scan_pos[o]     =   left_pos[o];
+        end
+    endgenerate 
+
+
+
+
 
     always@(posedge clk or negedge rst_n)begin
        if(!rst_n) begin
@@ -700,34 +920,36 @@ wire    signed  [63 : 0]    i64Delta            [0 :  1][0 : 31]                
         end
     end
 
-
-
-
-    always@(posedge clk or negedge rst_n)begin
-        if(!rst_n)begin
-            for(i = 0; i < 32; i = i + 1)begin
-                level_opt[i]    <=  0;
-            end
-        end
-    end
-
-
     generate 
         for(o = 0; o < 32; o = o + 1)begin
-            assign      coded_cost[o]   =   coded_cost_tem[o] < (dCurrCost[0][o] < dCurrCost[1][o] ? dCurrCost[0][o] : dCurrCost[1][o]) ? coded_cost_tem[o] : (dCurrCost[0][o] < dCurrCost[1][o] ? dCurrCost[0][o] : dCurrCost[1][o]) ;
-            assign      level_opt[o]    =   coded_cost_tem[o] < (dCurrCost[0][o] < dCurrCost[1][o] ? dCurrCost[0][o] : dCurrCost[1][o]) ? 0 : (dCurrCost[0][o] < dCurrCost[1][o] ? temp_coef_abs_d2[o] : (temp_coef_abs_d2[o] - 1 ) ) ;
+            assign      uncoded_cost[o]     =   uncoded_cost_tem[o] ;
+            assign      coded_cost[o]       =   coded_cost_tem[o] < (dCurrCost[0][o] < dCurrCost[1][o] ? dCurrCost[0][o] : dCurrCost[1][o]) ? coded_cost_tem[o] : (dCurrCost[0][o] < dCurrCost[1][o] ? dCurrCost[0][o] : dCurrCost[1][o]) ;
+            assign      level_opt[o]        =   coded_cost_tem[o] < (dCurrCost[0][o] < dCurrCost[1][o] ? dCurrCost[0][o] : dCurrCost[1][o]) ? 0 : (dCurrCost[0][o] < dCurrCost[1][o] ? temp_coef_abs_d2[o] : (temp_coef_abs_d2[o] - 1 ) ) ;
         end
     endgenerate
 
-
-
-    generate
+//output assignment
+    generate 
         for(o = 0; o < 32; o = o + 1)begin
-            assign  tmp_dst_coef[o]     =   temp_coef_sign_d2[o] ? -level_opt[o] : level_opt[o];
-            assign  uncoded_cost[o]     =   uncoded_cost_tem[o];
-            assign  o_valid             =   i_valid_d[1]    ;
+            assign      o_d64_cost_last_zero[o]     =   i_lambda_d[1] * i_rdoq_est_last_d[1] [i_ch_type_d[1] != Y_C] [(pre_level[o] - 1) > 5 ? 5 : (pre_level[o] - 1)] [funclog2(scan_pos[o] + 1)][0];
+            assign      o_d64_cost_last_one[o]      =   i_lambda_d[1] * i_rdoq_est_last_d[1] [i_ch_type_d[1] != Y_C] [(pre_level[o] - 1) > 5 ? 5 : (pre_level[o] - 1)] [funclog2(scan_pos[o] + 1)][1];
+            assign      o_base_cost_buffer_tmp[o]   =   level_opt[o] ? coded_cost[o] - uncoded_cost[o] + o_d64_cost_last_zero[o] : coded_cost[o] - uncoded_cost[o];
+            assign      o_tmp_dst_coef_sign[o]      =   temp_coef_sign_d2[o];
+            assign      o_level_opt[o]              =   level_opt[o];
         end
+            assign      o_valid                     =   i_valid_d[1];
+            assign      o_width_log2                =   i_width_log2_d[1];
+            assign      o_height_log2               =   i_height_log2_d[1];
     endgenerate
+
+
+
+
+
+
+
+
+
 
 
 
@@ -746,9 +968,6 @@ wire    signed  [63 : 0]    i64Delta            [0 :  1][0 : 31]                
 
 
 //test bench
-
-
-
 
 integer fp_pre_level_w1;
 integer wr_pre_level_j,wr_pre_level_k;
@@ -843,23 +1062,23 @@ initial begin
     $fclose(fp_uncoded_cost_w);
 end
 
-integer fp_dst_coef_w1;
-integer wr_dst_coef_j,wr_dst_coef_k;
-reg     signed  [63: 0]     dst_coef_data        [0 : 63]    ;
-initial begin 
-    #14;
-    fp_dst_coef_w1 = $fopen("../../../../../result/ocd/fpga_dst_coef/fpga_dst_coef_16x16.txt", "w");
-    for (wr_dst_coef_j = 0; wr_dst_coef_j < 16; wr_dst_coef_j = wr_dst_coef_j + 1) begin
-        for (wr_dst_coef_k = 0; wr_dst_coef_k < 16; wr_dst_coef_k = wr_dst_coef_k + 1) begin
-            dst_coef_data[wr_dst_coef_k] = tmp_dst_coef[wr_dst_coef_k];
-        end
-        #2;
-        $fwrite(fp_dst_coef_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-            dst_coef_data[0 ], dst_coef_data[1 ], dst_coef_data[2 ], dst_coef_data[3 ], dst_coef_data[4 ], dst_coef_data[5 ], dst_coef_data[6 ], dst_coef_data[7 ], 
-            dst_coef_data[8 ], dst_coef_data[9 ], dst_coef_data[10], dst_coef_data[11], dst_coef_data[12], dst_coef_data[13], dst_coef_data[14], dst_coef_data[15]);
-    end
-    $fclose(fp_dst_coef_w1);
-end
+// integer fp_dst_coef_w1;
+// integer wr_dst_coef_j,wr_dst_coef_k;
+// reg     signed  [63: 0]     dst_coef_data        [0 : 63]    ;
+// initial begin 
+//     #14;
+//     fp_dst_coef_w1 = $fopen("../../../../../result/ocd/fpga_dst_coef/fpga_dst_coef_16x16.txt", "w");
+//     for (wr_dst_coef_j = 0; wr_dst_coef_j < 16; wr_dst_coef_j = wr_dst_coef_j + 1) begin
+//         for (wr_dst_coef_k = 0; wr_dst_coef_k < 16; wr_dst_coef_k = wr_dst_coef_k + 1) begin
+//             dst_coef_data[wr_dst_coef_k] = o_tmp_dst_coef[wr_dst_coef_k];
+//         end
+//         #2;
+//         $fwrite(fp_dst_coef_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+//             dst_coef_data[0 ], dst_coef_data[1 ], dst_coef_data[2 ], dst_coef_data[3 ], dst_coef_data[4 ], dst_coef_data[5 ], dst_coef_data[6 ], dst_coef_data[7 ], 
+//             dst_coef_data[8 ], dst_coef_data[9 ], dst_coef_data[10], dst_coef_data[11], dst_coef_data[12], dst_coef_data[13], dst_coef_data[14], dst_coef_data[15]);
+//     end
+//     $fclose(fp_dst_coef_w1);
+// end
 
 
 

@@ -18,6 +18,8 @@ module pre_quant(
     input           [31: 0]     i_rdoq_est_last     [0 :  1][0 :  5][0 : 11][0 : 1] ,//pending
     input           [31: 0]     i_rdoq_est_level    [0 : 23][0 :  1]                ,//pending
     input           [31: 0]     i_rdoq_est_run      [0 : 23][0 :  1]                ,//pending
+    input           [9 : 0]     i_left_pos          [0 : 31]                        ,//the max value is 1023
+    input           [9 : 0]     i_bottom_pos        [0 : 31]                        ,//the max value is 1023
 
 //input data                    
     input                       i_valid                                             ,
@@ -35,6 +37,8 @@ module pre_quant(
     output          [31: 0]     o_rdoq_est_last     [0 :  1][0 :  5][0 : 11][0 : 1] ,//pending
     output          [31: 0]     o_rdoq_est_level    [0 : 23][0 :  1]                ,//pending
     output          [31: 0]     o_rdoq_est_run      [0 : 23][0 :  1]                ,//pending
+    output          [9 : 0]     o_left_pos          [0 : 31]                        ,//the max value is 1023
+    output          [9 : 0]     o_bottom_pos        [0 : 31]                        ,//the max value is 1023
 
 //output data       
     output                      o_valid                                             ,
@@ -78,6 +82,8 @@ reg             [31: 0]     i_rdoq_est_cbf_d    [0 :  3][0 :  2][0 :  1]        
 reg             [31: 0]     i_rdoq_est_last_d   [0 :  3][0 :  1][0 :  5][0 : 11][0 : 1] ;//pending
 reg             [31: 0]     i_rdoq_est_level_d  [0 :  3][0 : 23][0 :  1]                ;//pending
 reg             [31: 0]     i_rdoq_est_run_d    [0 :  3][0 : 23][0 :  1]                ;//pending
+reg             [9 : 0]     i_left_pos_d        [0 :  3][0 : 31]                        ;
+reg             [9 : 0]     i_bottom_pos_d      [0 :  3][0 : 31]                        ;
 
 reg                         o_en                                                        ;
 
@@ -106,6 +112,8 @@ assign  o_ch_type       =   i_ch_type_d[3];
 assign  o_q_bits        =   i_q_bits_d[3];
 assign  o_err_scale     =   i_err_scale_d[3];
 assign  o_lambda        =   i_lambda_d[3];
+assign  o_left_pos      =   i_left_pos_d[3]; 
+assign  o_bottom_pos    =   i_bottom_pos_d[3];
 
 generate
     for (o = 0; o < 3; o = o + 1) begin
@@ -154,6 +162,12 @@ endgenerate
                 i_err_scale_d[i]        <=  0;
                 i_lambda_d[i]           <=  0;
             end
+            for(i = 0; i < 4; i = i + 1)begin
+                for(j = 0; j < 32; j = j + 1)begin
+                    i_left_pos_d[i][j]      <=  0;
+                    i_bottom_pos_d[i][j]    <=  0;
+                end
+            end
             for(m = 0; m < 4; m = m + 1)begin
                 for (i = 0; i < 3; i = i + 1) begin
                     for(j = 0; j < 2; j = j + 1)begin
@@ -189,7 +203,11 @@ endgenerate
             i_q_bits_d[0]           <=      i_q_bits;
             i_err_scale_d[0]        <=      i_err_scale;
             i_lambda_d[0]           <=      i_lambda;
-
+            
+            for(j = 0; j < 32; j = j + 1)begin
+                i_left_pos_d[0][j]      <=  i_left_pos[j]       ;
+                i_bottom_pos_d[0][j]    <=  i_bottom_pos[j]     ;
+            end
             for (i = 0; i < 3; i = i + 1) begin
                 for(j = 0; j < 2; j = j + 1)begin
                     i_rdoq_est_cbf_d[0][i][j] <= i_rdoq_est_cbf[i][j];
@@ -232,6 +250,14 @@ endgenerate
                 i_lambda_d[i]           <=  i_lambda_d[i-1];
             end
             
+            
+            for(i = 1; i < 4; i = i + 1)begin
+                for(j = 0; j < 32; j = j + 1)begin
+                    i_left_pos_d[i][j]      <=  i_left_pos_d[i-1][j]  ;
+                    i_bottom_pos_d[i][j]    <=  i_bottom_pos_d[i-1][j];
+                end
+            end
+
             for(m = 1; m < 4; m = m + 1)begin
                 for (i = 0; i < 3; i = i + 1) begin
                     for(j = 0; j < 2; j = j + 1)begin
