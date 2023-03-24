@@ -55,6 +55,7 @@ reg                         temp_coef_sign_d3   [0 : 31]                        
 
 reg             [31 : 0]    pre_level           [0 : 31]                                ;
 reg             [15 : 0]    run                 [0 : 31]                                ;
+reg             [15 : 0]    run_tem             [0 : 31]                                ;
 
 reg     signed  [63 : 0]    uncoded_cost_tem    [0 : 31]                                ;
 reg     signed  [63 : 0]    uncoded_cost_tem_d1 [0 : 31]                                ;
@@ -269,6 +270,7 @@ wire    signed  [63 : 0]    i64Delta            [0 :  1][0 : 31]                
         end
     endgenerate
 
+
 //pipe 2
 
     always@(posedge clk or negedge rst_n)begin
@@ -393,6 +395,15 @@ wire    signed  [63 : 0]    i64Delta            [0 :  1][0 : 31]                
         end
     end
 
+//run_tem shift
+    generate
+        for(o = 1; o < 32; o = o + 1)begin
+            assign  run_tem[o - 1]    =       run[o];
+        end
+        assign  run_tem[31]     =       run[31];
+    endgenerate
+
+
 //calculate run
     always@(posedge clk or negedge rst_n)begin
         if(!rst_n)begin
@@ -403,21 +414,21 @@ wire    signed  [63 : 0]    i64Delta            [0 :  1][0 : 31]                
         else if(column_cnt[0])begin
         //even rows
             for(i = 0; i < 32; i = i + 2)begin
-                run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+                run[i]          <=  level_opt[i + 1]    ?   0 : run_tem[i] + 1;
             end
 
         //odd rows
             for(i = 1; i < 3; i = i + 2)begin
-                run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+                run[i]          <=  level_opt[i + 1]    ?   0 : run_tem[i] + 1;
             end
             for(i = 5; i < 7; i = i + 2)begin
-                run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+                run[i]          <=  level_opt[i + 1]    ?   0 : run_tem[i] + 1;
             end
             for(i = 9; i < 15; i = i + 2)begin
-                run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+                run[i]          <=  level_opt[i + 1]    ?   0 : run_tem[i] + 1;
             end            
             for(i = 17; i < 31; i = i + 2)begin
-                run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+                run[i]          <=  level_opt[i + 1]    ?   0 : run_tem[i] + 1;
             end
             //determine the value of the last row 
             case(i_height_log2_d[0])
@@ -428,23 +439,23 @@ wire    signed  [63 : 0]    i64Delta            [0 :  1][0 : 31]                
                         run[31]             <=  0   ;//pending, not used
                     end
                 3'd3    : begin
-                        run[3]              <=  level_opt[3  + 1]   ?   0 : run[i] + 1;
+                        run[3]              <=  level_opt[3  + 1]   ?   0 : run_tem[3] + 1;
                         run[7]              <=  i_data_d1[7     ]   ?   0 : 1;
                         run[15]             <=  0   ;//pending, not used
                         run[31]             <=  0   ;//pending, not used
 
                     end
                 3'd4    : begin
-                        run[3]              <=  level_opt[3  + 1]   ?   0 : run[i] + 1;
-                        run[7]              <=  level_opt[7  + 1]   ?   0 : run[i] + 1;
+                        run[3]              <=  level_opt[3  + 1]   ?   0 : run_tem[3] + 1;
+                        run[7]              <=  level_opt[7  + 1]   ?   0 : run_tem[7] + 1;
                         run[15]             <=  i_data_d1[15    ]   ?   0 : 1;
                         run[31]             <=  0   ;//pending, not used
 
                     end
                 3'd5    : begin
-                        run[3]              <=  level_opt[3  + 1]   ?   0 : run[i] + 1;
-                        run[7]              <=  level_opt[7  + 1]   ?   0 : run[i] + 1;
-                        run[15]             <=  level_opt[15 + 1]   ?   0 : run[i] + 1;
+                        run[3]              <=  level_opt[3  + 1]   ?   0 : run_tem[3] + 1;
+                        run[7]              <=  level_opt[7  + 1]   ?   0 : run_tem[7] + 1;
+                        run[15]             <=  level_opt[15 + 1]   ?   0 : run_tem[15] + 1;
                         run[31]             <=  i_data_d1[31    ]   ?   0 : 1;
 
                     end
@@ -466,16 +477,16 @@ wire    signed  [63 : 0]    i64Delta            [0 :  1][0 : 31]                
             end
             else begin
                 for(i = 1; i < 3; i = i + 2)begin
-                    run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+                    run[i]          <=  level_opt[i + 1]    ?   0 : run_tem[i] + 1;
                 end
                 for(i = 5; i < 7; i = i + 2)begin
-                    run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+                    run[i]          <=  level_opt[i + 1]    ?   0 : run_tem[i] + 1;
                 end
                 for(i = 9; i < 15; i = i + 2)begin
-                    run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+                    run[i]          <=  level_opt[i + 1]    ?   0 : run_tem[i] + 1;
                 end            
                 for(i = 17; i < 31; i = i + 2)begin
-                    run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+                    run[i]          <=  level_opt[i + 1]    ?   0 : run_tem[i] + 1;
                 end
                 //determine the value of the last row 
                 case(i_height_log2_d[0])
@@ -486,23 +497,23 @@ wire    signed  [63 : 0]    i64Delta            [0 :  1][0 : 31]                
                             run[31]             <=  0   ;//pending, not used
                         end
                     3'd3    : begin
-                            run[3]              <=  level_opt[3  + 1]   ?   0 : run[i] + 1;
+                            run[3]              <=  level_opt[3  + 1]   ?   0 : run_tem[3] + 1;
                             run[7]              <=  i_data_d1[7     ]   ?   0 : 1;
                             run[15]             <=  0   ;//pending, not used
                             run[31]             <=  0   ;//pending, not used
 
                         end
                     3'd4    : begin
-                            run[3]              <=  level_opt[3  + 1]   ?   0 : run[i] + 1;
-                            run[7]              <=  level_opt[7  + 1]   ?   0 : run[i] + 1;
+                            run[3]              <=  level_opt[3  + 1]   ?   0 : run_tem[3] + 1;
+                            run[7]              <=  level_opt[7  + 1]   ?   0 : run_tem[7] + 1;
                             run[15]             <=  i_data_d1[15    ]   ?   0 : 1;
                             run[31]             <=  0   ;//pending, not used
 
                         end
                     3'd5    : begin
-                            run[3]              <=  level_opt[3  + 1]   ?   0 : run[i] + 1;
-                            run[7]              <=  level_opt[7  + 1]   ?   0 : run[i] + 1;
-                            run[15]             <=  level_opt[15 + 1]   ?   0 : run[i] + 1;
+                            run[3]              <=  level_opt[3  + 1]   ?   0 : run_tem[3] + 1;
+                            run[7]              <=  level_opt[7  + 1]   ?   0 : run_tem[7] + 1;
+                            run[15]             <=  level_opt[15 + 1]   ?   0 : run_tem[15] + 1;
                             run[31]             <=  i_data_d1[31    ]   ?   0 : 1;
 
                         end
@@ -523,7 +534,7 @@ wire    signed  [63 : 0]    i64Delta            [0 :  1][0 : 31]                
             end
             else begin
                 for(i = 0; i < 32; i = i + 2)begin
-                    run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+                    run[i]          <=  level_opt[i + 1]    ?   0 : run_tem[i] + 1;
                 end
             end
 
@@ -735,119 +746,122 @@ wire    signed  [63 : 0]    i64Delta            [0 :  1][0 : 31]                
 
 
 //test bench
-integer fp_r, fp_w1, fp_w2, rd_i, rd_j, rd_k, rd_l, wr_i, wr_j, wr_k;
-reg     signed  [63: 0]     wr_data [0 : 63]    ;
-
-// initial begin 
-//     #14;
-//     fp_w2 = $fopen("../../../../../result/ocd/fpga_level_opt/fpga_level_opt_16x16.txt", "w");
-//     for (wr_j = 0; wr_j < 16; wr_j = wr_j + 1) begin
-//         for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-//             wr_data[wr_k] = level_opt[wr_k];
-//         end
-//         #2;
-//         $fwrite(fp_w2, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-//             wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], 
-//             wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-//     end
-//     $fclose(fp_w2);
-// end
 
 
 
-// initial begin 
-//     #16;
-//     fp_w2 = $fopen("../../../../../result/ocd/fpga_coded_cost/fpga_coded_cost_tem_16x16.txt", "w");
-//     for (wr_j = 0; wr_j < 16; wr_j = wr_j + 1) begin
-//         for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-//             wr_data[wr_k] = coded_cost_tem[wr_k];
-//         end
-//         #2;
-//         $fwrite(fp_w2, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n",  
-//             wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], 
-//             wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-//     end
-//     $fclose(fp_w2);
-// end
 
-// initial begin 
-//     #16;
-//     fp_w2 = $fopen("../../../../../result/ocd/fpga_dst_coef/fpga_dst_coef_16x16.txt", "w");
-//     for (wr_j = 0; wr_j < 16; wr_j = wr_j + 1) begin
-//         for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-//             wr_data[wr_k] = tmp_dst_coef[wr_k];
-//         end
-//         #2;
-//         $fwrite(fp_w2, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-//             wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], 
-//             wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-//     end
-//     $fclose(fp_w2);
-// end
-
-
-// initial begin 
-//     #14;
-//     fp_w2 = $fopen("../../../../../result/ocd/fpga_coded_cost/fpga_coded_cost_16x16.txt", "w");
-//     for (wr_j = 0; wr_j < 16; wr_j = wr_j + 1) begin
-//         for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-//             wr_data[wr_k] = coded_cost[wr_k];
-//         end
-//         #2;
-//         $fwrite(fp_w2, "%16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d \n", 
-//             wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], 
-//             wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-//     end
-//     $fclose(fp_w2);
-// end
-
-
-// initial begin 
-//     #14;
-//     fp_w2 = $fopen("../../../../../result/ocd/fpga_uncoded_cost/fpga_uncoded_cost_16x16.txt", "w");
-//     for (wr_j = 0; wr_j < 16; wr_j = wr_j + 1) begin
-//         for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-//             wr_data[wr_k] = uncoded_cost[wr_k];
-//         end
-//         #2;
-//         $fwrite(fp_w2, "%16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d \n", 
-//             wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], 
-//             wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-//     end
-//     $fclose(fp_w2);
-// end
-
-
-// initial begin 
-//     #14;
-//     //16x16
-//     fp_w1 = $fopen("../../../../../result/ocd/fpga_prevel/fpga_prevel_16x16.txt", "w");
-//     for (wr_j = 0; wr_j < 16; wr_j = wr_j + 1) begin
-//         for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-//             wr_data[wr_k] = pre_level[wr_k];
-//         end
-//         #2;
-//         $fwrite(fp_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-//             wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], 
-//             wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-//     end
-//     $fclose(fp_w1);
-// end
-
+integer fp_pre_level_w1;
+integer wr_pre_level_j,wr_pre_level_k;
+reg     signed  [63: 0]     pre_level_data        [0 : 63]    ;
 initial begin 
     #14;
-    fp_w2 = $fopen("../../../../../result/ocd/fpga_run/fpga_run_16x16.txt", "w");
-    for (wr_j = 0; wr_j < 16; wr_j = wr_j + 1) begin
-        for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-            wr_data[wr_k] = run[wr_k];
+    fp_pre_level_w1 = $fopen("../../../../../result/ocd/fpga_prevel/fpga_prevel_16x16.txt", "w");
+    for (wr_pre_level_j = 0; wr_pre_level_j < 16; wr_pre_level_j = wr_pre_level_j + 1) begin
+        for (wr_pre_level_k = 0; wr_pre_level_k < 16; wr_pre_level_k = wr_pre_level_k + 1) begin
+            pre_level_data[wr_pre_level_k] = pre_level[wr_pre_level_k];
         end
         #2;
-        $fwrite(fp_w2, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], 
-            wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
+        $fwrite(fp_pre_level_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            pre_level_data[0 ], pre_level_data[1 ], pre_level_data[2 ], pre_level_data[3 ], pre_level_data[4 ], pre_level_data[5 ], pre_level_data[6 ], pre_level_data[7 ], 
+            pre_level_data[8 ], pre_level_data[9 ], pre_level_data[10], pre_level_data[11], pre_level_data[12], pre_level_data[13], pre_level_data[14], pre_level_data[15]);
     end
-    $fclose(fp_w2);
+    $fclose(fp_pre_level_w1);
 end
+
+integer fp_run_w1;
+integer wr_run_j,wr_run_k;
+reg     signed  [63: 0]     run_data        [0 : 63]    ;
+initial begin 
+    #14;
+    fp_run_w1 = $fopen("../../../../../result/ocd/fpga_run/fpga_run_16x16.txt", "w");
+    for (wr_run_j = 0; wr_run_j < 16; wr_run_j = wr_run_j + 1) begin
+        for (wr_run_k = 0; wr_run_k < 16; wr_run_k = wr_run_k + 1) begin
+            run_data[wr_run_k] = run[wr_run_k];
+        end
+        #2;
+        $fwrite(fp_run_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            run_data[0 ], run_data[1 ], run_data[2 ], run_data[3 ], run_data[4 ], run_data[5 ], run_data[6 ], run_data[7 ], 
+            run_data[8 ], run_data[9 ], run_data[10], run_data[11], run_data[12], run_data[13], run_data[14], run_data[15]);
+    end
+    $fclose(fp_run_w1);
+end
+
+integer fp_opt_w2;
+integer wr_opt_j,wr_opt_k;
+reg     signed  [63: 0]     level_opt_data  [0 : 63]    ;
+initial begin 
+    #14;
+    fp_opt_w2 = $fopen("../../../../../result/ocd/fpga_level_opt/fpga_level_opt_16x16.txt", "w");
+    for (wr_opt_j = 0; wr_opt_j < 16; wr_opt_j = wr_opt_j + 1) begin
+        for (wr_opt_k = 0; wr_opt_k < 16; wr_opt_k = wr_opt_k + 1) begin
+            level_opt_data[wr_opt_k] = level_opt[wr_opt_k];
+        end
+        #2;
+        $fwrite(fp_opt_w2, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            level_opt_data[0 ], level_opt_data[1 ], level_opt_data[2 ], level_opt_data[3 ], level_opt_data[4 ], level_opt_data[5 ], level_opt_data[6 ], level_opt_data[7 ], 
+            level_opt_data[8 ], level_opt_data[9 ], level_opt_data[10], level_opt_data[11], level_opt_data[12], level_opt_data[13], level_opt_data[14], level_opt_data[15]);
+    end
+    $fclose(fp_opt_w2);
+end
+
+
+integer fp_coded_cost_w;
+integer wr_coded_cost_j,wr_coded_cost_k;
+reg     signed  [63: 0]     coded_cost_data  [0 : 63]    ;
+initial begin 
+    #14;
+    fp_coded_cost_w = $fopen("../../../../../result/ocd/fpga_coded_cost/fpga_coded_cost_16x16.txt", "w");
+    for (wr_coded_cost_j = 0; wr_coded_cost_j < 16; wr_coded_cost_j = wr_coded_cost_j + 1) begin
+        for (wr_coded_cost_k = 0; wr_coded_cost_k < 16; wr_coded_cost_k = wr_coded_cost_k + 1) begin
+            coded_cost_data[wr_coded_cost_k] = coded_cost[wr_coded_cost_k];
+        end
+        #2;
+        $fwrite(fp_coded_cost_w, "%16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d \n",  
+            coded_cost_data[0 ], coded_cost_data[1 ], coded_cost_data[2 ], coded_cost_data[3 ], coded_cost_data[4 ], coded_cost_data[5 ], coded_cost_data[6 ], coded_cost_data[7 ], 
+            coded_cost_data[8 ], coded_cost_data[9 ], coded_cost_data[10], coded_cost_data[11], coded_cost_data[12], coded_cost_data[13], coded_cost_data[14], coded_cost_data[15]);
+    end
+    $fclose(fp_coded_cost_w);
+end
+
+
+
+integer fp_uncoded_cost_w;
+integer wr_uncoded_cost_j,wr_uncoded_cost_k;
+reg     signed  [63: 0]     uncoded_cost_data  [0 : 63]    ;
+initial begin 
+    #14;
+    fp_uncoded_cost_w = $fopen("../../../../../result/ocd/fpga_uncoded_cost/fpga_uncoded_cost_16x16.txt", "w");
+    for (wr_uncoded_cost_j = 0; wr_uncoded_cost_j < 16; wr_uncoded_cost_j = wr_uncoded_cost_j + 1) begin
+        for (wr_uncoded_cost_k = 0; wr_uncoded_cost_k < 16; wr_uncoded_cost_k = wr_uncoded_cost_k + 1) begin
+            uncoded_cost_data[wr_uncoded_cost_k] = uncoded_cost[wr_uncoded_cost_k];
+        end
+        #2;
+        $fwrite(fp_uncoded_cost_w, "%16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d %16d \n",  
+            uncoded_cost_data[0 ], uncoded_cost_data[1 ], uncoded_cost_data[2 ], uncoded_cost_data[3 ], uncoded_cost_data[4 ], uncoded_cost_data[5 ], uncoded_cost_data[6 ], uncoded_cost_data[7 ], 
+            uncoded_cost_data[8 ], uncoded_cost_data[9 ], uncoded_cost_data[10], uncoded_cost_data[11], uncoded_cost_data[12], uncoded_cost_data[13], uncoded_cost_data[14], uncoded_cost_data[15]);
+    end
+    $fclose(fp_uncoded_cost_w);
+end
+
+integer fp_dst_coef_w1;
+integer wr_dst_coef_j,wr_dst_coef_k;
+reg     signed  [63: 0]     dst_coef_data        [0 : 63]    ;
+initial begin 
+    #14;
+    fp_dst_coef_w1 = $fopen("../../../../../result/ocd/fpga_dst_coef/fpga_dst_coef_16x16.txt", "w");
+    for (wr_dst_coef_j = 0; wr_dst_coef_j < 16; wr_dst_coef_j = wr_dst_coef_j + 1) begin
+        for (wr_dst_coef_k = 0; wr_dst_coef_k < 16; wr_dst_coef_k = wr_dst_coef_k + 1) begin
+            dst_coef_data[wr_dst_coef_k] = tmp_dst_coef[wr_dst_coef_k];
+        end
+        #2;
+        $fwrite(fp_dst_coef_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            dst_coef_data[0 ], dst_coef_data[1 ], dst_coef_data[2 ], dst_coef_data[3 ], dst_coef_data[4 ], dst_coef_data[5 ], dst_coef_data[6 ], dst_coef_data[7 ], 
+            dst_coef_data[8 ], dst_coef_data[9 ], dst_coef_data[10], dst_coef_data[11], dst_coef_data[12], dst_coef_data[13], dst_coef_data[14], dst_coef_data[15]);
+    end
+    $fclose(fp_dst_coef_w1);
+end
+
+
 
 
 
