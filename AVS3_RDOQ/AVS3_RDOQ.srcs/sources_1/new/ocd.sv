@@ -313,115 +313,226 @@ wire    signed  [63 : 0]    i64Delta            [0 :  1][0 : 31]                
     end
 
 
-    //calculate pre_level and run
+//calculate pre_level
     always@(posedge clk or negedge rst_n)begin
         if(!rst_n)begin
             for(i = 0; i < 32; i = i + 1)begin
                 pre_level[i]    <=  0;
-                run[i]          <=  0;
             end
         end
         else if(column_cnt[0])begin
             for(i = 0; i < 32; i = i + 2)begin
                 pre_level[i]    <=  i_data_d1[i]        ?   temp_coef_abs_d1[i] : 1;
-                run[i]          <=  i_data_d1[i]        ?   0 : 1;
             end
 
             for(i = 1; i < 3; i = i + 2)begin
                 pre_level[i]    <=  level_opt[i + 1]    ?   level_opt[i + 1] : 1;
-                run[i]          <=  level_opt[i + 1]    ?   0 : 1;
             end
             for(i = 5; i < 7; i = i + 2)begin
                 pre_level[i]    <=  level_opt[i + 1]    ?   level_opt[i + 1] : 1;
-                run[i]          <=  level_opt[i + 1]    ?   0 : 1;
             end
             for(i = 9; i < 15; i = i + 2)begin
                 pre_level[i]    <=  level_opt[i + 1]    ?   level_opt[i + 1] : 1;
-                run[i]          <=  level_opt[i + 1]    ?   0 : 1;
             end            
             for(i = 17; i < 31; i = i + 2)begin
                 pre_level[i]    <=  level_opt[i + 1]    ?   level_opt[i + 1] : 1;
-                run[i]          <=  level_opt[i + 1]    ?   0 : 1;
             end
             
             //determine the value of the last row 
             case(i_height_log2_d[0])
                 3'd2    : begin    
                         pre_level[3]        <=  i_data_d1[3     ]   ?   temp_coef_abs_d1[3] : 1;
-                        run[3]              <=  i_data_d1[3     ]   ?   0 : 1;
                         pre_level[7]        <=  0   ;//pending, not used
-                        run[7]              <=  0   ;//pending, not used
                         pre_level[15]       <=  0   ;//pending, not used
-                        run[15]             <=  0   ;//pending, not used
                         pre_level[31]       <=  0   ;//pending, not used
-                        run[31]             <=  0   ;//pending, not used
                     end
                 3'd3    : begin
                         pre_level[3]        <=  level_opt[3  + 1]   ?   level_opt[3 + 1] : 1;
-                        run[3]              <=  level_opt[3  + 1]   ?   0 : 1;
                         pre_level[7]        <=  i_data_d1[7     ]   ?   temp_coef_abs_d1[7] : 1;
-                        run[7]              <=  i_data_d1[7     ]   ?   0 : 1;
                         pre_level[15]       <=  0   ;//pending, not used
-                        run[15]             <=  0   ;//pending, not used
                         pre_level[31]       <=  0   ;//pending, not used
-                        run[31]             <=  0   ;//pending, not used
 
                     end
                 3'd4    : begin
                         pre_level[3]        <=  level_opt[3  + 1]   ?   level_opt[3 + 1] : 1;
-                        run[3]              <=  level_opt[3  + 1]   ?   0 : 1;
                         pre_level[7]        <=  level_opt[7  + 1]   ?   level_opt[7 + 1] : 1;
-                        run[7]              <=  level_opt[7  + 1]   ?   0 : 1;
                         pre_level[15]       <=  i_data_d1[15    ]   ?   temp_coef_abs_d1[15] : 1;
-                        run[15]             <=  i_data_d1[15    ]   ?   0 : 1;
                         pre_level[31]       <=  0   ;//pending, not used
-                        run[31]             <=  0   ;//pending, not used
 
                     end
                 3'd5    : begin
                         pre_level[3]        <=  level_opt[3  + 1]   ?   level_opt[3  + 1] : 1;
-                        run[3]              <=  level_opt[3  + 1]   ?   0 : 1;
                         pre_level[7]        <=  level_opt[7  + 1]   ?   level_opt[7  + 1] : 1;
-                        run[7]              <=  level_opt[7  + 1]   ?   0 : 1;
                         pre_level[15]       <=  level_opt[15 + 1]   ?   level_opt[15 + 1] : 1;
-                        run[15]             <=  level_opt[15 + 1]   ?   0 : 1;
                         pre_level[31]       <=  i_data_d1[31    ]   ?   temp_coef_abs_d1[31] : 1;
-                        run[31]             <=  i_data_d1[31    ]   ?   0 : 1;
 
                     end
                 default : begin
                         pre_level[3]        <=  0 ;
-                        run[3]              <=  0 ;
                         pre_level[7]        <=  0 ;
-                        run[7]              <=  0 ;
                         pre_level[15]       <=  0 ;
-                        run[15]             <=  0 ;
                         pre_level[31]       <=  0 ;
-                        run[31]             <=  0 ;
                     end
             endcase
         end
         else begin
             for(i = 1; i < 32; i = i + 2)begin
                 pre_level[i]    <=  i_data_d1[i]        ?   temp_coef_abs_d1[i] : 1;
-                run[i]          <=  i_data_d1[i]        ?   0 : 1;
             end
 
             if(column_cnt == 0)begin
                 for(i = 0; i < 32; i = i + 2)begin
                     pre_level[i]    <=  i_data_d1[i]        ?   temp_coef_abs_d1[i] : 1;
-                    run[i]          <=  i_data_d1[i]        ?   0 : 1;
                 end
             end
             else begin
                 for(i = 0; i < 32; i = i + 2)begin
                     pre_level[i]    <=  level_opt[i + 1]    ?   level_opt[i + 1] : 1;
-                    run[i]          <=  level_opt[i + 1]    ?   0 : 1;
                 end
             end
         end
     end
 
+//calculate run
+    always@(posedge clk or negedge rst_n)begin
+        if(!rst_n)begin
+            for(i = 0; i < 32; i = i + 1)begin
+                run[i]          <=  0;
+            end
+        end
+        else if(column_cnt[0])begin
+        //even rows
+            for(i = 0; i < 32; i = i + 2)begin
+                run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+            end
+
+        //odd rows
+            for(i = 1; i < 3; i = i + 2)begin
+                run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+            end
+            for(i = 5; i < 7; i = i + 2)begin
+                run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+            end
+            for(i = 9; i < 15; i = i + 2)begin
+                run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+            end            
+            for(i = 17; i < 31; i = i + 2)begin
+                run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+            end
+            //determine the value of the last row 
+            case(i_height_log2_d[0])
+                3'd2    : begin    
+                        run[3]              <=  i_data_d1[3     ]   ?   0 : 1;
+                        run[7]              <=  0   ;//pending, not used
+                        run[15]             <=  0   ;//pending, not used
+                        run[31]             <=  0   ;//pending, not used
+                    end
+                3'd3    : begin
+                        run[3]              <=  level_opt[3  + 1]   ?   0 : run[i] + 1;
+                        run[7]              <=  i_data_d1[7     ]   ?   0 : 1;
+                        run[15]             <=  0   ;//pending, not used
+                        run[31]             <=  0   ;//pending, not used
+
+                    end
+                3'd4    : begin
+                        run[3]              <=  level_opt[3  + 1]   ?   0 : run[i] + 1;
+                        run[7]              <=  level_opt[7  + 1]   ?   0 : run[i] + 1;
+                        run[15]             <=  i_data_d1[15    ]   ?   0 : 1;
+                        run[31]             <=  0   ;//pending, not used
+
+                    end
+                3'd5    : begin
+                        run[3]              <=  level_opt[3  + 1]   ?   0 : run[i] + 1;
+                        run[7]              <=  level_opt[7  + 1]   ?   0 : run[i] + 1;
+                        run[15]             <=  level_opt[15 + 1]   ?   0 : run[i] + 1;
+                        run[31]             <=  i_data_d1[31    ]   ?   0 : 1;
+
+                    end
+                default : begin
+                        run[3]              <=  0 ;
+                        run[7]              <=  0 ;
+                        run[15]             <=  0 ;
+                        run[31]             <=  0 ;
+                    end
+            endcase
+
+        end
+        else begin
+        //odd rows
+            if(column_cnt == 0)begin
+                for(i = 1; i < 32; i = i + 2)begin
+                    run[i]          <=  i_data_d1[i]        ?   0 : 1;
+                end
+            end
+            else begin
+                for(i = 1; i < 3; i = i + 2)begin
+                    run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+                end
+                for(i = 5; i < 7; i = i + 2)begin
+                    run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+                end
+                for(i = 9; i < 15; i = i + 2)begin
+                    run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+                end            
+                for(i = 17; i < 31; i = i + 2)begin
+                    run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+                end
+                //determine the value of the last row 
+                case(i_height_log2_d[0])
+                    3'd2    : begin    
+                            run[3]              <=  i_data_d1[3     ]   ?   0 : 1;
+                            run[7]              <=  0   ;//pending, not used
+                            run[15]             <=  0   ;//pending, not used
+                            run[31]             <=  0   ;//pending, not used
+                        end
+                    3'd3    : begin
+                            run[3]              <=  level_opt[3  + 1]   ?   0 : run[i] + 1;
+                            run[7]              <=  i_data_d1[7     ]   ?   0 : 1;
+                            run[15]             <=  0   ;//pending, not used
+                            run[31]             <=  0   ;//pending, not used
+
+                        end
+                    3'd4    : begin
+                            run[3]              <=  level_opt[3  + 1]   ?   0 : run[i] + 1;
+                            run[7]              <=  level_opt[7  + 1]   ?   0 : run[i] + 1;
+                            run[15]             <=  i_data_d1[15    ]   ?   0 : 1;
+                            run[31]             <=  0   ;//pending, not used
+
+                        end
+                    3'd5    : begin
+                            run[3]              <=  level_opt[3  + 1]   ?   0 : run[i] + 1;
+                            run[7]              <=  level_opt[7  + 1]   ?   0 : run[i] + 1;
+                            run[15]             <=  level_opt[15 + 1]   ?   0 : run[i] + 1;
+                            run[31]             <=  i_data_d1[31    ]   ?   0 : 1;
+
+                        end
+                    default : begin
+                            run[3]              <=  0 ;
+                            run[7]              <=  0 ;
+                            run[15]             <=  0 ;
+                            run[31]             <=  0 ;
+                        end
+                endcase
+            end
+
+        //even rows
+            if(column_cnt == 0)begin
+                for(i = 0; i < 32; i = i + 2)begin
+                    run[i]          <=  i_data_d1[i]        ?   0 : 1;
+                end
+            end
+            else begin
+                for(i = 0; i < 32; i = i + 2)begin
+                    run[i]          <=  level_opt[i + 1]    ?   0 : run[i] + 1;
+                end
+            end
+
+        end
+    end
+
+
+
+//calculate ctx_run and ctx_level
     generate
         for(o = 0; o < 32; o = o + 1)begin
             assign  ctx_run[o]          =   ( ( (pre_level[o] - 1) > 5 ? 5 : (pre_level[o] - 1) ) << 1 ) + ( i_ch_type_d[1] == Y_C ? 0 : 12 );
@@ -723,20 +834,20 @@ reg     signed  [63: 0]     wr_data [0 : 63]    ;
 //     $fclose(fp_w1);
 // end
 
-// initial begin 
-//     #14;
-//     fp_w2 = $fopen("../../../../../result/ocd/fpga_run/fpga_run_16x16.txt", "w");
-//     for (wr_j = 0; wr_j < 16; wr_j = wr_j + 1) begin
-//         for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-//             wr_data[wr_k] = run[wr_k];
-//         end
-//         #2;
-//         $fwrite(fp_w2, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-//             wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], 
-//             wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-//     end
-//     $fclose(fp_w2);
-// end
+initial begin 
+    #14;
+    fp_w2 = $fopen("../../../../../result/ocd/fpga_run/fpga_run_16x16.txt", "w");
+    for (wr_j = 0; wr_j < 16; wr_j = wr_j + 1) begin
+        for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
+            wr_data[wr_k] = run[wr_k];
+        end
+        #2;
+        $fwrite(fp_w2, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], 
+            wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
+    end
+    $fclose(fp_w2);
+end
 
 
 
