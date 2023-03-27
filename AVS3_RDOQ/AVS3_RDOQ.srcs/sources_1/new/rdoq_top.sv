@@ -64,6 +64,8 @@ wire            [9 : 0]     pre_quant_bottom_pos        [0 : 31]                
 
 
 wire                        ocd_valid                                                   ;
+wire            [2  : 0]    ocd_width_log2                                              ;
+wire            [2  : 0]    ocd_height_log2                                             ;
 wire            [15 : 0]    ocd_level_opt               [0 : 31]                        ;
 wire                        ocd_tmp_dst_coef_sign       [0 : 31]                        ;//the sign of tmp_dst_coef 1- 0+
 wire    signed  [63 : 0]    ocd_d64_cost_last_zero      [0 : 31]                        ;
@@ -146,6 +148,8 @@ wire    signed  [63 : 0]    ocd_base_cost_buffer_tmp    [0 : 31]                
         .i_data                 (pre_quant_coef             ),
 
     //output parameter      
+        .o_width_log2           (ocd_width_log2             ),
+        .o_height_log2          (ocd_height_log2            ),
 
     //output data       
         .o_valid                (ocd_valid                  ),
@@ -156,7 +160,28 @@ wire    signed  [63 : 0]    ocd_base_cost_buffer_tmp    [0 : 31]                
         .o_base_cost_buffer_tmp (ocd_base_cost_buffer_tmp   )
     );
 
+lnpd u_lnpd(      
+//system clk and rest       
+    .clk                        (clk                        ),
+    .rst_n                      (rst_n                      ),
 
+//input parameter           
+    .i_width_log2               (ocd_width_log2             ),//the value is between 2 and 6
+    .i_height_log2              (ocd_height_log2            ),//the value is between 2 and 6            
+
+//input data 
+    .i_valid                    (ocd_valid                  ),
+    .i_level_opt                (ocd_level_opt              ),
+    .i_tmp_dst_coef_sign        (ocd_tmp_dst_coef_sign      ),//the sign of tmp_dst_coef 1- 0+
+    .i_d64_cost_last_zero       (ocd_d64_cost_last_zero     ),
+    .i_d64_cost_last_one        (ocd_d64_cost_last_one      ),
+    .i_base_cost_buffer_tmp     (ocd_base_cost_buffer_tmp   ),
+
+//output parameter                      
+
+//output data                 
+    .o_valid                    ()                                         
+);
 
 
 endmodule

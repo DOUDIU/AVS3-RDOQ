@@ -36,7 +36,7 @@ module ocd(
     output  signed  [63 : 0]    o_base_cost_buffer_tmp  [0 : 31]                        
 );
 
-//parameter definition
+//local parameter definition
 localparam  Y_C                         =   2'd0    ,
             U_C                         =   2'd1    ,
             V_C                         =   2'd2    ;
@@ -931,9 +931,10 @@ wire    signed  [63 : 0]    coded_cost          [0 : 31]                        
 //output assignment
     generate 
         for(o = 0; o < 32; o = o + 1)begin
-            assign      o_d64_cost_last_zero[o]     =   i_lambda_d[1] * i_rdoq_est_last_d[1] [i_ch_type_d[1] != Y_C] [(pre_level[o] - 1) > 5 ? 5 : (pre_level[o] - 1)] [funclog2(scan_pos[o] + 1)][0];
-            assign      o_d64_cost_last_one[o]      =   i_lambda_d[1] * i_rdoq_est_last_d[1] [i_ch_type_d[1] != Y_C] [(pre_level[o] - 1) > 5 ? 5 : (pre_level[o] - 1)] [funclog2(scan_pos[o] + 1)][1];
-            assign      o_base_cost_buffer_tmp[o]   =   level_opt[o] ? coded_cost[o] - uncoded_cost[o] + o_d64_cost_last_zero[o] : coded_cost[o] - uncoded_cost[o];
+            assign      o_d64_cost_last_zero[o]     =   i_lambda_d[1] * i_rdoq_est_last_d[1] [i_ch_type_d[1] != Y_C] [((pre_level[o] - 1) > 5 ? 5 : (pre_level[o] - 1))] [funclog2(scan_pos[o] + 1)] [0];
+            assign      o_d64_cost_last_one[o]      =   i_lambda_d[1] * i_rdoq_est_last_d[1] [i_ch_type_d[1] != Y_C] [((pre_level[o] - 1) > 5 ? 5 : (pre_level[o] - 1))] [funclog2(scan_pos[o] + 1)] [1];
+
+            assign      o_base_cost_buffer_tmp[o]   =   level_opt[o] ? (coded_cost[o] - uncoded_cost[o] + o_d64_cost_last_zero[o]) : (coded_cost[o] - uncoded_cost[o]);
             assign      o_tmp_dst_coef_sign[o]      =   temp_coef_sign_d2[o];
             assign      o_level_opt[o]              =   level_opt[o];
         end
@@ -954,20 +955,34 @@ wire    signed  [63 : 0]    coded_cost          [0 : 31]                        
 
 
 //function log2
-    function integer funclog2;
-    input integer value;
-    begin
-        value = value - 1;
-        funclog2 = 0;
-        if(value > 0)begin
-            funclog2 = funclog2 + 1;
-            value = value >> 1;
-        end
-    end
-    endfunction
-
+function integer funclog2; 
+    input integer value; 
+    begin 
+    for(funclog2 = 0; value > 1; funclog2 = funclog2 + 1) 
+        value = value >> 1; 
+    end 
+endfunction 
 
 //test bench
+
+integer fp_base_cost_buffer_w1;
+integer wr_base_cost_buffer_j,wr_base_cost_buffer_k;
+reg     signed  [63: 0]     base_cost_buffer_data        [0 : 63]    ;
+initial begin 
+    #14;
+    fp_base_cost_buffer_w1 = $fopen("../../../../../result/ocd/fpga_base_cost_buffer/fpga_base_cost_buffer_16x16.txt", "w");
+    for (wr_base_cost_buffer_j = 0; wr_base_cost_buffer_j < 16; wr_base_cost_buffer_j = wr_base_cost_buffer_j + 1) begin
+        for (wr_base_cost_buffer_k = 0; wr_base_cost_buffer_k < 16; wr_base_cost_buffer_k = wr_base_cost_buffer_k + 1) begin
+            base_cost_buffer_data[wr_base_cost_buffer_k] = o_base_cost_buffer_tmp[wr_base_cost_buffer_k];
+        end
+        #2;
+        $fwrite(fp_base_cost_buffer_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            base_cost_buffer_data[0 ], base_cost_buffer_data[1 ], base_cost_buffer_data[2 ], base_cost_buffer_data[3 ], base_cost_buffer_data[4 ], base_cost_buffer_data[5 ], base_cost_buffer_data[6 ], base_cost_buffer_data[7 ], 
+            base_cost_buffer_data[8 ], base_cost_buffer_data[9 ], base_cost_buffer_data[10], base_cost_buffer_data[11], base_cost_buffer_data[12], base_cost_buffer_data[13], base_cost_buffer_data[14], base_cost_buffer_data[15]);
+    end
+    $fclose(fp_base_cost_buffer_w1);
+end
+
 
 integer fp_pre_level_w1;
 integer wr_pre_level_j,wr_pre_level_k;
