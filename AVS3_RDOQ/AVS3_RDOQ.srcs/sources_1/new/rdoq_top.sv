@@ -1,46 +1,41 @@
 module rdoq_top(      
 //system clk and rest       
-    input                       clk                                                 ,
-    input                       rst_n                                               ,
+    input                       clk                                             ,
+    input                       rst_n                                           ,
 
-//input block information                           
-    input           [21 : 0]    q_value                                             ,
-    input           [4  : 0]    q_bits                                              ,
+//input block information                       
+    input           [21: 0]     q_value                                         ,
+    input           [4 : 0]     q_bits                                          ,
 
-    input           [2  : 0]    cu_width_log2                                       ,//the value is between 2 and 6
-    input           [2  : 0]    cu_height_log2                                      ,//the value is between 2 and 6
-    input           [2  : 0]    ch_type                                             ,//Y_C 0; U_C 1; Y_C 2;
-    input   signed  [63 : 0]    err_scale                                           ,
-    input   signed  [63 : 0]    lambda                                              ,
+    input           [2 : 0]     cu_width_log2                                   ,//the value is between 2 and 6
+    input           [2 : 0]     cu_height_log2                                  ,//the value is between 2 and 6
+    input           [2 : 0]     ch_type                                         ,//Y_C 0; U_C 1; Y_C 2;
+    input   signed  [63: 0]     err_scale                                       ,
+    input   signed  [63: 0]     lambda                                          ,
 
-    input           [6  : 0]    qp                                                  ,
-    input           [0  : 0]    is_intra                                            ,
-    input           [3  : 0]    bit_depth                                           ,
+    input           [6 : 0]     qp                                              ,
+    input           [0 : 0]     is_intra                                        ,
+    input           [3 : 0]     bit_depth                                       ,
 
-    input           [31 : 0]    rdoq_est_cbf        [0 :  2][0 :  1]                ,//pending
-    input           [31 : 0]    rdoq_est_last       [0 :  1][0 :  5][0 : 11][0 : 1] ,//pending
-    input           [31 : 0]    rdoq_est_level      [0 : 23][0 :  1]                ,//pending
-    input           [31 : 0]    rdoq_est_run        [0 : 23][0 :  1]                ,//pending
-    input           [9  : 0]    left_pos            [0 : 31]                        ,//the max value is 1023
-    input           [9  : 0]    bottom_pos          [0 : 31]                        ,//the max value is 1023
+    input           [31: 0]     rdoq_est_cbf    [0 :  2][0 :  1]                ,//pending
+    input           [31: 0]     rdoq_est_last   [0 :  1][0 :  5][0 : 11][0 : 1] ,//pending
+    input           [31: 0]     rdoq_est_level  [0 : 23][0 :  1]                ,//pending
+    input           [31: 0]     rdoq_est_run    [0 : 23][0 :  1]                ,//pending
+    input           [9 : 0]     left_pos        [0 : 31]                        ,//the max value is 1023
+    input           [9 : 0]     bottom_pos      [0 : 31]                        ,//the max value is 1023
 
-//input block data  
-    input                       i_valid                                             ,
-    input   signed  [15 : 0]    src_coef            [0 : 31]                        ,
+//input block data
+    input                       i_valid                                         ,
+    input   signed  [15: 0]     src_coef        [0 : 31]                        ,
 
-//output block data                      
+//output block data                     
+    output                      o_valid                                         ,
+    output  signed  [15: 0]     dst_coef        [0 : 31]                        ,
 
-    output  signed  [15 : 0]    o_tmp_dst_coef      [0 : 31]                        ,
-    output                      o_valid                                             ,
-    output  signed  [6  : 0]    o_rdoq_last_x                                       ,
-    output  signed  [6  : 0]    o_rdoq_last_y                                       ,
-    output  signed  [63 : 0]    o_final_rdoq_cost                                   ,
-    output  signed  [63 : 0]    o_d64_best_cost_tmp                                 
+//the last none zero position                   
+    output          [3 : 0]     final_X                                         ,
+    output          [3 : 0]     final_y                                         
 );
-
-//integer definition
-integer i,j,k,l,m   ;
-genvar  o,p,q,r     ;
 
 //wire definition
 wire            [13: 0]     scale                                                       ;
@@ -76,29 +71,6 @@ wire                        ocd_tmp_dst_coef_sign       [0 : 31]                
 wire    signed  [63 : 0]    ocd_d64_cost_last_zero      [0 : 31]                        ;
 wire    signed  [63 : 0]    ocd_d64_cost_last_one       [0 : 31]                        ; 
 wire    signed  [63 : 0]    ocd_base_cost_buffer_tmp    [0 : 31]                        ;
-
-wire    signed  [15 : 0]    lnpd_tmp_dst_coef           [0 : 31]                        ;
-wire                        lnpd_valid                                                  ;
-wire    signed  [6  : 0]    lnpd_rdoq_last_x                                            ;
-wire    signed  [6  : 0]    lnpd_rdoq_last_y                                            ;
-wire    signed  [63 : 0]    lnpd_final_rdoq_cost                                        ;
-wire    signed  [63 : 0]    lnpd_d64_best_cost_tmp                                      ;
-
-
-//assignment
-generate
-    for(o = 0; o < 32; o = o + 1)begin
-        assign  o_tmp_dst_coef[o]   =   lnpd_tmp_dst_coef[o];
-    end
-endgenerate
-
-assign  o_valid                 =   lnpd_valid                  ;
-assign  o_rdoq_last_x           =   lnpd_rdoq_last_x            ;
-assign  o_rdoq_last_y           =   lnpd_rdoq_last_y            ;
-assign  o_final_rdoq_cost       =   lnpd_final_rdoq_cost        ;
-assign  o_d64_best_cost_tmp     =   lnpd_d64_best_cost_tmp      ;
-
-
 
     pre_quant u_pre_quant(
         //system clk and rest
@@ -208,16 +180,8 @@ lnpd u_lnpd(
 //output parameter                      
 
 //output data                 
-    .o_tmp_dst_coef             (lnpd_tmp_dst_coef          ),
-    .o_valid                    (lnpd_valid                 ),
-    .o_rdoq_last_x              (lnpd_rdoq_last_x           ),
-    .o_rdoq_last_y              (lnpd_rdoq_last_y           ),
-    .o_final_rdoq_cost          (lnpd_final_rdoq_cost       ),
-    .o_d64_best_cost_tmp        (lnpd_d64_best_cost_tmp     )                                      
-);               
-
-//output data                 
-
+    .o_valid                    ()                                         
+);
 
 
 endmodule

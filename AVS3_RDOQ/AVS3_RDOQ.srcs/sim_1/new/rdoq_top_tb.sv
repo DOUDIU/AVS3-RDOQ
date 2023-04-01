@@ -86,7 +86,12 @@ rdoq_top u_rdoq_top(
     .src_coef               (i_data         ),
 
     //output block data
-    .o_valid                (o_valid        )
+    .o_valid                (o_valid        ),
+    .dst_coef               (o_data         ),
+
+    //the last none zero position
+    .final_X                (final_X        ),
+    .final_y                (final_y        )
 );
 
 
