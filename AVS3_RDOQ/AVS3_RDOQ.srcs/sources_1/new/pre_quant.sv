@@ -412,25 +412,23 @@ endgenerate
 
 
 // //test bench
-// integer fp_r, fp_w, rd_i, rd_j, rd_k, rd_l, wr_i, wr_j, wr_k;
-// reg     signed  [15: 0]     wr_data [0 : 63]    ;
-// initial begin 
-//     #2;
-//     #8;
-//     //16x16
-//     fp_w = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_16x16.txt", "w");
-//     for (wr_j = 0; wr_j < 16; wr_j = wr_j + 1) begin
-//         for (wr_k = 0; wr_k < 16; wr_k = wr_k + 1) begin
-//             wr_data[wr_k] = o_data[wr_k];
-//         end
-//         #2;
-//         $fwrite(fp_w, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-//             wr_data[0 ], wr_data[1 ], wr_data[2 ], wr_data[3 ], wr_data[4 ], wr_data[5 ], wr_data[6 ], wr_data[7 ], 
-//             wr_data[8 ], wr_data[9 ], wr_data[10], wr_data[11], wr_data[12], wr_data[13], wr_data[14], wr_data[15]);
-//     end
-//     $fclose(fp_w);
-// end
-
+    integer fp_pq_w1;
+    integer wr_pq_j,wr_pq_k;
+    reg     signed  [63: 0]     pq_data        [0 : 63]    ;
+    initial begin 
+        #10;
+        fp_pq_w1 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_16x16.txt", "w");
+        for (wr_pq_j = 0; wr_pq_j < 16; wr_pq_j = wr_pq_j + 1) begin
+            for (wr_pq_k = 0; wr_pq_k < 16; wr_pq_k = wr_pq_k + 1) begin
+                pq_data[wr_pq_k] = o_data[wr_pq_k];
+            end
+            #2;
+            $fwrite(fp_pq_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                pq_data[0 ], pq_data[1 ], pq_data[2 ], pq_data[3 ], pq_data[4 ], pq_data[5 ], pq_data[6 ], pq_data[7 ], 
+                pq_data[8 ], pq_data[9 ], pq_data[10], pq_data[11], pq_data[12], pq_data[13], pq_data[14], pq_data[15]);
+        end
+        $fclose(fp_pq_w1);
+    end
 
 
 endmodule
