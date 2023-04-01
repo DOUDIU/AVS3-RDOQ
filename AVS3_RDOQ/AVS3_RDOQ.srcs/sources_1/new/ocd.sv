@@ -364,7 +364,7 @@ wire    signed  [63 : 0]    coded_cost          [0 : 31]                        
                 left_pos[i]        <=      0;
             end
         end
-        if(column_cnt[0]) begin
+        else if(column_cnt[0]) begin
             for(i = 0; i < 32; i = i + 2)begin
                 left_pos[i]     <=  left_pos_tem[i] - 1;
             end
@@ -946,22 +946,54 @@ wire    signed  [63 : 0]    coded_cost          [0 : 31]                        
 
 
 
+// //function log2
+// function integer funclog2; 
+//     input integer value; 
+//     begin 
+//     for(funclog2 = 0; value > 1; funclog2 = funclog2 + 1) 
+//         value = value >> 1; 
+//     end 
+// endfunction 
+
+function [3 : 0] funclog2;
+    input [15 : 0]  value;
+    begin
+        if(value[15])
+            funclog2    =   15;
+        else if(value[14])
+            funclog2    =   14;
+        else if(value[13])
+            funclog2    =   13;
+        else if(value[12])
+            funclog2    =   12;
+        else if(value[11])
+            funclog2    =   11;
+        else if(value[10])
+            funclog2    =   10;
+        else if(value[9])
+            funclog2    =   9;
+        else if(value[8])
+            funclog2    =   8;
+        else if(value[7])
+            funclog2    =   7;
+        else if(value[6])
+            funclog2    =   6;
+        else if(value[5])
+            funclog2    =   5;
+        else if(value[4])
+            funclog2    =   4;
+        else if(value[3])
+            funclog2    =   3;
+        else if(value[2])
+            funclog2    =   2;
+        else if(value[1])
+            funclog2    =   1;
+        else if(value[0])
+            funclog2    =   0;
+    end
+endfunction
 
 
-
-
-
-
-
-
-//function log2
-function integer funclog2; 
-    input integer value; 
-    begin 
-    for(funclog2 = 0; value > 1; funclog2 = funclog2 + 1) 
-        value = value >> 1; 
-    end 
-endfunction 
 
 //test bench
 
