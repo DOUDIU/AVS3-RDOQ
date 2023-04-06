@@ -11,13 +11,12 @@ module pre_quant(
     input           [2 : 0]     i_height_log2                                       ,//the value is between 2 and 6
     input           [2 : 0]     i_ch_type                                           ,//Y_C 0; U_C 1; V_C 2;
     input           [4 : 0]     i_q_bits                                            ,
-    input   signed  [29: 0]     i_err_scale                                         ,
-    input   signed  [63: 0]     i_lambda                                            ,
+    input   signed  [27: 0]     i_err_scale                                         ,
+    input   signed  [23: 0]     i_lambda                                            ,
 
-    input           [31: 0]     i_rdoq_est_cbf      [0 :  2][0 :  1]                ,//pending
-    input           [31: 0]     i_rdoq_est_last     [0 :  1][0 :  5][0 : 11][0 : 1] ,//pending
-    input           [31: 0]     i_rdoq_est_level    [0 : 23][0 :  1]                ,//pending
-    input           [31: 0]     i_rdoq_est_run      [0 : 23][0 :  1]                ,//pending
+    input           [16: 0]     i_rdoq_est_last     [0 :  1][0 :  5][0 : 11][0 : 1] ,//pending
+    input           [16: 0]     i_rdoq_est_level    [0 : 23][0 :  1]                ,//pending
+    input           [16: 0]     i_rdoq_est_run      [0 : 23][0 :  1]                ,//pending
     input           [9 : 0]     i_left_pos          [0 : 31]                        ,//the max value is 1023
     input           [9 : 0]     i_bottom_pos        [0 : 31]                        ,//the max value is 1023
 
@@ -30,19 +29,18 @@ module pre_quant(
     output          [2 : 0]     o_height_log2                                       ,//the value is between 2 and 6
     output          [2 : 0]     o_ch_type                                           ,//Y_C 0; U_C 1; V_C 2;
     output          [4 : 0]     o_q_bits                                            ,
-    output  signed  [29: 0]     o_err_scale                                         ,
-    output  signed  [63: 0]     o_lambda                                            ,
+    output  signed  [27: 0]     o_err_scale                                         ,
+    output  signed  [23: 0]     o_lambda                                            ,
 
-    output          [31: 0]     o_rdoq_est_cbf      [0 :  2][0 :  1]                ,//pending
-    output          [31: 0]     o_rdoq_est_last     [0 :  1][0 :  5][0 : 11][0 : 1] ,//pending
-    output          [31: 0]     o_rdoq_est_level    [0 : 23][0 :  1]                ,//pending
-    output          [31: 0]     o_rdoq_est_run      [0 : 23][0 :  1]                ,//pending
+    output          [16: 0]     o_rdoq_est_last     [0 :  1][0 :  5][0 : 11][0 : 1] ,//pending
+    output          [16: 0]     o_rdoq_est_level    [0 : 23][0 :  1]                ,//pending
+    output          [16: 0]     o_rdoq_est_run      [0 : 23][0 :  1]                ,//pending
     output          [9 : 0]     o_left_pos          [0 : 31]                        ,//the max value is 1023
     output          [9 : 0]     o_bottom_pos        [0 : 31]                        ,//the max value is 1023
 
 //output data       
     output                      o_valid                                             ,
-    output  signed  [63: 0]     o_level_double      [0 : 31]                        ,
+    output  signed  [23: 0]     o_level_double      [0 : 31]                        ,
     output  signed  [15: 0]     o_data              [0 : 31]                            
 );
 
@@ -57,12 +55,12 @@ genvar  o,p,q,r     ;
 
 
 //reg definition
-reg     signed  [63: 0]     temp_level          [0 : 31]                                ;//16 + 22 = 38
-reg     signed  [63: 0]     level_double        [0 : 31]                                ;
-reg     signed  [63: 0]     level_double_d1     [0 : 31]                                ;
-reg     signed  [63: 0]     level_double_d2     [0 : 31]                                ;
-reg             [31: 0]     max_abs_level       [0 : 31]                                ;
-reg             [31: 0]     max_abs_level_t     [0 : 31]                                ;
+reg     signed  [23: 0]     temp_level          [0 : 31]                                ;//16 + 22 = 38
+reg     signed  [23: 0]     level_double        [0 : 31]                                ;
+reg     signed  [23: 0]     level_double_d1     [0 : 31]                                ;
+reg     signed  [23: 0]     level_double_d2     [0 : 31]                                ;
+reg             [23: 0]     max_abs_level       [0 : 31]                                ;
+reg             [23: 0]     max_abs_level_t     [0 : 31]                                ;
 
 reg                         src_coef_sign       [0 : 3][0 : 31]                         ;
 
@@ -75,12 +73,12 @@ reg             [2 : 0]     i_width_log2_d      [0 :  3]                        
 reg             [2 : 0]     i_height_log2_d     [0 :  3]                                ;
 reg             [2 : 0]     i_ch_type_d         [0 :  3]                                ;
 reg             [4 : 0]     i_q_bits_d          [0 :  3]                                ;
-reg     signed  [29: 0]     i_err_scale_d       [0 :  3]                                ;
-reg     signed  [63: 0]     i_lambda_d          [0 :  3]                                ;
+reg     signed  [27: 0]     i_err_scale_d       [0 :  3]                                ;
+reg     signed  [23: 0]     i_lambda_d          [0 :  3]                                ;
 
-reg             [31: 0]     i_rdoq_est_cbf_d    [0 :  3][0 :  2][0 :  1]                ;//pending
-reg             [31: 0]     i_rdoq_est_last_d   [0 :  3][0 :  1][0 :  5][0 : 11][0 : 1] ;//pending
-reg             [31: 0]     i_rdoq_est_level_d  [0 :  3][0 : 23][0 :  1]                ;//pending
+reg             [16: 0]     i_rdoq_est_cbf_d    [0 :  3][0 :  2][0 :  1]                ;//pending
+reg             [16: 0]     i_rdoq_est_last_d   [0 :  3][0 :  1][0 :  5][0 : 11][0 : 1] ;//pending
+reg             [16: 0]     i_rdoq_est_level_d  [0 :  3][0 : 23][0 :  1]                ;//pending
 reg             [31: 0]     i_rdoq_est_run_d    [0 :  3][0 : 23][0 :  1]                ;//pending
 reg             [9 : 0]     i_left_pos_d        [0 :  3][0 : 31]                        ;
 reg             [9 : 0]     i_bottom_pos_d      [0 :  3][0 : 31]                        ;
@@ -116,11 +114,6 @@ assign  o_left_pos      =   i_left_pos_d[3];
 assign  o_bottom_pos    =   i_bottom_pos_d[3];
 
 generate
-    for (o = 0; o < 3; o = o + 1) begin
-        for(p = 0; p < 2; p = p + 1)begin
-            assign o_rdoq_est_cbf[o][p] = i_rdoq_est_cbf_d[3][o][p];
-        end
-    end
     for (o = 0; o < 2; o = o + 1) begin
         for(p = 0; p < 6; p = p + 1)begin
             for(q = 0; q < 12; q = q + 1)begin
@@ -204,14 +197,13 @@ endgenerate
             i_err_scale_d[0]        <=      i_err_scale;
             i_lambda_d[0]           <=      i_lambda;
             
+            for(i = 0; i < 32; i = i + 1)begin
+                src_coef_sign[0][i]     <=  i_data[i][15]; 
+            end
+            
             for(j = 0; j < 32; j = j + 1)begin
                 i_left_pos_d[0][j]      <=  i_left_pos[j]       ;
                 i_bottom_pos_d[0][j]    <=  i_bottom_pos[j]     ;
-            end
-            for (i = 0; i < 3; i = i + 1) begin
-                for(j = 0; j < 2; j = j + 1)begin
-                    i_rdoq_est_cbf_d[0][i][j] <= i_rdoq_est_cbf[i][j];
-                end
             end
             for (i = 0; i < 2; i = i + 1) begin
                 for(j = 0; j < 6; j = j + 1)begin
@@ -259,11 +251,6 @@ endgenerate
             end
 
             for(m = 1; m < 4; m = m + 1)begin
-                for (i = 0; i < 3; i = i + 1) begin
-                    for(j = 0; j < 2; j = j + 1)begin
-                        i_rdoq_est_cbf_d[m][i][j] <= i_rdoq_est_cbf_d[m-1][i][j];
-                    end
-                end
                 for (i = 0; i < 2; i = i + 1) begin
                     for(j = 0; j < 6; j = j + 1)begin
                         for(k = 0; k < 12; k = k + 1)begin
@@ -296,14 +283,12 @@ endgenerate
     always@(posedge clk or negedge rst_n)begin
         if(!rst_n)begin
             for(i = 0; i < 32; i = i + 1)begin
-                temp_level[i]           <=  0;
-                src_coef_sign[0][i]     <=  0;   
+                temp_level[i]           <=  0; 
             end
         end
         else begin
             for(i = 0; i < 32; i = i + 1)begin
                 temp_level[i]           <=  i_data_abs[i] * q_value ;
-                src_coef_sign[0][i]     <=  i_data[i][15]; 
             end
         end
     end
@@ -410,8 +395,8 @@ endgenerate
         end
     end
 
-
-// //test bench
+`ifdef file_write
+    //test bench
     integer fp_pq_w1;
     integer wr_pq_j,wr_pq_k;
     reg     signed  [63: 0]     pq_data        [0 : 63]    ;
@@ -429,6 +414,6 @@ endgenerate
         end
         $fclose(fp_pq_w1);
     end
-
+`endif
 
 endmodule

@@ -1,5 +1,5 @@
-#ocd
-print("\nocd:")
+#pq
+print("\npq:")
 f1 = open(".././result/pq/pq_fpga_coeff/pq_fpga_16x16.txt","r")
 f2 = open(".././result/pq/pq_hpm_coeff/pq_hpm_16x16.txt","r")
 txt1 = f1.read()
@@ -9,6 +9,9 @@ if txt1 == txt2:
 else:
     print("pq 16x16 : False!")
 
+
+#ocd
+print("\nocd:")
 f1 = open(".././result/ocd/fpga_prevel/fpga_prevel_16x16.txt","r")
 f2 = open(".././result/ocd/hpm_prevel/hpm_prevel_16x16.txt","r")
 txt1 = f1.read()

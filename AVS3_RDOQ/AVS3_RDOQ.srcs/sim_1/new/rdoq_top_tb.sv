@@ -24,7 +24,8 @@ integer fp_r, fp_w, rd_i, rd_j, rd_k, rd_l, wr_i, wr_j, wr_k, rd_z, rd_y;
     reg             [2 : 0]             cu_height_log2      ;
     reg             [2 : 0]             ch_type             ;
     reg     signed  [63: 0]             err_scale           ;
-    reg     signed  [63: 0]             lambda              ;
+    reg     signed  [19: 0]             diff_scale          ;
+    reg     signed  [23: 0]             lambda              ;
 
     reg             [6 : 0]             qp                  ;
     reg             [0 : 0]             is_intra            ;
@@ -37,9 +38,9 @@ integer fp_r, fp_w, rd_i, rd_j, rd_k, rd_l, wr_i, wr_j, wr_k, rd_z, rd_y;
     reg             [9 : 0]     left_pos        [0 : 31]        ;
     reg             [9 : 0]     bottom_pos      [0 : 31]        ;
     reg             [31: 0]     rdoq_est_cbf    [0 :  2][0 :  1];//pending
-    reg             [31: 0]     rdoq_est_last   [0 :  1][0 :  5][0 : 11][0 : 1];//pending
-    reg             [31: 0]     rdoq_est_level  [0 : 23][0 :  1];//pending
-    reg             [31: 0]     rdoq_est_run    [0 : 23][0 :  1];//pending
+    reg             [16: 0]     rdoq_est_last   [0 :  1][0 :  5][0 : 11][0 : 1];//pending
+    reg             [16: 0]     rdoq_est_level  [0 : 23][0 :  1];//pending
+    reg             [16: 0]     rdoq_est_run    [0 : 23][0 :  1];//pending
 
 
 //output parameter 
@@ -69,12 +70,12 @@ rdoq_top u_rdoq_top(
     .ch_type                (ch_type        ),//Y_C 0; U_C 1; Y_C 2;
     .err_scale              (err_scale      ),
     .lambda                 (lambda         ),
+    .diff_scale             (diff_scale     ),
 
     //.qp                     (qp             ),
     //.is_intra               (is_intra       ),
     //.bit_depth              (bit_depth      ),
 
-    .rdoq_est_cbf           (rdoq_est_cbf   ),
     .rdoq_est_last          (rdoq_est_last  ),
     .rdoq_est_level         (rdoq_est_level ),
     .rdoq_est_run           (rdoq_est_run   ),
@@ -104,7 +105,7 @@ initial begin
     qp              =   7 'd0;
     ch_type         =   3 'd0;
     is_intra        =   1 'd0;
-    lambda          =   64'd0;
+    lambda          =   24'd0;
     bit_depth       =   4 'd0;
     q_value         =   22'd0;
     q_bits          =   5 'd0;
@@ -159,7 +160,8 @@ initial begin
     cu_height_log2  =   SIZE16          ;
     ch_type         =   Y_C             ;
     err_scale       =   64'd62245902    ;
-    lambda          =   64'd10131659    ;
+    lambda          =   24'd10131659    ;
+    diff_scale      =   20'd19555       ;
 
     qp              =   7 'd63          ;
     is_intra        =   1 'd1           ;
@@ -252,7 +254,7 @@ initial begin
     qp              =   7 'd63          ;
     ch_type         =   Y_C             ;
     is_intra        =   1 'd1           ;
-    lambda          =   64'd10131659    ;
+    lambda          =   24'd10131659    ;
     bit_depth       =   4 'd10          ;
     fp_r = $fopen("../../../../../result/origin_data/src/origin_data_8x8.txt", "r");
     for (rd_i = 0; rd_i < 8; rd_i = rd_i + 1) begin
@@ -277,7 +279,7 @@ initial begin
     qp              =   7 'd63          ;
     ch_type         =   Y_C             ;
     is_intra        =   1 'd1           ;
-    lambda          =   64'd10131659    ;
+    lambda          =   24'd10131659    ;
     bit_depth       =   4 'd10          ;
     fp_r = $fopen("../../../../../result/origin_data/src/origin_data_4x4.txt", "r");
     for (rd_i = 0; rd_i < 4; rd_i = rd_i + 1) begin
@@ -302,7 +304,7 @@ initial begin
     qp              =   7 'd63          ;
     ch_type         =   Y_C             ;
     is_intra        =   1 'd1           ;
-    lambda          =   64'd10131659    ;
+    lambda          =   24'd10131659    ;
     bit_depth       =   4 'd10          ;
     fp_r = $fopen("../../../../../result/origin_data/src/origin_data_32x32.txt", "r");
     for (rd_i = 0; rd_i < 32; rd_i = rd_i + 1) begin

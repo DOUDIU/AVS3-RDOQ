@@ -84,10 +84,6 @@ reg     signed  [6  : 0]    rdoq_last_x_tem             [0 : 31]                
 reg     signed  [6  : 0]    rdoq_last_y_tem             [0 : 31]                ;
 reg     signed  [63 : 0]    endPosCost_tem              [0 : 31]                ;
 
-reg     signed  [63 : 0]    d64_best_cost_tmp_left_d    [0 : 31]                ;
-reg     signed  [63 : 0]    final_rdoq_cost_left_d      [0 : 31]                ;
-reg     signed  [6  : 0]    final_rdoq_last_x_left_d    [0 : 31]                ;
-reg     signed  [6  : 0]    final_rdoq_last_y_left_d    [0 : 31]                ;
 
 
 reg     signed  [63 : 0]    temp_RdoqCost_except_final_cost_left_d      [0 : 31][0 : 31]    ;
@@ -99,7 +95,11 @@ reg     signed  [63 : 0]    tempCost_left_d                             [0 : 31]
 
 
 //wire definition   
-wire    signed  [63 : 0]    temp_RdoqCost_except_final_cost_left    [0  : 31]   ;
+wire    signed  [63 : 0]    temp_RdoqCost_except_final_cost_left    [0 : 31]    ;
+wire    signed  [63 : 0]    d64_best_cost_tmp_left_d                [0 : 31]    ;
+wire    signed  [63 : 0]    final_rdoq_cost_left_d                  [0 : 31]    ;
+wire    signed  [6  : 0]    final_rdoq_last_x_left_d                [0 : 31]    ;
+wire    signed  [6  : 0]    final_rdoq_last_y_left_d                [0 : 31]    ;
 
 //assignment
 assign  o_valid     =   i_valid;
@@ -1188,8 +1188,8 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
     always@(posedge clk or negedge rst_n)begin
         if(!rst_n)begin
             for(i = 0; i < 32; i = i + 1)begin
-                rdoq_last_x [i] = -1;
-                rdoq_last_y [i] = -1;
+                rdoq_last_x [i] <= -1;
+                rdoq_last_y [i] <= -1;
             end
         end
         else if(column_cnt[0])begin
@@ -1486,14 +1486,14 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         end
                     end
                 default : begin
-                        rdoqD64LastOne  [ 3]    <=  0;
-                        rdoqD64LastZero [ 3]    <=  0;
-                        rdoqD64LastOne  [ 7]    <=  0;
-                        rdoqD64LastZero [ 7]    <=  0;
-                        rdoqD64LastOne  [15]    <=  0;
-                        rdoqD64LastZero [15]    <=  0;
-                        rdoqD64LastOne  [31]    <=  0;
-                        rdoqD64LastZero [31]    <=  0;
+                        rdoq_last_x[ 3]    <=  0;
+                        rdoq_last_y[ 3]    <=  0;
+                        rdoq_last_x[ 7]    <=  0;
+                        rdoq_last_y[ 7]    <=  0;
+                        rdoq_last_x[15]    <=  0;
+                        rdoq_last_y[15]    <=  0;
+                        rdoq_last_x[31]    <=  0;
+                        rdoq_last_y[31]    <=  0;
                     end
             endcase
         end
@@ -1801,14 +1801,14 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                             end
                         end
                     default : begin
-                            rdoqD64LastOne  [ 3]    <=  0;
-                            rdoqD64LastZero [ 3]    <=  0;
-                            rdoqD64LastOne  [ 7]    <=  0;
-                            rdoqD64LastZero [ 7]    <=  0;
-                            rdoqD64LastOne  [15]    <=  0;
-                            rdoqD64LastZero [15]    <=  0;
-                            rdoqD64LastOne  [31]    <=  0;
-                            rdoqD64LastZero [31]    <=  0;
+                            rdoq_last_x[ 3]    <=  0;
+                            rdoq_last_y[ 3]    <=  0;
+                            rdoq_last_x[ 7]    <=  0;
+                            rdoq_last_y[ 7]    <=  0;
+                            rdoq_last_x[15]    <=  0;
+                            rdoq_last_y[15]    <=  0;
+                            rdoq_last_x[31]    <=  0;
+                            rdoq_last_y[31]    <=  0;
                         end
                 endcase
             end
@@ -2517,19 +2517,19 @@ generate
         //input data
             .rdoqD64LastOne          (rdoqD64LastOne_left_d[o][o]                                               ),  
             .temp_RdoqCost           (final_rdoq_cost_left[o] + temp_RdoqCost_except_final_cost_left_d[o][o]    ),  
-            .tempCost                (tempCost_left_d[o][o]                                                     ),  
+            .tempCost                (tempCost_left_d   [o][o]                                                  ),  
             .rdoq_last_x             (rdoq_last_x_left_d[o][o]                                                  ),
             .rdoq_last_y             (rdoq_last_y_left_d[o][o]                                                  ),
 
             .final_rdoq_last_x_in    (final_rdoq_last_x_left_d[o]       ),
             .final_rdoq_last_y_in    (final_rdoq_last_y_left_d[o]       ), 
-            .final_rdoq_cost_in      (final_rdoq_cost_left_d[o]         ),
+            .final_rdoq_cost_in      (final_rdoq_cost_left_d  [o]       ),
             .d64_best_cost_tmp_in    (d64_best_cost_tmp_left_d[o]       ),
 
         //output data
             .final_rdoq_last_x_out   (final_rdoq_last_x_left_d[o + 1]   ),
             .final_rdoq_last_y_out   (final_rdoq_last_y_left_d[o + 1]   ), 
-            .final_rdoq_cost_out     (final_rdoq_cost_left_d[o + 1]     ),
+            .final_rdoq_cost_out     (final_rdoq_cost_left_d  [o + 1]   ),
             .d64_best_cost_tmp_out   (d64_best_cost_tmp_left_d[o + 1]   )     
         );
     end
@@ -2550,15 +2550,13 @@ endgenerate
 
 
 
-
-
-//test bench
-
+`ifdef file_write//test bench
+    
     integer fp_tempCost_w1;
     integer wr_tempCost_j,wr_tempCost_k;
     reg     signed  [63: 0]     tempCost_data        [0 : 63]    ;
     initial begin 
-        #18;
+        #20;
         fp_tempCost_w1 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_16x16.txt", "w");
         for (wr_tempCost_j = 0; wr_tempCost_j < 16; wr_tempCost_j = wr_tempCost_j + 1) begin
             for (wr_tempCost_k = 0; wr_tempCost_k < 16; wr_tempCost_k = wr_tempCost_k + 1) begin
@@ -2577,7 +2575,7 @@ endgenerate
     integer wr_rdoqD64LastOne_j,wr_rdoqD64LastOne_k;
     reg     signed  [63: 0]     rdoqD64LastOne_data        [0 : 63]    ;
     initial begin 
-        #18;
+        #20;
         fp_rdoqD64LastOne_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_16x16.txt", "w");
         for (wr_rdoqD64LastOne_j = 0; wr_rdoqD64LastOne_j < 16; wr_rdoqD64LastOne_j = wr_rdoqD64LastOne_j + 1) begin
             for (wr_rdoqD64LastOne_k = 0; wr_rdoqD64LastOne_k < 16; wr_rdoqD64LastOne_k = wr_rdoqD64LastOne_k + 1) begin
@@ -2595,7 +2593,7 @@ endgenerate
     integer wr_rdoqD64LastZero_j,wr_rdoqD64LastZero_k;
     reg     signed  [63: 0]     rdoqD64LastZero_data        [0 : 63]    ;
     initial begin 
-        #18;
+        #20;
         fp_rdoqD64LastZero_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_16x16.txt", "w");
         for (wr_rdoqD64LastZero_j = 0; wr_rdoqD64LastZero_j < 16; wr_rdoqD64LastZero_j = wr_rdoqD64LastZero_j + 1) begin
             for (wr_rdoqD64LastZero_k = 0; wr_rdoqD64LastZero_k < 16; wr_rdoqD64LastZero_k = wr_rdoqD64LastZero_k + 1) begin
@@ -2614,7 +2612,7 @@ endgenerate
     integer wr_endPosCost_j,wr_endPosCost_k;
     reg     signed  [63: 0]     endPosCost_data        [0 : 63]    ;
     initial begin 
-        #18;
+        #20;
         fp_endPosCost_w1 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_16x16.txt", "w");
         for (wr_endPosCost_j = 0; wr_endPosCost_j < 16; wr_endPosCost_j = wr_endPosCost_j + 1) begin
             for (wr_endPosCost_k = 0; wr_endPosCost_k < 16; wr_endPosCost_k = wr_endPosCost_k + 1) begin
@@ -2632,7 +2630,7 @@ endgenerate
     integer wr_rdoq_last_x_j,wr_rdoq_last_x_k;
     reg     signed  [63: 0]     rdoq_last_x_data        [0 : 63]    ;
     initial begin 
-        #18;
+        #20;
         fp_rdoq_last_x_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_16x16.txt", "w");
         for (wr_rdoq_last_x_j = 0; wr_rdoq_last_x_j < 16; wr_rdoq_last_x_j = wr_rdoq_last_x_j + 1) begin
             for (wr_rdoq_last_x_k = 0; wr_rdoq_last_x_k < 16; wr_rdoq_last_x_k = wr_rdoq_last_x_k + 1) begin
@@ -2650,7 +2648,7 @@ endgenerate
     integer wr_rdoq_last_y_j,wr_rdoq_last_y_k;
     reg     signed  [63: 0]     rdoq_last_y_data        [0 : 63]    ;
     initial begin 
-        #18;
+        #20;
         fp_rdoq_last_y_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_16x16.txt", "w");
         for (wr_rdoq_last_y_j = 0; wr_rdoq_last_y_j < 16; wr_rdoq_last_y_j = wr_rdoq_last_y_j + 1) begin
             for (wr_rdoq_last_y_k = 0; wr_rdoq_last_y_k < 16; wr_rdoq_last_y_k = wr_rdoq_last_y_k + 1) begin
@@ -2664,7 +2662,7 @@ endgenerate
         $fclose(fp_rdoq_last_y_w1);
     end
 
-
+`endif
 
 
 

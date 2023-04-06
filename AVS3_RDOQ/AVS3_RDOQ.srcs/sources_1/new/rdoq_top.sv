@@ -1,3 +1,6 @@
+
+`define file_write
+
 module rdoq_top(      
 //system clk and rest       
     input                       clk                                                 ,
@@ -10,17 +13,17 @@ module rdoq_top(
     input           [2  : 0]    cu_width_log2                                       ,//the value is between 2 and 6
     input           [2  : 0]    cu_height_log2                                      ,//the value is between 2 and 6
     input           [2  : 0]    ch_type                                             ,//Y_C 0; U_C 1; Y_C 2;
-    input   signed  [63 : 0]    err_scale                                           ,
-    input   signed  [63 : 0]    lambda                                              ,
+    input   signed  [27 : 0]    err_scale                                           ,
+    input   signed  [23 : 0]    lambda                                              ,
+    input   signed  [19 : 0]    diff_scale                                          ,
 
-    input           [6  : 0]    qp                                                  ,
-    input           [0  : 0]    is_intra                                            ,
-    input           [3  : 0]    bit_depth                                           ,
+    // input           [6  : 0]    qp                                                  ,
+    // input           [0  : 0]    is_intra                                            ,
+    // input           [3  : 0]    bit_depth                                           ,
 
-    input           [31 : 0]    rdoq_est_cbf        [0 :  2][0 :  1]                ,//pending
-    input           [31 : 0]    rdoq_est_last       [0 :  1][0 :  5][0 : 11][0 : 1] ,//pending
-    input           [31 : 0]    rdoq_est_level      [0 : 23][0 :  1]                ,//pending
-    input           [31 : 0]    rdoq_est_run        [0 : 23][0 :  1]                ,//pending
+    input           [16 : 0]    rdoq_est_last       [0 :  1][0 :  5][0 : 11][0 : 1] ,//pending
+    input           [16 : 0]    rdoq_est_level      [0 : 23][0 :  1]                ,//pending
+    input           [16 : 0]    rdoq_est_run        [0 : 23][0 :  1]                ,//pending
     input           [9  : 0]    left_pos            [0 : 31]                        ,//the max value is 1023
     input           [9  : 0]    bottom_pos          [0 : 31]                        ,//the max value is 1023
 
@@ -56,14 +59,13 @@ wire                        pre_quant_valid                                     
 wire            [2 : 0]     pre_quant_width_log2                                        ;
 wire            [2 : 0]     pre_quant_height_log2                                       ;
 wire            [2 : 0]     pre_quant_ch_type                                           ;
-wire    signed  [63: 0]     pre_quant_level_double      [31: 0]                         ;
+wire    signed  [23: 0]     pre_quant_level_double      [31: 0]                         ;
 wire            [4 : 0]     pre_quant_q_bits                                            ;
-wire    signed  [29: 0]     pre_quant_err_scale                                         ;
-wire    signed  [63: 0]     pre_quant_lambda                                            ;
-wire            [31: 0]     pre_quant_rdoq_est_cbf      [0 :  2][0 :  1]                ;//pending
-wire            [31: 0]     pre_quant_rdoq_est_last     [0 :  1][0 :  5][0 : 11][0 : 1] ;//pending
-wire            [31: 0]     pre_quant_rdoq_est_level    [0 : 23][0 :  1]                ;//pending
-wire            [31: 0]     pre_quant_rdoq_est_run      [0 : 23][0 :  1]                ;//pending
+wire    signed  [27: 0]     pre_quant_err_scale                                         ;
+wire    signed  [23: 0]     pre_quant_lambda                                            ;
+wire            [16: 0]     pre_quant_rdoq_est_last     [0 :  1][0 :  5][0 : 11][0 : 1] ;//pending
+wire            [16: 0]     pre_quant_rdoq_est_level    [0 : 23][0 :  1]                ;//pending
+wire            [16: 0]     pre_quant_rdoq_est_run      [0 : 23][0 :  1]                ;//pending
 wire            [9 : 0]     pre_quant_left_pos          [0 : 31]                        ;
 wire            [9 : 0]     pre_quant_bottom_pos        [0 : 31]                        ;
 
@@ -116,7 +118,6 @@ assign  o_d64_best_cost_tmp     =   lnpd_d64_best_cost_tmp      ;
         .i_err_scale            (err_scale                  ),
         .i_lambda               (lambda                     ),
 
-        .i_rdoq_est_cbf         (rdoq_est_cbf               ),
         .i_rdoq_est_last        (rdoq_est_last              ),
         .i_rdoq_est_level       (rdoq_est_level             ),
         .i_rdoq_est_run         (rdoq_est_run               ),
@@ -135,7 +136,6 @@ assign  o_d64_best_cost_tmp     =   lnpd_d64_best_cost_tmp      ;
         .o_err_scale            (pre_quant_err_scale        ),
         .o_lambda               (pre_quant_lambda           ),
 
-        .o_rdoq_est_cbf         (pre_quant_rdoq_est_cbf     ),
         .o_rdoq_est_last        (pre_quant_rdoq_est_last    ),
         .o_rdoq_est_level       (pre_quant_rdoq_est_level   ),
         .o_rdoq_est_run         (pre_quant_rdoq_est_run     ),
@@ -161,8 +161,8 @@ assign  o_d64_best_cost_tmp     =   lnpd_d64_best_cost_tmp      ;
         .i_q_bits               (pre_quant_q_bits           ),
         .i_err_scale            (pre_quant_err_scale        ),
         .i_lambda               (pre_quant_lambda           ),
+        .i_diff_scale           (diff_scale                 ),//haven't adopt delay operation
     
-        .i_rdoq_est_cbf         (pre_quant_rdoq_est_cbf     ),
         .i_rdoq_est_last        (pre_quant_rdoq_est_last    ),
         .i_rdoq_est_level       (pre_quant_rdoq_est_level   ),
         .i_rdoq_est_run         (pre_quant_rdoq_est_run     ),
@@ -188,35 +188,33 @@ assign  o_d64_best_cost_tmp     =   lnpd_d64_best_cost_tmp      ;
         .o_base_cost_buffer_tmp (ocd_base_cost_buffer_tmp   )
     );
 
-lnpd u_lnpd(      
-//system clk and rest       
-    .clk                        (clk                        ),
-    .rst_n                      (rst_n                      ),
+    lnpd u_lnpd(      
+    //system clk and rest       
+        .clk                        (clk                        ),
+        .rst_n                      (rst_n                      ),
 
-//input parameter           
-    .i_width_log2               (ocd_width_log2             ),//the value is between 2 and 6
-    .i_height_log2              (ocd_height_log2            ),//the value is between 2 and 6            
+    //input parameter           
+        .i_width_log2               (ocd_width_log2             ),//the value is between 2 and 6
+        .i_height_log2              (ocd_height_log2            ),//the value is between 2 and 6            
 
-//input data 
-    .i_valid                    (ocd_valid                  ),
-    .i_level_opt                (ocd_level_opt              ),
-    .i_tmp_dst_coef_sign        (ocd_tmp_dst_coef_sign      ),//the sign of tmp_dst_coef 1- 0+
-    .i_d64_cost_last_zero       (ocd_d64_cost_last_zero     ),
-    .i_d64_cost_last_one        (ocd_d64_cost_last_one      ),
-    .i_base_cost_buffer_tmp     (ocd_base_cost_buffer_tmp   ),
+    //input data 
+        .i_valid                    (ocd_valid                  ),
+        .i_level_opt                (ocd_level_opt              ),
+        .i_tmp_dst_coef_sign        (ocd_tmp_dst_coef_sign      ),//the sign of tmp_dst_coef 1- 0+
+        .i_d64_cost_last_zero       (ocd_d64_cost_last_zero     ),
+        .i_d64_cost_last_one        (ocd_d64_cost_last_one      ),
+        .i_base_cost_buffer_tmp     (ocd_base_cost_buffer_tmp   ),
 
-//output parameter                      
+    //output parameter                      
 
-//output data                 
-    .o_tmp_dst_coef             (lnpd_tmp_dst_coef          ),
-    .o_valid                    (lnpd_valid                 ),
-    .o_rdoq_last_x              (lnpd_rdoq_last_x           ),
-    .o_rdoq_last_y              (lnpd_rdoq_last_y           ),
-    .o_final_rdoq_cost          (lnpd_final_rdoq_cost       ),
-    .o_d64_best_cost_tmp        (lnpd_d64_best_cost_tmp     )                                      
-);               
-
-//output data                 
+    //output data                 
+        .o_tmp_dst_coef             (lnpd_tmp_dst_coef          ),
+        .o_valid                    (lnpd_valid                 ),
+        .o_rdoq_last_x              (lnpd_rdoq_last_x           ),
+        .o_rdoq_last_y              (lnpd_rdoq_last_y           ),
+        .o_final_rdoq_cost          (lnpd_final_rdoq_cost       ),
+        .o_d64_best_cost_tmp        (lnpd_d64_best_cost_tmp     )                                      
+    );               
 
 
 
