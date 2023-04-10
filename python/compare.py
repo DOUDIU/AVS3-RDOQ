@@ -69,14 +69,14 @@ else:
     print("level_opt 16x16 : False!")
 
     
-# f1 = open(".././result/ocd/fpga_dst_coef/fpga_dst_coef_16x16.txt","r")
-# f2 = open(".././result/ocd/hpm_dst_coef/hpm_dst_coef_16x16.txt","r")
-# txt1 = f1.read()
-# txt2 = f2.read()
-# if txt1 == txt2:
-#     print("dst_coef 16x16 : Right!")
-# else:
-#     print("dst_coef 16x16 : False!")
+f1 = open(".././result/ocd/fpga_base_cost_buffer/fpga_base_cost_buffer_16x16.txt","r")
+f2 = open(".././result/ocd/hpm_base_cost_buffer/hpm_base_cost_buffer_16x16.txt","r")
+txt1 = f1.read()
+txt2 = f2.read()
+if txt1 == txt2:
+    print("base_cost_buffer 16x16 : Right!")
+else:
+    print("base_cost_buffer 16x16 : False!")
 
 #lnpd
 print("\nlnpd:")

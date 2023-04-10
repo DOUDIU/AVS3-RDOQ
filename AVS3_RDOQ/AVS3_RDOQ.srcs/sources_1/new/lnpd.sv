@@ -1,30 +1,32 @@
+`include "rdoq_header.vh"
+
 module lnpd(      
 //system clk and rest       
-    input                       clk                                             ,
-    input                       rst_n                                           ,
+    input                                           clk                                 ,
+    input                                           rst_n                               ,
 
 //input parameter           
-    input           [2 : 0]     i_width_log2                                    ,//the value is between 2 and 6
-    input           [2 : 0]     i_height_log2                                   ,//the value is between 2 and 6            
+    input           [`w_size            - 1 : 0]    i_width_log2                        ,//the value is between 2 and 6
+    input           [`w_size            - 1 : 0]    i_height_log2                       ,//the value is between 2 and 6            
 
 //input data 
-    input                       i_valid                                         ,
-    input           [15 : 0]    i_level_opt             [0 : 31]                ,
-    input                       i_tmp_dst_coef_sign     [0 : 31]                ,//the sign of tmp_dst_coef 1- 0+
-    input   signed  [63 : 0]    i_d64_cost_last_zero    [0 : 31]                ,
-    input   signed  [63 : 0]    i_d64_cost_last_one     [0 : 31]                , 
-    input   signed  [63 : 0]    i_base_cost_buffer_tmp  [0 : 31]                ,
+    input                                           i_valid                             ,
+    input           [15 : 0]                        i_level_opt             [0 : 31]    ,
+    input                                           i_tmp_dst_coef_sign     [0 : 31]    ,//the sign of tmp_dst_coef 1- 0+
+    input   signed  [`w_rdoq_est_last   - 1 : 0]    i_d64_cost_last_zero    [0 : 31]    ,
+    input   signed  [`w_rdoq_est_last   - 1 : 0]    i_d64_cost_last_one     [0 : 31]    , 
+    input   signed  [33                     : 0]    i_base_cost_buffer_tmp  [0 : 31]    ,
 
 //output parameter                      
 
 //output data                 
 
-    output  signed  [15 : 0]    o_tmp_dst_coef          [0 : 31]                ,
-    output                      o_valid                                         ,
-    output  signed  [6  : 0]    o_rdoq_last_x                                   ,
-    output  signed  [6  : 0]    o_rdoq_last_y                                   ,
-    output  signed  [63 : 0]    o_final_rdoq_cost                               ,
-    output  signed  [63 : 0]    o_d64_best_cost_tmp                             
+    output  signed  [15                     : 0]    o_tmp_dst_coef          [0 : 31]    ,
+    output                                          o_valid                             ,
+    output  signed  [6                      : 0]    o_rdoq_last_x                       ,
+    output  signed  [6                      : 0]    o_rdoq_last_y                       ,
+    output  signed  [63                     : 0]    o_final_rdoq_cost                   ,
+    output  signed  [63                     : 0]    o_d64_best_cost_tmp                 
 );
 
 
@@ -35,12 +37,12 @@ integer i,j,k,l,m   ;
 genvar  o,p,q,r     ;
 
 //reg definition
-reg             [2  : 0]    i_width_log2_d1                                     ;//the value is between 2 and 6
-reg             [2  : 0]    i_height_log2_d1                                    ;//the value is between 2 and 6  
-reg             [2  : 0]    i_width_log2_d2                                     ;//the value is between 2 and 6
-reg             [2  : 0]    i_height_log2_d2                                    ;//the value is between 2 and 6  
-reg             [2  : 0]    i_width_log2_d3                                     ;//the value is between 2 and 6
-reg             [2  : 0]    i_height_log2_d3                                    ;//the value is between 2 and 6  
+reg             [`w_size - 1 : 0]    i_width_log2_d1                            ;
+reg             [`w_size - 1 : 0]    i_height_log2_d1                           ;
+reg             [`w_size - 1 : 0]    i_width_log2_d2                            ;
+reg             [`w_size - 1 : 0]    i_height_log2_d2                           ;
+reg             [`w_size - 1 : 0]    i_width_log2_d3                            ;
+reg             [`w_size - 1 : 0]    i_height_log2_d3                           ;
 reg             [15 : 0]    i_level_opt_d1              [0 : 31]                ;
 reg     signed  [63 : 0]    i_d64_cost_last_zero_d1     [0 : 31]                ;
 reg     signed  [63 : 0]    i_d64_cost_last_one_d1      [0 : 31]                ; 
@@ -169,15 +171,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
         end
     end
 
-    //do shift operation to the former temCost
-/*
-    generate
-        for(o = 1; o < 32; o = o + 1)begin
-            assign  tempCost_tem[o - 1]     =   tempCost[o];
-        end
-        assign  tempCost_tem[31]    =   tempCost[31];
-    endgenerate
-*/     
+    //do shift operation to the former temCost  
     always@(*)begin
         if(!rst_n)begin
             for(i = 0; i < 32; i = i + 1)begin
@@ -298,16 +292,6 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
 
 
     //do shift operation to the former rdoqD64LastOne and rdoqD64LastZero
-/*
-    generate
-        for(o = 1; o < 32; o = o + 1)begin
-            assign  rdoqD64LastOne_tem [o - 1]     =   rdoqD64LastOne [o];
-            assign  rdoqD64LastZero_tem[o - 1]     =   rdoqD64LastZero[o];
-        end
-        assign  rdoqD64LastOne_tem [31]    =   rdoqD64LastOne [31];
-        assign  rdoqD64LastZero_tem[31]    =   rdoqD64LastZero[31];
-    endgenerate
-*/
     always@(*)begin
         if(!rst_n)begin
             for(i = 0; i < 32; i = i + 1)begin
@@ -1060,16 +1044,6 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
     end
 
     //do shift operation to the former rdoq_last_x and rdoq_last_y
-/*
-    generate
-        for(o = 1; o < 32; o = o + 1)begin
-            assign  rdoq_last_x_tem[o - 1]     =   rdoq_last_x[o];
-            assign  rdoq_last_y_tem[o - 1]     =   rdoq_last_y[o];
-        end
-        assign  rdoq_last_x_tem[31]    =   rdoq_last_x[31];
-        assign  rdoq_last_y_tem[31]    =   rdoq_last_y[31];
-    endgenerate
-*/
     always@(*)begin
         if(!rst_n)begin
             for(i = 0; i < 32; i = i + 1)begin
@@ -1817,14 +1791,6 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
 
 
     //do shift operation to the former endPosCost
-/*
-    generate
-        for(o = 1; o < 32; o = o + 1)begin
-            assign  endPosCost_tem[o - 1]     =   endPosCost[o];
-        end
-        assign  endPosCost_tem[31]    =   endPosCost[31];
-    endgenerate
-*/
     always@(*)begin
         if(!rst_n)begin
             for(i = 0; i < 32; i = i + 1)begin

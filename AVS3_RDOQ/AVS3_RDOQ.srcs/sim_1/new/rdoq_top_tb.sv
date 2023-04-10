@@ -1,4 +1,5 @@
 `timescale 1ns / 1ns
+`include "../../sources_1/new/rdoq_header.vh"
 
 module rdoq_top_tb();
 
@@ -14,33 +15,32 @@ localparam  SIZE4       = 3'd2  ,
 integer fp_r, fp_w, rd_i, rd_j, rd_k, rd_l, wr_i, wr_j, wr_k, rd_z, rd_y;
 
 //system input
-    reg                                 clk                 ;
-    reg                                 reset               ;
+    reg                                             clk             ;
+    reg                                             reset           ;
 //input parameter       
-    reg             [21: 0]             q_value             ;
-    reg             [4 : 0]             q_bits              ;
+    reg             [`w_q_value     - 1 : 0]        q_value         ;
+    reg             [`w_q_bits      - 1 : 0]        q_bits          ;
 
-    reg             [2 : 0]             cu_width_log2       ;
-    reg             [2 : 0]             cu_height_log2      ;
-    reg             [2 : 0]             ch_type             ;
-    reg     signed  [63: 0]             err_scale           ;
-    reg     signed  [19: 0]             diff_scale          ;
-    reg     signed  [23: 0]             lambda              ;
+    reg             [`w_size        - 1 : 0]        cu_width_log2   ;
+    reg             [`w_size        - 1 : 0]        cu_height_log2  ;
+    reg     signed  [`w_err_scale   - 1 : 0]        err_scale       ;
+    reg     signed  [`w_diff_scale  - 1 : 0]        diff_scale      ;
+    reg     signed  [`w_lambda      - 1 : 0]        lambda          ;
 
-    reg             [6 : 0]             qp                  ;
-    reg             [0 : 0]             is_intra            ;
-    reg             [3 : 0]             bit_depth           ;
+    reg             [6                  : 0]        qp              ;
+    reg             [0                  : 0]        is_intra        ;
+    reg             [3                  : 0]        bit_depth       ;
 
 
 //input data
-    reg                         i_valid;
-    reg     signed  [15: 0]     i_data          [0 : 31]        ;
-    reg             [9 : 0]     left_pos        [0 : 31]        ;
-    reg             [9 : 0]     bottom_pos      [0 : 31]        ;
-    reg             [31: 0]     rdoq_est_cbf    [0 :  2][0 :  1];//pending
-    reg             [16: 0]     rdoq_est_last   [0 :  1][0 :  5][0 : 11][0 : 1];//pending
-    reg             [16: 0]     rdoq_est_level  [0 : 23][0 :  1];//pending
-    reg             [16: 0]     rdoq_est_run    [0 : 23][0 :  1];//pending
+    reg                                             i_valid                     ;
+    reg     signed  [`w_data_in         - 1 : 0]    i_data          [0 : 31]    ;
+    reg             [`w_pos             - 1 : 0]    left_pos        [0 : 31]    ;
+    reg             [`w_pos             - 1 : 0]    bottom_pos      [0 : 31]    ;
+    reg             [31                     : 0]    rdoq_est_cbf    [0 :  2][0 :  1];
+    reg             [`w_rdoq_est_last   - 1 : 0]    rdoq_est_last   [0 :  5][0 : 11][0 : 1];
+    reg             [`w_rdoq_est_level  - 1 : 0]    rdoq_est_level  [0 : 23][0 :  1];
+    reg             [`w_rdoq_est_run    - 1 : 0]    rdoq_est_run    [0 : 23][0 :  1];
 
 
 //output parameter 
@@ -51,8 +51,8 @@ integer fp_r, fp_w, rd_i, rd_j, rd_k, rd_l, wr_i, wr_j, wr_k, rd_z, rd_y;
     wire    signed  [15: 0]     o_data  [0 : 31]    ;
 
 //txt rd/wr 
-    reg     signed  [15: 0]     rd_data [0 : 63]    ;
-    reg     signed  [15: 0]     wr_data [0 : 63]    ;
+    reg     signed  [15 : 0]    rd_data [0 : 63]    ;
+    reg     signed  [15 : 0]    wr_data [0 : 63]    ;
 
     reg             [31: 0]     rdoq_data           ;
 
@@ -67,14 +67,9 @@ rdoq_top u_rdoq_top(
 
     .cu_width_log2          (cu_width_log2  ),//the value is between 2 and 4
     .cu_height_log2         (cu_height_log2 ),//the value is between 2 and 4
-    .ch_type                (ch_type        ),//Y_C 0; U_C 1; Y_C 2;
     .err_scale              (err_scale      ),
     .lambda                 (lambda         ),
     .diff_scale             (diff_scale     ),
-
-    //.qp                     (qp             ),
-    //.is_intra               (is_intra       ),
-    //.bit_depth              (bit_depth      ),
 
     .rdoq_est_last          (rdoq_est_last  ),
     .rdoq_est_level         (rdoq_est_level ),
@@ -100,15 +95,14 @@ initial begin
     clk             =       0;
     reset           =       0;
 
-    cu_width_log2   =   3 'd0;
-    cu_height_log2  =   3 'd0;
+    cu_width_log2   =   `w_size'd0;
+    cu_height_log2  =   `w_size'd0;
     qp              =   7 'd0;
-    ch_type         =   3 'd0;
     is_intra        =   1 'd0;
-    lambda          =   24'd0;
+    lambda          =   `w_lambda'd0;
     bit_depth       =   4 'd0;
-    q_value         =   22'd0;
-    q_bits          =   5 'd0;
+    q_value         =   `w_q_value'd0;
+    q_bits          =   `w_q_bits'd0;
     i_valid         =       0;
     
 
@@ -128,12 +122,10 @@ initial begin
             rdoq_est_cbf[rd_i][rd_j] = 0;
         end
     end
-    for (rd_i = 0; rd_i < 2; rd_i = rd_i + 1) begin
-        for(rd_j = 0; rd_j < 6; rd_j = rd_j + 1)begin
-            for(rd_k = 0; rd_k < 12; rd_k = rd_k + 1)begin
-                for(rd_l = 0; rd_l < 2; rd_l = rd_l + 1)begin
-                    rdoq_est_last[rd_i][rd_j][rd_k][rd_l] = 0;
-                end
+    for(rd_j = 0; rd_j < 6; rd_j = rd_j + 1)begin
+        for(rd_k = 0; rd_k < 12; rd_k = rd_k + 1)begin
+            for(rd_l = 0; rd_l < 2; rd_l = rd_l + 1)begin
+                rdoq_est_last[rd_j][rd_k][rd_l] = 0;
             end
         end
     end
@@ -153,15 +145,14 @@ initial begin
     //16x16
     i_valid         =   1               ;
 
-    q_value         =   22'd69          ;
-    q_bits          =   5 'd15          ;
+    q_value         =   `w_q_value'd69          ;
+    q_bits          =   `w_q_bits'd15          ;
 
     cu_width_log2   =   SIZE16          ;
     cu_height_log2  =   SIZE16          ;
-    ch_type         =   Y_C             ;
-    err_scale       =   64'd62245902    ;
-    lambda          =   24'd10131659    ;
-    diff_scale      =   20'd19555       ;
+    err_scale       =   `w_err_scale'd62245902    ;
+    lambda          =   `w_lambda'd10131659    ;
+    diff_scale      =   `w_diff_scale'd19555       ;
 
     qp              =   7 'd63          ;
     is_intra        =   1 'd1           ;
@@ -176,13 +167,11 @@ initial begin
     $fclose(fp_r);
     
     fp_r = $fopen("../../../../../result/origin_data/rdoq_est_last/est_last_16x16.txt", "r");
-        for (rd_i = 0; rd_i < 2; rd_i = rd_i + 1) begin
-            for(rd_j = 0; rd_j < 6; rd_j = rd_j + 1)begin
-                for(rd_k = 0; rd_k < 12; rd_k = rd_k + 1)begin
-                    for(rd_l = 0; rd_l < 2; rd_l = rd_l + 1)begin
-                        $fscanf(fp_r, "%d ", rdoq_data);
-                        rdoq_est_last[rd_i][rd_j][rd_k][rd_l] = rdoq_data;
-                    end
+        for(rd_j = 0; rd_j < 6; rd_j = rd_j + 1)begin
+            for(rd_k = 0; rd_k < 12; rd_k = rd_k + 1)begin
+                for(rd_l = 0; rd_l < 2; rd_l = rd_l + 1)begin
+                    $fscanf(fp_r, "%d ", rdoq_data);
+                    rdoq_est_last[rd_j][rd_k][rd_l] = rdoq_data;
                 end
             end
         end
@@ -252,9 +241,8 @@ initial begin
     cu_width_log2   =   SIZE8           ;
     cu_height_log2  =   SIZE8           ;
     qp              =   7 'd63          ;
-    ch_type         =   Y_C             ;
     is_intra        =   1 'd1           ;
-    lambda          =   24'd10131659    ;
+    lambda          =   `w_lambda'd10131659    ;
     bit_depth       =   4 'd10          ;
     fp_r = $fopen("../../../../../result/origin_data/src/origin_data_8x8.txt", "r");
     for (rd_i = 0; rd_i < 8; rd_i = rd_i + 1) begin
@@ -277,9 +265,8 @@ initial begin
     cu_width_log2   =   SIZE4           ;
     cu_height_log2  =   SIZE4           ;
     qp              =   7 'd63          ;
-    ch_type         =   Y_C             ;
     is_intra        =   1 'd1           ;
-    lambda          =   24'd10131659    ;
+    lambda          =   `w_lambda'd10131659    ;
     bit_depth       =   4 'd10          ;
     fp_r = $fopen("../../../../../result/origin_data/src/origin_data_4x4.txt", "r");
     for (rd_i = 0; rd_i < 4; rd_i = rd_i + 1) begin
@@ -302,9 +289,8 @@ initial begin
     cu_width_log2   =   SIZE32          ;
     cu_height_log2  =   SIZE32          ;
     qp              =   7 'd63          ;
-    ch_type         =   Y_C             ;
     is_intra        =   1 'd1           ;
-    lambda          =   24'd10131659    ;
+    lambda          =   `w_lambda'd10131659    ;
     bit_depth       =   4 'd10          ;
     fp_r = $fopen("../../../../../result/origin_data/src/origin_data_32x32.txt", "r");
     for (rd_i = 0; rd_i < 32; rd_i = rd_i + 1) begin
@@ -328,9 +314,6 @@ initial begin
 
 
 end
-
-
-//write
 
 
 
