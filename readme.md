@@ -53,3 +53,13 @@
 |           | ocd                | 67397 | 12967 | 0         | 320  | 64.11（v）  |
 |           | lnpd               | 2989  | 2427  | 0         | 0    | 189.25（v） |
 
+1.replace the multiplication operation to add and shift operation in "temp_coef_abs_d2" which value is between 2-9
+
+2.reduce the bit width of "i64Delta" thus reduce half amount of dsp in the calcualtion of "err" 
+
+| 时间      | 备注               | LUT   | FF    | RAM(bits) | DSP  | Fmax(MHz)   |
+| --------- | ------------------ | ----- | ----- | --------- | ---- | ----------- |
+| 2023.4.12 | 单尺寸RDOQ流水结构 | 79711 | 24259 | 0         | 224  | 126.85（s） |
+|           | pre_quant          | 6374  | 9879  | 0         | 32   | 350.2（v）  |
+|           | ocd                | 69714 | 14757 | 0         | 192  |             |
+|           | lnpd               | 2985  | 2427  | 0         | 0    | 189.25（v） |

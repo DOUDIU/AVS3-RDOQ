@@ -81,9 +81,10 @@ reg             [31                     : 0]    level_opt           [0 : 31]    
 reg             [31                     : 0]    level_opt_d1        [0 : 31]                    ;
 reg     signed  [23                     : 0]    dCurrCost           [0 :  1][0 : 31]            ;
 reg     signed  [23                     : 0]    dCurrCost_tem       [0 :  2][0 :  1][0 : 31]    ;
-reg     signed  [31                     : 0]    err1_tem            [0 : 31]                    ;
 reg     signed  [17                     : 0]    err1                [0 : 31]                    ;
+reg     signed  [31                     : 0]    err1_tem            [0 : 31]                    ;
 reg     signed  [11                     : 0]    err                 [0 :  1][0 : 31]            ;
+reg     signed  [31                     : 0]    err_tem             [0 :  1][0 : 31]            ;
 reg     signed  [23                     : 0]    err_x_err           [0 :  1][0 : 31]            ;
 
 
@@ -111,7 +112,8 @@ wire            [`w_temp_coef       - 1 : 0]    temp_coef_abs           [0 : 31]
 wire            [`w_pos             - 1 : 0]    scan_pos                [0 : 31]            ;//zigzag scan position of each row
 wire            [4                      : 0]    ctx_run                 [0 : 31]            ;
 wire            [4                      : 0]    ctx_level               [0 : 31]            ;
-wire    signed  [31                     : 0]    i64Delta                [0 :  1][0 : 31]    ;
+wire    signed  [18                     : 0]    i64Delta                [0 :  1][0 : 31]    ;
+wire    signed  [31                     : 0]    i64Delta_tem            [0 :  1][0 : 31]    ;
 
 
 //assignment
@@ -228,10 +230,18 @@ wire    signed  [31                     : 0]    i64Delta                [0 :  1]
 
     generate
         for(o = 0; o < 32; o = o + 1)begin
-            assign  i64Delta[0][o]  =   i_level_double[o] - (temp_coef_abs[o] << i_q_bits);
-            assign  i64Delta[1][o]  =   i_level_double[o] - ((temp_coef_abs[o] - 1) << i_q_bits);
+            assign  i64Delta_tem[0][o]  =   i_level_double[o] - (temp_coef_abs[o] << i_q_bits);
+            assign  i64Delta_tem[1][o]  =   i_level_double[o] - ((temp_coef_abs[o] - 1) << i_q_bits);
         end
     endgenerate
+
+    generate
+        for(o = 0; o < 32; o = o + 1)begin
+            assign  i64Delta[0][o]  =   i64Delta_tem[0][o][18 : 0];
+            assign  i64Delta[1][o]  =   i64Delta_tem[1][o][18 : 0];
+        end
+    endgenerate
+
 
 //pipe 1
 
@@ -286,27 +296,42 @@ wire    signed  [31                     : 0]    i64Delta                [0 :  1]
             for(o = 0; o < 32; o = o + 1)begin
                 always@(posedge clk or negedge rst_n)begin
                     if(!rst_n)begin
-                        for(j = 0; j < 2; j = j + 1)begin
-                            err[j][o]     <=      0;
-                        end
+                        err_tem[0][o]   <=      0;
                     end
                     else if(temp_coef_abs[o] == 0) begin 
-                        for(j = 0; j < 2; j = j + 1)begin
-                            err[j][o]     <=      0;
-                        end
-                    end
-                    else if(temp_coef_abs[o] == 1) begin 
-                        err[0][o]   <=  (i64Delta[0][o] * i_diff_scale) >>> ERR_SCALE_PRECISION_BITS;
-
-                        err[1][o]   <=  0;
+                        err_tem[0][o]   <=      0;
                     end
                     else begin
-                        err[0][o]   <=  (i64Delta[0][o] * i_diff_scale) >>> ERR_SCALE_PRECISION_BITS;
-                        err[1][o]   <=  (i64Delta[1][o] * i_diff_scale) >>> ERR_SCALE_PRECISION_BITS;
+                        err_tem[0][o]   <=  (i64Delta[0][o] * i_diff_scale) >>> ERR_SCALE_PRECISION_BITS;
                     end
                 end
             end
         endgenerate
+
+        generate
+            for(o = 0; o < 32; o = o + 1)begin
+                always@(posedge clk or negedge rst_n)begin
+                    if(!rst_n)begin
+                        err_tem[1][o]   <=      0;
+                    end
+                    else if((temp_coef_abs[o] == 0) || (temp_coef_abs[o] == 1)) begin 
+                        err_tem[1][o]   <=      0;
+                    end
+                    else begin
+                        err_tem[1][o]   <=  (i64Delta[1][o] * i_diff_scale) >>> ERR_SCALE_PRECISION_BITS;
+                    end
+                end
+            end
+        endgenerate
+
+    generate
+        for(p = 0; p < 2; p = p + 1)begin
+            for(o = 0; o < 32; o = o + 1)begin
+                assign  err[p][o]  =   err_tem[p][o][11 : 0];
+            end
+        end
+    endgenerate
+
 
     //calculate err1
         always@(posedge clk or negedge rst_n)begin
@@ -384,66 +409,66 @@ wire    signed  [31                     : 0]    i64Delta                [0 :  1]
             assign  left_pos_tem[31]     =  left_pos[31];
         endgenerate
 
-    /*
-        always@(*)begin
-            for(i = 2; i < 32; i = i + 2)begin
-                left_pos_tem[i - 1]     <=  left_pos[i];
-            end
+    
+        // always@(*)begin
+        //     for(i = 2; i < 32; i = i + 2)begin
+        //         left_pos_tem[i - 1]     <=  left_pos[i];
+        //     end
             
-            for(i = 1 ; i < 3; i = i + 2)begin
-                left_pos_tem[i - 1]     <=  left_pos[i];
-            end
-            for(i = 5 ; i < 7; i = i + 2)begin
-                left_pos_tem[i - 1]     <=  left_pos[i];
-            end
-            for(i = 9 ; i < 15; i = i + 2)begin
-                left_pos_tem[i - 1]     <=  left_pos[i];
-            end            
-            for(i = 17; i < 31; i = i + 2)begin
-                left_pos_tem[i - 1]     <=  left_pos[i];
-            end
-            case(i_height_log2_d[0])
-                3'd2    : begin    
-                        for(i = 1 ; i < 4; i = i + 1)begin
-                            left_pos_tem[i - 1]     <=  left_pos[i];
-                        end
-                        left_pos_tem[3 ]    <=  left_pos_tem[3 ];
-                        for(i = 4 ; i < 32; i = i + 1)begin
-                            left_pos_tem[i]         <=  0;
-                        end
-                    end
-                3'd3    : begin
-                        for(i = 1 ; i < 8; i = i + 1)begin
-                            left_pos_tem[i - 1]     <=  left_pos[i];
-                        end
-                        left_pos_tem[7 ]    <=  left_pos_tem[7 ];
-                        for(i = 8 ; i < 32; i = i + 1)begin
-                            left_pos_tem[i]         <=  0;
-                        end
-                    end
-                3'd4    : begin
-                        for(i = 1 ; i < 16; i = i + 1)begin
-                            left_pos_tem[i - 1]     <=  left_pos[i];
-                        end
-                        left_pos_tem[15]    <=  left_pos_tem[15];
-                        for(i = 16 ; i < 32; i = i + 1)begin
-                            left_pos_tem[i]         <=  0;
-                        end
-                    end
-                3'd5    : begin
-                        for(i = 1 ; i < 32; i = i + 1)begin
-                            left_pos_tem[i - 1]     <=  left_pos[i];
-                        end
-                        left_pos_tem[31]    <=  left_pos_tem[31];
-                    end
-                default : begin
-                        for(i = 0 ; i < 32; i = i + 1)begin
-                            left_pos_tem[i]         <=  0;
-                        end
-                    end
-            endcase 
-        end
-    */
+        //     for(i = 1 ; i < 3; i = i + 2)begin
+        //         left_pos_tem[i - 1]     <=  left_pos[i];
+        //     end
+        //     for(i = 5 ; i < 7; i = i + 2)begin
+        //         left_pos_tem[i - 1]     <=  left_pos[i];
+        //     end
+        //     for(i = 9 ; i < 15; i = i + 2)begin
+        //         left_pos_tem[i - 1]     <=  left_pos[i];
+        //     end            
+        //     for(i = 17; i < 31; i = i + 2)begin
+        //         left_pos_tem[i - 1]     <=  left_pos[i];
+        //     end
+        //     case(i_height_log2_d[0])
+        //         3'd2    : begin    
+        //                 for(i = 1 ; i < 4; i = i + 1)begin
+        //                     left_pos_tem[i - 1]     <=  left_pos[i];
+        //                 end
+        //                 left_pos_tem[3 ]    <=  left_pos_tem[3 ];
+        //                 for(i = 4 ; i < 32; i = i + 1)begin
+        //                     left_pos_tem[i]         <=  0;
+        //                 end
+        //             end
+        //         3'd3    : begin
+        //                 for(i = 1 ; i < 8; i = i + 1)begin
+        //                     left_pos_tem[i - 1]     <=  left_pos[i];
+        //                 end
+        //                 left_pos_tem[7 ]    <=  left_pos_tem[7 ];
+        //                 for(i = 8 ; i < 32; i = i + 1)begin
+        //                     left_pos_tem[i]         <=  0;
+        //                 end
+        //             end
+        //         3'd4    : begin
+        //                 for(i = 1 ; i < 16; i = i + 1)begin
+        //                     left_pos_tem[i - 1]     <=  left_pos[i];
+        //                 end
+        //                 left_pos_tem[15]    <=  left_pos_tem[15];
+        //                 for(i = 16 ; i < 32; i = i + 1)begin
+        //                     left_pos_tem[i]         <=  0;
+        //                 end
+        //             end
+        //         3'd5    : begin
+        //                 for(i = 1 ; i < 32; i = i + 1)begin
+        //                     left_pos_tem[i - 1]     <=  left_pos[i];
+        //                 end
+        //                 left_pos_tem[31]    <=  left_pos_tem[31];
+        //             end
+        //         default : begin
+        //                 for(i = 0 ; i < 32; i = i + 1)begin
+        //                     left_pos_tem[i]         <=  0;
+        //                 end
+        //             end
+        //     endcase 
+        // end
+    
     //calculate scan position
         always@(posedge clk or negedge rst_n)begin
             if(!rst_n) begin
@@ -866,6 +891,7 @@ wire    signed  [31                     : 0]    i64Delta                [0 :  1]
             end
         endgenerate
 
+
     //calculate dCurrCost[0]
         generate            
             for(o = 0; o < 32; o = o + 1)begin
@@ -876,12 +902,12 @@ wire    signed  [31                     : 0]    i64Delta                [0 :  1]
                 assign  dCurrCost_tem[1][0][o]   =  err_x_err[0][o] +
                                                     i_rdoq_est_level_d[1][ctx_level[o]    ][0] + 
                                                     i_rdoq_est_level_d[1][ctx_level[o] + 1][0] << 3 - i_rdoq_est_level_d[1][ctx_level[o] + 1][0] +
-                                                    ((funclog2(temp_coef_abs_d2[o] - 7) < 12 ? funclog2(temp_coef_abs_d2[o] - 7) * 2 + 1 : 25) << 16);
+                                                    ((funclog2(temp_coef_abs_d2[o] - 7) < 12 ? (funclog2(temp_coef_abs_d2[o] - 7) << 1 ) + 1 : 25) << 16);
             end    
             for(o = 0; o < 32; o = o + 1)begin
                 assign  dCurrCost_tem[2][0][o]   =  err_x_err[0][o] +
                                                     i_rdoq_est_level_d[1][ctx_level[o]    ][0] + 
-                                                    i_rdoq_est_level_d[1][ctx_level[o] + 1][0] * (temp_coef_abs_d2[o] - 2) + 
+                                                    //i_rdoq_est_level_d[1][ctx_level[o] + 1][0] * (temp_coef_abs_d2[o] - 2) + 
                                                     i_rdoq_est_level_d[1][ctx_level[o] + 1][1];
             end
         endgenerate
@@ -895,8 +921,28 @@ wire    signed  [31                     : 0]    i64Delta                [0 :  1]
                     1 : begin
                         dCurrCost[0][i]     <=  dCurrCost_tem[0][0][i];
                     end
-                    2,3,4,5,6,7,8 : begin
+                    // 2,3,4,5,6,7,8 : begin
+                    //     dCurrCost[0][i]     <=  dCurrCost_tem[2][0][i];
+                    2 : begin
                         dCurrCost[0][i]     <=  dCurrCost_tem[2][0][i];
+                    end
+                    3 : begin
+                        dCurrCost[0][i]     <=  dCurrCost_tem[2][0][i] + i_rdoq_est_level_d[1][ctx_level[i] + 1][0];
+                    end
+                    4 : begin
+                        dCurrCost[0][i]     <=  dCurrCost_tem[2][0][i] + (i_rdoq_est_level_d[1][ctx_level[i] + 1][0] << 1);
+                    end
+                    5 : begin
+                        dCurrCost[0][i]     <=  dCurrCost_tem[2][0][i] + (i_rdoq_est_level_d[1][ctx_level[i] + 1][0] << 1) + i_rdoq_est_level_d[1][ctx_level[i] + 1][0];
+                    end
+                    6 : begin
+                        dCurrCost[0][i]     <=  dCurrCost_tem[2][0][i] + (i_rdoq_est_level_d[1][ctx_level[i] + 1][0] << 2);
+                    end
+                    7 : begin
+                        dCurrCost[0][i]     <=  dCurrCost_tem[2][0][i] + (i_rdoq_est_level_d[1][ctx_level[i] + 1][0] << 2) + i_rdoq_est_level_d[1][ctx_level[i] + 1][0];
+                    end
+                    8 : begin
+                        dCurrCost[0][i]     <=  dCurrCost_tem[2][0][i] + (i_rdoq_est_level_d[1][ctx_level[i] + 1][0] << 2) + (i_rdoq_est_level_d[1][ctx_level[i] + 1][0] << 1);
                     end
                     default: begin 
                         dCurrCost[0][i]     <=  dCurrCost_tem[1][0][i];
@@ -915,12 +961,12 @@ wire    signed  [31                     : 0]    i64Delta                [0 :  1]
                 assign  dCurrCost_tem[1][1][o]   =  err_x_err[1][o] +
                                                     i_rdoq_est_run_d[1][ctx_level[o]    ][0] + 
                                                     i_rdoq_est_run_d[1][ctx_level[o] + 1][0] << 3 - i_rdoq_est_run_d[1][ctx_level[o] + 1][0] + 
-                                                    ((funclog2(temp_coef_abs_d2[o] - 1 - 7) < 12 ? funclog2(temp_coef_abs_d2[o] - 1 - 7) * 2 + 1 : 25) << 16);
+                                                    ((funclog2(temp_coef_abs_d2[o] - 1 - 7) < 12 ? (funclog2(temp_coef_abs_d2[o] - 1 - 7) << 1 ) + 1 : 25) << 16);
             end    
             for(o = 0; o < 32; o = o + 1)begin
                 assign  dCurrCost_tem[2][1][o]   =  err_x_err[1][o] +
                                                     i_rdoq_est_run_d[1][ctx_level[o]    ][0] + 
-                                                    i_rdoq_est_run_d[1][ctx_level[o] + 1][0] * (temp_coef_abs_d2[o] - 1 - 2) + 
+                                                    //i_rdoq_est_run_d[1][ctx_level[o] + 1][0] * (temp_coef_abs_d2[o] - 1 - 2) + 
                                                     i_rdoq_est_run_d[1][ctx_level[o] + 1][1];
             end
         endgenerate
@@ -934,8 +980,29 @@ wire    signed  [31                     : 0]    i64Delta                [0 :  1]
                     2 : begin
                         dCurrCost[1][i]     <=  dCurrCost_tem[0][1][i];
                     end
-                    3,4,5,6,7,8,9 : begin
+                    // 3,4,5,6,7,8,9 : begin
+                    //     dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i];
+                    // end
+                    3 : begin
                         dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i];
+                    end
+                    4 : begin
+                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + i_rdoq_est_run_d[1][ctx_level[i] + 1][0];
+                    end
+                    5 : begin
+                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + (i_rdoq_est_run_d[1][ctx_level[i] + 1][0] << 1);
+                    end
+                    6 : begin
+                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + (i_rdoq_est_run_d[1][ctx_level[i] + 1][0] << 1) + i_rdoq_est_run_d[1][ctx_level[i] + 1][0];
+                    end
+                    7 : begin
+                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + (i_rdoq_est_run_d[1][ctx_level[i] + 1][0] << 2);
+                    end
+                    8 : begin
+                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + (i_rdoq_est_run_d[1][ctx_level[i] + 1][0] << 2) + i_rdoq_est_run_d[1][ctx_level[i] + 1][0];
+                    end
+                    9 : begin
+                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + (i_rdoq_est_run_d[1][ctx_level[i] + 1][0] << 2) + (i_rdoq_est_run_d[1][ctx_level[i] + 1][0] << 1);
                     end
                     default: begin 
                         dCurrCost[1][i]     <=  dCurrCost_tem[1][1][i];
@@ -951,7 +1018,6 @@ wire    signed  [31                     : 0]    i64Delta                [0 :  1]
                                                     0 : (dCurrCost[0][o] < dCurrCost[1][o] ? temp_coef_abs_d2[o] : (temp_coef_abs_d2[o] - 1 ) ) ;
             end
         endgenerate
-
 
 //pipe 3
 
@@ -1032,40 +1098,11 @@ wire    signed  [31                     : 0]    i64Delta                [0 :  1]
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //function definition
     function [3 : 0] funclog2;
-        input [15 : 0]  value;
+        input [9 : 0]  value;
         begin
-            if(value[15])
-                funclog2    =   15;
-            else if(value[14])
-                funclog2    =   14;
-            else if(value[13])
-                funclog2    =   13;
-            else if(value[12])
-                funclog2    =   12;
-            else if(value[11])
-                funclog2    =   11;
-            else if(value[10])
-                funclog2    =   10;
-            else if(value[9])
+            if(value[9])
                 funclog2    =   9;
             else if(value[8])
                 funclog2    =   8;
