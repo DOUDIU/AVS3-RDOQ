@@ -1,4 +1,4 @@
-//`define file_write          1
+`define file_write          1
 
 //width of each parameter
 `define w_diff_scale        17
@@ -7,7 +7,7 @@
 `define w_lambda            24
 `define w_q_bits            5
 
-`define w_rdoq_est_last     16
+`define w_rdoq_est_last     17
 `define w_rdoq_est_level    17
 `define w_rdoq_est_run      17
 

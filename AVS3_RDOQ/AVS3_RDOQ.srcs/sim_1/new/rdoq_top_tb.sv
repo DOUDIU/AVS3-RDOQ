@@ -27,9 +27,7 @@ integer fp_r, fp_w, rd_i, rd_j, rd_k, rd_l, wr_i, wr_j, wr_k, rd_z, rd_y;
     reg     signed  [`w_diff_scale  - 1 : 0]        diff_scale      ;
     reg     signed  [`w_lambda      - 1 : 0]        lambda          ;
 
-    reg             [6                  : 0]        qp              ;
     reg             [0                  : 0]        is_intra        ;
-    reg             [3                  : 0]        bit_depth       ;
 
 
 //input data
@@ -89,20 +87,21 @@ rdoq_top u_rdoq_top(
 always #1 begin
     clk <= ~clk;
 end
+  
 
 //read
 initial begin
     clk             =       0;
     reset           =       0;
 
-    cu_width_log2   =   `w_size'd0;
-    cu_height_log2  =   `w_size'd0;
-    qp              =   7 'd0;
-    is_intra        =   1 'd0;
-    lambda          =   `w_lambda'd0;
-    bit_depth       =   4 'd0;
-    q_value         =   `w_q_value'd0;
-    q_bits          =   `w_q_bits'd0;
+    q_value         =       `w_q_value'd0;
+    q_bits          =       `w_q_bits'd0;
+    cu_width_log2   =       `w_size'd0;
+    cu_height_log2  =       `w_size'd0;
+    err_scale       =       0;
+    lambda          =       `w_lambda'd0;
+    diff_scale      =       0;
+
     i_valid         =       0;
     
 
@@ -142,21 +141,34 @@ initial begin
     #2;
     reset = 1;
     //Start
-    //16x16
-    i_valid         =   1               ;
 
-    q_value         =   `w_q_value'd69          ;
-    q_bits          =   `w_q_bits'd15          ;
+//16x16
+    i_valid         =   1                           ;
 
-    cu_width_log2   =   SIZE16          ;
-    cu_height_log2  =   SIZE16          ;
-    err_scale       =   `w_err_scale'd62245902    ;
-    lambda          =   `w_lambda'd10131659    ;
-    diff_scale      =   `w_diff_scale'd19555       ;
+    fp_r = $fopen("../../../../../result/origin_data/q_value/q_value_16x16.txt", "r");
+    $fscanf(fp_r, "%d ", q_value);
+    $fclose(fp_r);
+    fp_r = $fopen("../../../../../result/origin_data/q_bits/q_bits_16x16.txt", "r");
+    $fscanf(fp_r, "%d ", q_bits);
+    $fclose(fp_r);
+    fp_r = $fopen("../../../../../result/origin_data/cu_width_log2/cu_width_log2_16x16.txt", "r");
+    $fscanf(fp_r, "%d ", cu_width_log2);
+    $fclose(fp_r);
+    fp_r = $fopen("../../../../../result/origin_data/cu_height_log2/cu_height_log2_16x16.txt", "r");
+    $fscanf(fp_r, "%d ", cu_height_log2);
+    $fclose(fp_r);
 
-    qp              =   7 'd63          ;
-    is_intra        =   1 'd1           ;
-    bit_depth       =   4 'd10          ;
+    rd_l = $fopen("../../../../../result/origin_data/lambda/lambda_16x16.txt", "r");
+    $fscanf(rd_l, "%d ", lambda);
+    $fclose(rd_l);
+    rd_l = $fopen("../../../../../result/origin_data/err_scale/err_scale_16x16.txt", "r");
+    $fscanf(rd_l, "%d ", err_scale);
+    $fclose(rd_l);
+    rd_l = $fopen("../../../../../result/origin_data/diff_scale/diff_scale_16x16.txt", "r");
+    $fscanf(rd_l, "%d ", diff_scale);
+    $fclose(rd_l);
+
+
     fp_r = $fopen("../../../../../result/origin_data/rdoq_est_cbf/est_cbf_16x16.txt", "r");
         for (rd_i = 0; rd_i < 3; rd_i = rd_i + 1) begin
             for(rd_j = 0; rd_j < 2; rd_j = rd_j + 1)begin
@@ -195,7 +207,7 @@ initial begin
         end
     $fclose(fp_r);
 
-    fp_r = $fopen("../../../../../result/origin_data/left_pos/left_pos.txt", "r");
+    fp_r = $fopen("../../../../../result/origin_data/left_pos/left_pos_16x16.txt", "r");
         $fscanf(fp_r, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
             rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ], rd_data[4 ], rd_data[5 ], rd_data[6 ], rd_data[7 ],
             rd_data[8 ], rd_data[9 ], rd_data[10], rd_data[11], rd_data[12], rd_data[13], rd_data[14], rd_data[15]);
@@ -205,7 +217,7 @@ initial begin
         end
     $fclose(fp_r);
 
-    fp_r = $fopen("../../../../../result/origin_data/bottom_pos/bottom_pos.txt", "r");
+    fp_r = $fopen("../../../../../result/origin_data/bottom_pos/bottom_pos_16x16.txt", "r");
         $fscanf(fp_r, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
             rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ], rd_data[4 ], rd_data[5 ], rd_data[6 ], rd_data[7 ],
             rd_data[8 ], rd_data[9 ], rd_data[10], rd_data[11], rd_data[12], rd_data[13], rd_data[14], rd_data[15]);
@@ -230,20 +242,128 @@ initial begin
     end
     $fclose(fp_r);
 
+    for (rd_i = 0; rd_i < 32; rd_i = rd_i + 1) begin
+        i_data[rd_i] = 0;
+    end
 
 
+//32x32
+    i_valid         =   1                           ;
+
+    fp_r = $fopen("../../../../../result/origin_data/q_value/q_value_32x32.txt", "r");
+    $fscanf(fp_r, "%d ", q_value);
+    $fclose(fp_r);
+    fp_r = $fopen("../../../../../result/origin_data/q_bits/q_bits_32x32.txt", "r");
+    $fscanf(fp_r, "%d ", q_bits);
+    $fclose(fp_r);
+    fp_r = $fopen("../../../../../result/origin_data/cu_width_log2/cu_width_log2_32x32.txt", "r");
+    $fscanf(fp_r, "%d ", cu_width_log2);
+    $fclose(fp_r);
+    fp_r = $fopen("../../../../../result/origin_data/cu_height_log2/cu_height_log2_32x32.txt", "r");
+    $fscanf(fp_r, "%d ", cu_height_log2);
+    $fclose(fp_r);
+
+    rd_l = $fopen("../../../../../result/origin_data/lambda/lambda_32x32.txt", "r");
+    $fscanf(rd_l, "%d ", lambda);
+    $fclose(rd_l);
+    rd_l = $fopen("../../../../../result/origin_data/err_scale/err_scale_32x32.txt", "r");
+    $fscanf(rd_l, "%d ", err_scale);
+    $fclose(rd_l);
+    rd_l = $fopen("../../../../../result/origin_data/diff_scale/diff_scale_32x32.txt", "r");
+    $fscanf(rd_l, "%d ", diff_scale);
+    $fclose(rd_l);
+
+
+    fp_r = $fopen("../../../../../result/origin_data/rdoq_est_cbf/est_cbf_32x32.txt", "r");
+        for (rd_i = 0; rd_i < 3; rd_i = rd_i + 1) begin
+            for(rd_j = 0; rd_j < 2; rd_j = rd_j + 1)begin
+                $fscanf(fp_r, "%d ", rdoq_data);
+                rdoq_est_cbf[rd_i][rd_j] = rdoq_data;
+            end
+        end
+    $fclose(fp_r);
+    
+    fp_r = $fopen("../../../../../result/origin_data/rdoq_est_last/est_last_32x32.txt", "r");
+        for(rd_j = 0; rd_j < 6; rd_j = rd_j + 1)begin
+            for(rd_k = 0; rd_k < 12; rd_k = rd_k + 1)begin
+                for(rd_l = 0; rd_l < 2; rd_l = rd_l + 1)begin
+                    $fscanf(fp_r, "%d ", rdoq_data);
+                    rdoq_est_last[rd_j][rd_k][rd_l] = rdoq_data;
+                end
+            end
+        end
+    $fclose(fp_r);
+    
+    fp_r = $fopen("../../../../../result/origin_data/rdoq_est_level/est_level_32x32.txt", "r");
+        for (rd_i = 0; rd_i < 24; rd_i = rd_i + 1) begin
+            for(rd_j = 0; rd_j < 2; rd_j = rd_j + 1)begin
+                $fscanf(fp_r, "%d ", rdoq_data);
+                rdoq_est_level[rd_i][rd_j] = rdoq_data;
+            end
+        end
+    $fclose(fp_r);
+
+    fp_r = $fopen("../../../../../result/origin_data/rdoq_est_run/est_run_32x32.txt", "r");
+        for (rd_i = 0; rd_i < 24; rd_i = rd_i + 1) begin
+            for(rd_j = 0; rd_j < 2; rd_j = rd_j + 1)begin
+                $fscanf(fp_r, "%d ", rdoq_data);
+                rdoq_est_run[rd_i][rd_j] = rdoq_data;
+            end
+        end
+    $fclose(fp_r);
+
+    fp_r = $fopen("../../../../../result/origin_data/left_pos/left_pos_32x32.txt", "r");
+        $fscanf(fp_r, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
+            rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ], rd_data[4 ], rd_data[5 ], rd_data[6 ], rd_data[7 ],
+            rd_data[8 ], rd_data[9 ], rd_data[10], rd_data[11], rd_data[12], rd_data[13], rd_data[14], rd_data[15], 
+            rd_data[16], rd_data[17], rd_data[18], rd_data[19], rd_data[20], rd_data[21], rd_data[22], rd_data[23], 
+            rd_data[24], rd_data[25], rd_data[26], rd_data[27], rd_data[28], rd_data[29], rd_data[30], rd_data[31]);
+
+        for (rd_k = 0; rd_k < 32; rd_k = rd_k + 1) begin
+            left_pos[rd_k] = rd_data[rd_k];
+        end
+    $fclose(fp_r);
+
+    fp_r = $fopen("../../../../../result/origin_data/bottom_pos/bottom_pos_32x32.txt", "r");
+        $fscanf(fp_r, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
+            rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ], rd_data[4 ], rd_data[5 ], rd_data[6 ], rd_data[7 ],
+            rd_data[8 ], rd_data[9 ], rd_data[10], rd_data[11], rd_data[12], rd_data[13], rd_data[14], rd_data[15], 
+            rd_data[16], rd_data[17], rd_data[18], rd_data[19], rd_data[20], rd_data[21], rd_data[22], rd_data[23], 
+            rd_data[24], rd_data[25], rd_data[26], rd_data[27], rd_data[28], rd_data[29], rd_data[30], rd_data[31]);
+
+        for (rd_k = 0; rd_k < 32; rd_k = rd_k + 1) begin
+            bottom_pos[rd_k] = rd_data[rd_k];
+        end
+    $fclose(fp_r);
+
+
+    fp_r = $fopen("../../../../../result/origin_data/src/origin_data_32x32.txt", "r");
+    for (rd_i = 0; rd_i < 32; rd_i = rd_i + 1) begin
+        $fscanf(fp_r, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
+            rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ], rd_data[4 ], rd_data[5 ], rd_data[6 ], rd_data[7 ],
+            rd_data[8 ], rd_data[9 ], rd_data[10], rd_data[11], rd_data[12], rd_data[13], rd_data[14], rd_data[15], 
+            rd_data[16], rd_data[17], rd_data[18], rd_data[19], rd_data[20], rd_data[21], rd_data[22], rd_data[23], 
+            rd_data[24], rd_data[25], rd_data[26], rd_data[27], rd_data[28], rd_data[29], rd_data[30], rd_data[31]);
+
+            for (rd_k = 0; rd_k < 32; rd_k = rd_k + 1) begin
+                i_data[rd_k] = rd_data[rd_k];
+            end
+            #2;
+            i_valid = 0;
+    end
+    $fclose(fp_r);
 
     for (rd_i = 0; rd_i < 32; rd_i = rd_i + 1) begin
         i_data[rd_i] = 0;
     end
-    //8x8
+
+
+
+//8x8
     i_valid = 1;
     cu_width_log2   =   SIZE8           ;
     cu_height_log2  =   SIZE8           ;
-    qp              =   7 'd63          ;
-    is_intra        =   1 'd1           ;
     lambda          =   `w_lambda'd10131659    ;
-    bit_depth       =   4 'd10          ;
     fp_r = $fopen("../../../../../result/origin_data/src/origin_data_8x8.txt", "r");
     for (rd_i = 0; rd_i < 8; rd_i = rd_i + 1) begin
         $fscanf(fp_r, "%d %d %d %d %d %d %d %d", 
@@ -264,10 +384,7 @@ initial begin
     i_valid = 1;
     cu_width_log2   =   SIZE4           ;
     cu_height_log2  =   SIZE4           ;
-    qp              =   7 'd63          ;
-    is_intra        =   1 'd1           ;
     lambda          =   `w_lambda'd10131659    ;
-    bit_depth       =   4 'd10          ;
     fp_r = $fopen("../../../../../result/origin_data/src/origin_data_4x4.txt", "r");
     for (rd_i = 0; rd_i < 4; rd_i = rd_i + 1) begin
         $fscanf(fp_r, "%d %d %d %d", rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ]);
@@ -284,14 +401,12 @@ initial begin
     for (rd_i = 0; rd_i < 32; rd_i = rd_i + 1) begin
         i_data[rd_i] = 0;
     end
-    //32x32
+
+//32x32
     i_valid = 1;
     cu_width_log2   =   SIZE32          ;
     cu_height_log2  =   SIZE32          ;
-    qp              =   7 'd63          ;
-    is_intra        =   1 'd1           ;
     lambda          =   `w_lambda'd10131659    ;
-    bit_depth       =   4 'd10          ;
     fp_r = $fopen("../../../../../result/origin_data/src/origin_data_32x32.txt", "r");
     for (rd_i = 0; rd_i < 32; rd_i = rd_i + 1) begin
         $fscanf(fp_r, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", 
