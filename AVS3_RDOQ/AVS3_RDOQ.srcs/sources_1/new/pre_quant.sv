@@ -13,6 +13,7 @@ module pre_quant(
     input           [`w_q_bits          - 1 : 0]    i_q_bits                                    ,
     input   signed  [`w_err_scale       - 1 : 0]    i_err_scale                                 ,
     input   signed  [`w_lambda          - 1 : 0]    i_lambda                                    ,
+    input   signed  [`w_diff_scale      - 1 : 0]    i_diff_scale                                ,
 
     input           [`w_rdoq_est_last   - 1 : 0]    i_rdoq_est_last     [0 :  5][0 : 11][0 : 1] ,
     input           [`w_rdoq_est_level  - 1 : 0]    i_rdoq_est_level    [0 : 23][0 :  1]        ,
@@ -30,6 +31,7 @@ module pre_quant(
     output          [`w_q_bits          - 1 : 0]    o_q_bits                                    ,
     output  signed  [`w_err_scale       - 1 : 0]    o_err_scale                                 ,
     output  signed  [`w_lambda          - 1 : 0]    o_lambda                                    ,
+    output  signed  [`w_diff_scale      - 1 : 0]    o_diff_scale                                ,
 
     output          [`w_rdoq_est_last   - 1 : 0]    o_rdoq_est_last     [0 :  5][0 : 11][0 : 1] ,
     output          [`w_rdoq_est_level  - 1 : 0]    o_rdoq_est_level    [0 : 23][0 :  1]        ,
@@ -71,6 +73,7 @@ reg             [`w_size            - 1 : 0]    i_height_log2_d     [0 :  3]    
 reg             [`w_q_bits          - 1 : 0]    i_q_bits_d          [0 :  3]                        ;
 reg     signed  [`w_err_scale       - 1 : 0]    i_err_scale_d       [0 :  3]                        ;
 reg     signed  [`w_lambda          - 1 : 0]    i_lambda_d          [0 :  3]                        ;
+reg     signed  [`w_diff_scale      - 1 : 0]    i_diff_scale_d      [0 :  3]                        ;
 
 reg             [`w_rdoq_est_last   - 1 : 0]    i_rdoq_est_last_d   [0 :  3][0 :  5][0 : 11][0 : 1] ;
 reg             [`w_rdoq_est_level  - 1 : 0]    i_rdoq_est_level_d  [0 :  3][0 : 23][0 :  1]        ;
@@ -106,6 +109,7 @@ assign  o_err_scale     =   i_err_scale_d[3];
 assign  o_lambda        =   i_lambda_d[3];
 assign  o_left_pos      =   i_left_pos_d[3]; 
 assign  o_bottom_pos    =   i_bottom_pos_d[3];
+assign  o_diff_scale    =   i_diff_scale_d[3];
 
 generate
     for(p = 0; p < 6; p = p + 1)begin
@@ -145,6 +149,7 @@ endgenerate
                 i_q_bits_d[i]           <=  0;
                 i_err_scale_d[i]        <=  0;
                 i_lambda_d[i]           <=  0;
+                i_diff_scale_d[i]       <=  0;
             end
             for(i = 0; i < 4; i = i + 1)begin
                 for(j = 0; j < 32; j = j + 1)begin
@@ -179,6 +184,7 @@ endgenerate
             i_q_bits_d[0]           <=      i_q_bits;
             i_err_scale_d[0]        <=      i_err_scale;
             i_lambda_d[0]           <=      i_lambda;
+            i_diff_scale_d[0]       <=      i_diff_scale;
             
             for(i = 0; i < 32; i = i + 1)begin
                 src_coef_sign[0][i]     <=  i_data[i][15]; 
@@ -220,6 +226,7 @@ endgenerate
                 i_q_bits_d[i]           <=  i_q_bits_d[i-1];
                 i_err_scale_d[i]        <=  i_err_scale_d[i-1];
                 i_lambda_d[i]           <=  i_lambda_d[i-1];
+                i_diff_scale_d[i]       <=  i_diff_scale_d[i-1];
             end
             
             
@@ -392,6 +399,51 @@ endgenerate
         end
         $fclose(fp_pq_w1);
     end
+
+    initial begin 
+    integer fp_pq_w1;
+    integer wr_pq_j,wr_pq_k;
+    reg     signed  [63: 0]     pq_data        [0 : 63]    ;
+        #106;
+        fp_pq_w1 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_8x8.txt", "w");
+        for (wr_pq_j = 0; wr_pq_j < 8; wr_pq_j = wr_pq_j + 1) begin
+            for (wr_pq_k = 0; wr_pq_k < 8; wr_pq_k = wr_pq_k + 1) begin
+                pq_data[wr_pq_k] = o_data[wr_pq_k];
+            end
+            #2;
+            $fwrite(fp_pq_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            pq_data[0 ], pq_data[1 ], pq_data[2 ], pq_data[3 ], pq_data[4 ], pq_data[5 ], pq_data[6 ], pq_data[7 ]);
+        end
+        $fclose(fp_pq_w1);
+    end
+
+    initial begin 
+    integer fp_pq_w1;
+    integer wr_pq_j,wr_pq_k;
+    reg     signed  [63: 0]     pq_data        [0 : 63]    ;
+        #122;
+        fp_pq_w1 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_4x4.txt", "w");
+        for (wr_pq_j = 0; wr_pq_j < 4; wr_pq_j = wr_pq_j + 1) begin
+            for (wr_pq_k = 0; wr_pq_k < 4; wr_pq_k = wr_pq_k + 1) begin
+                pq_data[wr_pq_k] = o_data[wr_pq_k];
+            end
+            #2;
+            $fwrite(fp_pq_w1, "%6d %6d %6d %6d \n", 
+            pq_data[0 ], pq_data[1 ], pq_data[2 ], pq_data[3 ]);
+        end
+        $fclose(fp_pq_w1);
+    end
+
+
+
+
+
+
+
+
+
+
+
 
 `endif
 

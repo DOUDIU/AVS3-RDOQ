@@ -1130,7 +1130,7 @@ wire    signed  [31                     : 0]    i64Delta_tem            [0 :  1]
 `ifdef file_write //test bench
 
 
-    wire    signed  [39 : 0]    uncoded_cost        [0 : 31]                                ;
+    wire    signed  [63 : 0]    uncoded_cost        [0 : 31]                                ;
     wire    signed  [63 : 0]    coded_cost          [0 : 31]                                ;
 
     generate 
@@ -1256,8 +1256,6 @@ wire    signed  [31                     : 0]    i64Delta_tem            [0 :  1]
 
 
 //32*32
-
-
     initial begin 
     integer fp_pre_level_w1;
     integer wr_pre_level_j,wr_pre_level_k;
@@ -1382,7 +1380,218 @@ wire    signed  [31                     : 0]    i64Delta_tem            [0 :  1]
     end
 
 
+//8x8
+    initial begin 
+    integer fp_pre_level_w1;
+    integer wr_pre_level_j,wr_pre_level_k;
+    reg     signed  [63: 0]     pre_level_data        [0 : 63]    ;
+        #110;
+        fp_pre_level_w1 = $fopen("../../../../../result/ocd/fpga_prevel/fpga_prevel_8x8.txt", "w");
+        for (wr_pre_level_j = 0; wr_pre_level_j < 8; wr_pre_level_j = wr_pre_level_j + 1) begin
+            for (wr_pre_level_k = 0; wr_pre_level_k < 8; wr_pre_level_k = wr_pre_level_k + 1) begin
+                pre_level_data[wr_pre_level_k] = pre_level[wr_pre_level_k];
+            end
+            #2;
+            $fwrite(fp_pre_level_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            pre_level_data[0 ], pre_level_data[1 ], pre_level_data[2 ], pre_level_data[3 ], pre_level_data[4 ], pre_level_data[5 ], pre_level_data[6 ], pre_level_data[7 ]);
+        end
+        $fclose(fp_pre_level_w1);
+    end
 
+    initial begin 
+    integer fp_run_w1;
+    integer wr_run_j,wr_run_k;
+    reg     signed  [63: 0]     run_data        [0 : 63]    ;
+        #110;
+        fp_run_w1 = $fopen("../../../../../result/ocd/fpga_run/fpga_run_8x8.txt", "w");
+        for (wr_run_j = 0; wr_run_j < 8; wr_run_j = wr_run_j + 1) begin
+            for (wr_run_k = 0; wr_run_k < 8; wr_run_k = wr_run_k + 1) begin
+                run_data[wr_run_k] = run[wr_run_k];
+            end
+            #2;
+            $fwrite(fp_run_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            run_data[0 ], run_data[1 ], run_data[2 ], run_data[3 ], run_data[4 ], run_data[5 ], run_data[6 ], run_data[7 ]);
+        end
+        $fclose(fp_run_w1);
+    end
+
+    initial begin 
+    integer fp_opt_w2;
+    integer wr_opt_j,wr_opt_k;
+    reg     signed  [63: 0]     level_opt_data  [0 : 63]    ;
+        #110;
+        fp_opt_w2 = $fopen("../../../../../result/ocd/fpga_level_opt/fpga_level_opt_8x8.txt", "w");
+        for (wr_opt_j = 0; wr_opt_j < 8; wr_opt_j = wr_opt_j + 1) begin
+            for (wr_opt_k = 0; wr_opt_k < 8; wr_opt_k = wr_opt_k + 1) begin
+                level_opt_data[wr_opt_k] = level_opt[wr_opt_k];
+            end
+            #2;
+            $fwrite(fp_opt_w2, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            level_opt_data[0 ], level_opt_data[1 ], level_opt_data[2 ], level_opt_data[3 ], level_opt_data[4 ], level_opt_data[5 ], level_opt_data[6 ], level_opt_data[7 ]);
+        end
+        $fclose(fp_opt_w2);
+    end
+
+
+    initial begin 
+    integer fp_coded_cost_w;
+    integer wr_coded_cost_j,wr_coded_cost_k;
+    reg     signed  [63: 0]     coded_cost_data  [0 : 63]    ;
+        #110;
+        fp_coded_cost_w = $fopen("../../../../../result/ocd/fpga_coded_cost/fpga_coded_cost_8x8.txt", "w");
+        for (wr_coded_cost_j = 0; wr_coded_cost_j < 8; wr_coded_cost_j = wr_coded_cost_j + 1) begin
+            for (wr_coded_cost_k = 0; wr_coded_cost_k < 8; wr_coded_cost_k = wr_coded_cost_k + 1) begin
+                coded_cost_data[wr_coded_cost_k] = coded_cost[wr_coded_cost_k];
+            end
+            #2;
+            $fwrite(fp_coded_cost_w, "%16d %16d %16d %16d %16d %16d %16d %16d \n",  
+            coded_cost_data[0 ], coded_cost_data[1 ], coded_cost_data[2 ], coded_cost_data[3 ], coded_cost_data[4 ], coded_cost_data[5 ], coded_cost_data[6 ], coded_cost_data[7 ]);
+        end
+        $fclose(fp_coded_cost_w);
+    end
+
+
+
+    initial begin 
+    integer fp_uncoded_cost_w;
+    integer wr_uncoded_cost_j,wr_uncoded_cost_k;
+    reg     signed  [63: 0]     uncoded_cost_data  [0 : 63]    ;
+        #110;
+        fp_uncoded_cost_w = $fopen("../../../../../result/ocd/fpga_uncoded_cost/fpga_uncoded_cost_8x8.txt", "w");
+        for (wr_uncoded_cost_j = 0; wr_uncoded_cost_j < 8; wr_uncoded_cost_j = wr_uncoded_cost_j + 1) begin
+            for (wr_uncoded_cost_k = 0; wr_uncoded_cost_k < 8; wr_uncoded_cost_k = wr_uncoded_cost_k + 1) begin
+                uncoded_cost_data[wr_uncoded_cost_k] = uncoded_cost[wr_uncoded_cost_k];
+            end
+            #2;
+            $fwrite(fp_uncoded_cost_w, "%16d %16d %16d %16d %16d %16d %16d %16d \n",  
+            uncoded_cost_data[0 ], uncoded_cost_data[1 ], uncoded_cost_data[2 ], uncoded_cost_data[3 ], uncoded_cost_data[4 ], uncoded_cost_data[5 ], uncoded_cost_data[6 ], uncoded_cost_data[7 ]);
+        end
+        $fclose(fp_uncoded_cost_w);
+    end
+
+    initial begin 
+    integer fp_base_cost_buffer_w1;
+    integer wr_base_cost_buffer_j,wr_base_cost_buffer_k;
+    reg     signed  [63: 0]     base_cost_buffer_data        [0 : 63]    ;
+        #112;
+        fp_base_cost_buffer_w1 = $fopen("../../../../../result/ocd/fpga_base_cost_buffer/fpga_base_cost_buffer_8x8.txt", "w");
+        for (wr_base_cost_buffer_j = 0; wr_base_cost_buffer_j < 8; wr_base_cost_buffer_j = wr_base_cost_buffer_j + 1) begin
+            for (wr_base_cost_buffer_k = 0; wr_base_cost_buffer_k < 8; wr_base_cost_buffer_k = wr_base_cost_buffer_k + 1) begin
+                base_cost_buffer_data[wr_base_cost_buffer_k] = o_base_cost_buffer_tmp[wr_base_cost_buffer_k];
+            end
+            #2;
+            $fwrite(fp_base_cost_buffer_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            base_cost_buffer_data[0 ], base_cost_buffer_data[1 ], base_cost_buffer_data[2 ], base_cost_buffer_data[3 ], base_cost_buffer_data[4 ], base_cost_buffer_data[5 ], base_cost_buffer_data[6 ], base_cost_buffer_data[7 ]);
+        end
+        $fclose(fp_base_cost_buffer_w1);
+    end
+
+
+//4x4
+    initial begin 
+    integer fp_pre_level_w1;
+    integer wr_pre_level_j,wr_pre_level_k;
+    reg     signed  [63: 0]     pre_level_data        [0 : 63]    ;
+        #126;
+        fp_pre_level_w1 = $fopen("../../../../../result/ocd/fpga_prevel/fpga_prevel_4x4.txt", "w");
+        for (wr_pre_level_j = 0; wr_pre_level_j < 4; wr_pre_level_j = wr_pre_level_j + 1) begin
+            for (wr_pre_level_k = 0; wr_pre_level_k < 4; wr_pre_level_k = wr_pre_level_k + 1) begin
+                pre_level_data[wr_pre_level_k] = pre_level[wr_pre_level_k];
+            end
+            #2;
+            $fwrite(fp_pre_level_w1, "%6d %6d %6d %6d \n", 
+            pre_level_data[0 ], pre_level_data[1 ], pre_level_data[2 ], pre_level_data[3 ]);
+        end
+        $fclose(fp_pre_level_w1);
+    end
+
+    initial begin 
+    integer fp_run_w1;
+    integer wr_run_j,wr_run_k;
+    reg     signed  [63: 0]     run_data        [0 : 63]    ;
+        #126;
+        fp_run_w1 = $fopen("../../../../../result/ocd/fpga_run/fpga_run_4x4.txt", "w");
+        for (wr_run_j = 0; wr_run_j < 4; wr_run_j = wr_run_j + 1) begin
+            for (wr_run_k = 0; wr_run_k < 4; wr_run_k = wr_run_k + 1) begin
+                run_data[wr_run_k] = run[wr_run_k];
+            end
+            #2;
+            $fwrite(fp_run_w1, "%6d %6d %6d %6d \n", 
+            run_data[0 ], run_data[1 ], run_data[2 ], run_data[3 ]);
+        end
+        $fclose(fp_run_w1);
+    end
+
+    initial begin 
+    integer fp_opt_w2;
+    integer wr_opt_j,wr_opt_k;
+    reg     signed  [63: 0]     level_opt_data  [0 : 63]    ;
+        #126;
+        fp_opt_w2 = $fopen("../../../../../result/ocd/fpga_level_opt/fpga_level_opt_4x4.txt", "w");
+        for (wr_opt_j = 0; wr_opt_j < 4; wr_opt_j = wr_opt_j + 1) begin
+            for (wr_opt_k = 0; wr_opt_k < 4; wr_opt_k = wr_opt_k + 1) begin
+                level_opt_data[wr_opt_k] = level_opt[wr_opt_k];
+            end
+            #2;
+            $fwrite(fp_opt_w2, "%6d %6d %6d %6d \n", 
+            level_opt_data[0 ], level_opt_data[1 ], level_opt_data[2 ], level_opt_data[3 ]);
+        end
+        $fclose(fp_opt_w2);
+    end
+
+
+    initial begin 
+    integer fp_coded_cost_w;
+    integer wr_coded_cost_j,wr_coded_cost_k;
+    reg     signed  [63: 0]     coded_cost_data  [0 : 63]    ;
+        #126;
+        fp_coded_cost_w = $fopen("../../../../../result/ocd/fpga_coded_cost/fpga_coded_cost_4x4.txt", "w");
+        for (wr_coded_cost_j = 0; wr_coded_cost_j < 4; wr_coded_cost_j = wr_coded_cost_j + 1) begin
+            for (wr_coded_cost_k = 0; wr_coded_cost_k < 4; wr_coded_cost_k = wr_coded_cost_k + 1) begin
+                coded_cost_data[wr_coded_cost_k] = coded_cost[wr_coded_cost_k];
+            end
+            #2;
+            $fwrite(fp_coded_cost_w, "%16d %16d %16d %16d \n",  
+            coded_cost_data[0 ], coded_cost_data[1 ], coded_cost_data[2 ], coded_cost_data[3 ]);
+        end
+        $fclose(fp_coded_cost_w);
+    end
+
+
+
+    initial begin 
+    integer fp_uncoded_cost_w;
+    integer wr_uncoded_cost_j,wr_uncoded_cost_k;
+    reg     signed  [63: 0]     uncoded_cost_data  [0 : 63]    ;
+        #126;
+        fp_uncoded_cost_w = $fopen("../../../../../result/ocd/fpga_uncoded_cost/fpga_uncoded_cost_4x4.txt", "w");
+        for (wr_uncoded_cost_j = 0; wr_uncoded_cost_j < 4; wr_uncoded_cost_j = wr_uncoded_cost_j + 1) begin
+            for (wr_uncoded_cost_k = 0; wr_uncoded_cost_k < 4; wr_uncoded_cost_k = wr_uncoded_cost_k + 1) begin
+                uncoded_cost_data[wr_uncoded_cost_k] = uncoded_cost[wr_uncoded_cost_k];
+            end
+            #2;
+            $fwrite(fp_uncoded_cost_w, "%16d %16d %16d %16d \n",  
+            uncoded_cost_data[0 ], uncoded_cost_data[1 ], uncoded_cost_data[2 ], uncoded_cost_data[3 ]);
+        end
+        $fclose(fp_uncoded_cost_w);
+    end
+
+    initial begin 
+    integer fp_base_cost_buffer_w1;
+    integer wr_base_cost_buffer_j,wr_base_cost_buffer_k;
+    reg     signed  [63: 0]     base_cost_buffer_data        [0 : 63]    ;
+        #128;
+        fp_base_cost_buffer_w1 = $fopen("../../../../../result/ocd/fpga_base_cost_buffer/fpga_base_cost_buffer_4x4.txt", "w");
+        for (wr_base_cost_buffer_j = 0; wr_base_cost_buffer_j < 4; wr_base_cost_buffer_j = wr_base_cost_buffer_j + 1) begin
+            for (wr_base_cost_buffer_k = 0; wr_base_cost_buffer_k < 4; wr_base_cost_buffer_k = wr_base_cost_buffer_k + 1) begin
+                base_cost_buffer_data[wr_base_cost_buffer_k] = o_base_cost_buffer_tmp[wr_base_cost_buffer_k];
+            end
+            #2;
+            $fwrite(fp_base_cost_buffer_w1, "%6d %6d %6d %6d \n", 
+            base_cost_buffer_data[0 ], base_cost_buffer_data[1 ], base_cost_buffer_data[2 ], base_cost_buffer_data[3 ]);
+        end
+        $fclose(fp_base_cost_buffer_w1);
+    end
 
 
 

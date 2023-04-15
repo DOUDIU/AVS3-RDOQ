@@ -49,6 +49,7 @@ wire            [`w_size            - 1 : 0]    pre_quant_height_log2           
 wire            [`w_q_bits          - 1 : 0]    pre_quant_q_bits                                    ;
 wire    signed  [`w_err_scale       - 1 : 0]    pre_quant_err_scale                                 ;
 wire    signed  [`w_lambda          - 1 : 0]    pre_quant_lambda                                    ;
+wire    signed  [`w_diff_scale      - 1 : 0]    pre_quant_diff_scale                                ;
 wire            [`w_rdoq_est_last   - 1 : 0]    pre_quant_rdoq_est_last     [0 :  5][0 : 11][0 : 1] ;
 wire            [`w_rdoq_est_level  - 1 : 0]    pre_quant_rdoq_est_level    [0 : 23][0 :  1]        ;
 wire            [`w_rdoq_est_run    - 1 : 0]    pre_quant_rdoq_est_run      [0 : 23][0 :  1]        ;
@@ -101,6 +102,7 @@ assign  o_d64_best_cost_tmp     =   lnpd_d64_best_cost_tmp      ;
         .i_q_bits               (q_bits                     ),
         .i_err_scale            (err_scale                  ),
         .i_lambda               (lambda                     ),
+        .i_diff_scale           (diff_scale                 ),
 
         .i_rdoq_est_last        (rdoq_est_last              ),
         .i_rdoq_est_level       (rdoq_est_level             ),
@@ -118,6 +120,7 @@ assign  o_d64_best_cost_tmp     =   lnpd_d64_best_cost_tmp      ;
         .o_q_bits               (pre_quant_q_bits           ),
         .o_err_scale            (pre_quant_err_scale        ),
         .o_lambda               (pre_quant_lambda           ),
+        .o_diff_scale           (pre_quant_diff_scale       ),
 
         .o_rdoq_est_last        (pre_quant_rdoq_est_last    ),
         .o_rdoq_est_level       (pre_quant_rdoq_est_level   ),
@@ -143,7 +146,7 @@ assign  o_d64_best_cost_tmp     =   lnpd_d64_best_cost_tmp      ;
         .i_q_bits               (pre_quant_q_bits           ),
         .i_err_scale            (pre_quant_err_scale        ),
         .i_lambda               (pre_quant_lambda           ),
-        .i_diff_scale           (diff_scale                 ),//haven't adopt delay operation
+        .i_diff_scale           (pre_quant_diff_scale       ),
     
         .i_rdoq_est_last        (pre_quant_rdoq_est_last    ),
         .i_rdoq_est_level       (pre_quant_rdoq_est_level   ),

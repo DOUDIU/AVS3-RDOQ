@@ -37,12 +37,14 @@ integer i,j,k,l,m   ;
 genvar  o,p,q,r     ;
 
 //reg definition
-reg             [`w_size - 1 : 0]    i_width_log2_d1                            ;
-reg             [`w_size - 1 : 0]    i_height_log2_d1                           ;
-reg             [`w_size - 1 : 0]    i_width_log2_d2                            ;
-reg             [`w_size - 1 : 0]    i_height_log2_d2                           ;
-reg             [`w_size - 1 : 0]    i_width_log2_d3                            ;
-reg             [`w_size - 1 : 0]    i_height_log2_d3                           ;
+reg                                     i_valid_d1                              ;
+reg                                     i_valid_d2                              ;
+reg             [`w_size - 1 : 0]       i_width_log2_d1                         ;
+reg             [`w_size - 1 : 0]       i_height_log2_d1                        ;
+reg             [`w_size - 1 : 0]       i_width_log2_d2                         ;
+reg             [`w_size - 1 : 0]       i_height_log2_d2                        ;
+reg             [`w_size - 1 : 0]       i_width_log2_d3                         ;
+reg             [`w_size - 1 : 0]       i_height_log2_d3                        ;
 reg             [15 : 0]    i_level_opt_d1              [0 : 31]                ;
 reg     signed  [63 : 0]    i_d64_cost_last_zero_d1     [0 : 31]                ;
 reg     signed  [63 : 0]    i_d64_cost_last_one_d1      [0 : 31]                ; 
@@ -104,7 +106,7 @@ wire    signed  [6  : 0]    final_rdoq_last_x_left_d                [0 : 31]    
 wire    signed  [6  : 0]    final_rdoq_last_y_left_d                [0 : 31]    ;
 
 //assignment
-assign  o_valid     =   i_valid;
+assign  o_valid     =   i_valid_d2;
 generate 
     for(o = 0; o < 32; o = o + 1)begin
         assign  o_tmp_dst_coef[o]   =   i_tmp_dst_coef_sign[o] ? -i_level_opt[o] : i_level_opt[o];
@@ -133,6 +135,8 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
     //delay one cycle to the input data
     always@(posedge clk or negedge rst_n)begin
        if(!rst_n) begin
+                i_valid_d1                      <=      0;
+                i_valid_d2                      <=      0;
                 i_width_log2_d1                 <=      0;
                 i_height_log2_d1                <=      0;
             for(i = 0; i < 32; i = i + 1)begin
@@ -143,6 +147,8 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
             end
        end
        else begin
+                i_valid_d1                      <=      i_valid;
+                i_valid_d2                      <=      i_valid_d1;
                 i_width_log2_d1                 <=      i_width_log2    ;
                 i_height_log2_d1                <=      i_height_log2   ;
             for(i = 0; i < 32; i = i + 1)begin
@@ -417,7 +423,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
         else if(column_cnt[0])begin//odd column
             for(i = 0; i < 32; i = i + 2)begin
                 if(i_level_opt_d1[i])begin
-                    if(rdoq_last_y[i] != -1)begin
+                    if(rdoq_last_y_tem[i] != -1)begin
                         if(tempCost_tem[i] - endPosCost_tem[i] + rdoqD64LastOne_tem[i] - i_d64_cost_last_one_d1[i] + i_d64_cost_last_zero_d1[i] - rdoqD64LastZero_tem[i] > 0)begin
                             rdoqD64LastOne[i]       <=      i_d64_cost_last_one_d1[i]   ;
                             rdoqD64LastZero[i]      <=      i_d64_cost_last_zero_d1[i]  ;
@@ -2473,33 +2479,33 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
         end
     end
 
-generate
-    for(o = 0; o < 31; o = o + 1)begin
-        position_cal u_position_cal(      
-        //system clk and rest       
-            .clk                     (clk                               ),
-            .rst_n                   (rst_n                             ),
+    generate
+        for(o = 0; o < 31; o = o + 1)begin
+            position_cal u_position_cal(      
+            //system clk and rest       
+                .clk                     (clk                               ),
+                .rst_n                   (rst_n                             ),
 
-        //input data
-            .rdoqD64LastOne          (rdoqD64LastOne_left_d[o][o]                                               ),  
-            .temp_RdoqCost           (final_rdoq_cost_left[o] + temp_RdoqCost_except_final_cost_left_d[o][o]    ),  
-            .tempCost                (tempCost_left_d   [o][o]                                                  ),  
-            .rdoq_last_x             (rdoq_last_x_left_d[o][o]                                                  ),
-            .rdoq_last_y             (rdoq_last_y_left_d[o][o]                                                  ),
+            //input data
+                .rdoqD64LastOne          (rdoqD64LastOne_left_d[o][o]                                               ),  
+                .temp_RdoqCost           (final_rdoq_cost_left[o] + temp_RdoqCost_except_final_cost_left_d[o][o]    ),  
+                .tempCost                (tempCost_left_d   [o][o]                                                  ),  
+                .rdoq_last_x             (rdoq_last_x_left_d[o][o]                                                  ),
+                .rdoq_last_y             (rdoq_last_y_left_d[o][o]                                                  ),
 
-            .final_rdoq_last_x_in    (final_rdoq_last_x_left_d[o]       ),
-            .final_rdoq_last_y_in    (final_rdoq_last_y_left_d[o]       ), 
-            .final_rdoq_cost_in      (final_rdoq_cost_left_d  [o]       ),
-            .d64_best_cost_tmp_in    (d64_best_cost_tmp_left_d[o]       ),
+                .final_rdoq_last_x_in    (final_rdoq_last_x_left_d[o]       ),
+                .final_rdoq_last_y_in    (final_rdoq_last_y_left_d[o]       ), 
+                .final_rdoq_cost_in      (final_rdoq_cost_left_d  [o]       ),
+                .d64_best_cost_tmp_in    (d64_best_cost_tmp_left_d[o]       ),
 
-        //output data
-            .final_rdoq_last_x_out   (final_rdoq_last_x_left_d[o + 1]   ),
-            .final_rdoq_last_y_out   (final_rdoq_last_y_left_d[o + 1]   ), 
-            .final_rdoq_cost_out     (final_rdoq_cost_left_d  [o + 1]   ),
-            .d64_best_cost_tmp_out   (d64_best_cost_tmp_left_d[o + 1]   )     
-        );
-    end
-endgenerate
+            //output data
+                .final_rdoq_last_x_out   (final_rdoq_last_x_left_d[o + 1]   ),
+                .final_rdoq_last_y_out   (final_rdoq_last_y_left_d[o + 1]   ), 
+                .final_rdoq_cost_out     (final_rdoq_cost_left_d  [o + 1]   ),
+                .d64_best_cost_tmp_out   (d64_best_cost_tmp_left_d[o + 1]   )     
+            );
+        end
+    endgenerate
 
 
 
@@ -2518,10 +2524,12 @@ endgenerate
 
 `ifdef file_write//test bench
     
+
+//16x16
+    initial begin 
     integer fp_tempCost_w1;
     integer wr_tempCost_j,wr_tempCost_k;
     reg     signed  [63: 0]     tempCost_data        [0 : 63]    ;
-    initial begin 
         #20;
         fp_tempCost_w1 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_16x16.txt", "w");
         for (wr_tempCost_j = 0; wr_tempCost_j < 16; wr_tempCost_j = wr_tempCost_j + 1) begin
@@ -2537,10 +2545,10 @@ endgenerate
     end
 
 
+    initial begin 
     integer fp_rdoqD64LastOne_w1;
     integer wr_rdoqD64LastOne_j,wr_rdoqD64LastOne_k;
     reg     signed  [63: 0]     rdoqD64LastOne_data        [0 : 63]    ;
-    initial begin 
         #20;
         fp_rdoqD64LastOne_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_16x16.txt", "w");
         for (wr_rdoqD64LastOne_j = 0; wr_rdoqD64LastOne_j < 16; wr_rdoqD64LastOne_j = wr_rdoqD64LastOne_j + 1) begin
@@ -2555,10 +2563,10 @@ endgenerate
         $fclose(fp_rdoqD64LastOne_w1);
     end
 
+    initial begin 
     integer fp_rdoqD64LastZero_w1;
     integer wr_rdoqD64LastZero_j,wr_rdoqD64LastZero_k;
     reg     signed  [63: 0]     rdoqD64LastZero_data        [0 : 63]    ;
-    initial begin 
         #20;
         fp_rdoqD64LastZero_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_16x16.txt", "w");
         for (wr_rdoqD64LastZero_j = 0; wr_rdoqD64LastZero_j < 16; wr_rdoqD64LastZero_j = wr_rdoqD64LastZero_j + 1) begin
@@ -2574,10 +2582,10 @@ endgenerate
     end
 
 
+    initial begin 
     integer fp_endPosCost_w1;
     integer wr_endPosCost_j,wr_endPosCost_k;
     reg     signed  [63: 0]     endPosCost_data        [0 : 63]    ;
-    initial begin 
         #20;
         fp_endPosCost_w1 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_16x16.txt", "w");
         for (wr_endPosCost_j = 0; wr_endPosCost_j < 16; wr_endPosCost_j = wr_endPosCost_j + 1) begin
@@ -2592,10 +2600,10 @@ endgenerate
         $fclose(fp_endPosCost_w1);
     end
 
+    initial begin 
     integer fp_rdoq_last_x_w1;
     integer wr_rdoq_last_x_j,wr_rdoq_last_x_k;
     reg     signed  [63: 0]     rdoq_last_x_data        [0 : 63]    ;
-    initial begin 
         #20;
         fp_rdoq_last_x_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_16x16.txt", "w");
         for (wr_rdoq_last_x_j = 0; wr_rdoq_last_x_j < 16; wr_rdoq_last_x_j = wr_rdoq_last_x_j + 1) begin
@@ -2610,10 +2618,10 @@ endgenerate
         $fclose(fp_rdoq_last_x_w1);
     end
 
+    initial begin 
     integer fp_rdoq_last_y_w1;
     integer wr_rdoq_last_y_j,wr_rdoq_last_y_k;
     reg     signed  [63: 0]     rdoq_last_y_data        [0 : 63]    ;
-    initial begin 
         #20;
         fp_rdoq_last_y_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_16x16.txt", "w");
         for (wr_rdoq_last_y_j = 0; wr_rdoq_last_y_j < 16; wr_rdoq_last_y_j = wr_rdoq_last_y_j + 1) begin
@@ -2628,36 +2636,354 @@ endgenerate
         $fclose(fp_rdoq_last_y_w1);
     end
 
+
+
+//32x32
+    initial begin 
+    integer fp_tempCost_w1;
+    integer wr_tempCost_j,wr_tempCost_k;
+    reg     signed  [63: 0]     tempCost_data        [0 : 63]    ;
+        #52;
+        fp_tempCost_w1 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_32x32.txt", "w");
+        for (wr_tempCost_j = 0; wr_tempCost_j < 32; wr_tempCost_j = wr_tempCost_j + 1) begin
+            for (wr_tempCost_k = 0; wr_tempCost_k < 32; wr_tempCost_k = wr_tempCost_k + 1) begin
+                tempCost_data[wr_tempCost_k] = tempCost[wr_tempCost_k];
+            end
+            #2;
+            $fwrite(fp_tempCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            tempCost_data[0 ], tempCost_data[1 ], tempCost_data[2 ], tempCost_data[3 ], tempCost_data[4 ], tempCost_data[5 ], tempCost_data[6 ], tempCost_data[7 ],
+            tempCost_data[8 ], tempCost_data[9 ], tempCost_data[10], tempCost_data[11], tempCost_data[12], tempCost_data[13], tempCost_data[14], tempCost_data[15], 
+            tempCost_data[16], tempCost_data[17], tempCost_data[18], tempCost_data[19], tempCost_data[20], tempCost_data[21], tempCost_data[22], tempCost_data[23], 
+            tempCost_data[24], tempCost_data[25], tempCost_data[26], tempCost_data[27], tempCost_data[28], tempCost_data[29], tempCost_data[30], tempCost_data[31]);
+        end
+        $fclose(fp_tempCost_w1);
+    end
+
+
+    initial begin 
+    integer fp_rdoqD64LastOne_w1;
+    integer wr_rdoqD64LastOne_j,wr_rdoqD64LastOne_k;
+    reg     signed  [63: 0]     rdoqD64LastOne_data        [0 : 63]    ;
+        #52;
+        fp_rdoqD64LastOne_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_32x32.txt", "w");
+        for (wr_rdoqD64LastOne_j = 0; wr_rdoqD64LastOne_j < 32; wr_rdoqD64LastOne_j = wr_rdoqD64LastOne_j + 1) begin
+            for (wr_rdoqD64LastOne_k = 0; wr_rdoqD64LastOne_k < 32; wr_rdoqD64LastOne_k = wr_rdoqD64LastOne_k + 1) begin
+                rdoqD64LastOne_data[wr_rdoqD64LastOne_k] = rdoqD64LastOne[wr_rdoqD64LastOne_k];
+            end
+            #2;
+            $fwrite(fp_rdoqD64LastOne_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            rdoqD64LastOne_data[0 ], rdoqD64LastOne_data[1 ], rdoqD64LastOne_data[2 ], rdoqD64LastOne_data[3 ], rdoqD64LastOne_data[4 ], rdoqD64LastOne_data[5 ], rdoqD64LastOne_data[6 ], rdoqD64LastOne_data[7 ],
+            rdoqD64LastOne_data[8 ], rdoqD64LastOne_data[9 ], rdoqD64LastOne_data[10], rdoqD64LastOne_data[11], rdoqD64LastOne_data[12], rdoqD64LastOne_data[13], rdoqD64LastOne_data[14], rdoqD64LastOne_data[15], 
+            rdoqD64LastOne_data[16], rdoqD64LastOne_data[17], rdoqD64LastOne_data[18], rdoqD64LastOne_data[19], rdoqD64LastOne_data[20], rdoqD64LastOne_data[21], rdoqD64LastOne_data[22], rdoqD64LastOne_data[23], 
+            rdoqD64LastOne_data[24], rdoqD64LastOne_data[25], rdoqD64LastOne_data[26], rdoqD64LastOne_data[27], rdoqD64LastOne_data[28], rdoqD64LastOne_data[29], rdoqD64LastOne_data[30], rdoqD64LastOne_data[31]);
+        end
+        $fclose(fp_rdoqD64LastOne_w1);
+    end
+
+    initial begin 
+    integer fp_rdoqD64LastZero_w1;
+    integer wr_rdoqD64LastZero_j,wr_rdoqD64LastZero_k;
+    reg     signed  [63: 0]     rdoqD64LastZero_data        [0 : 63]    ;
+        #52;
+        fp_rdoqD64LastZero_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_32x32.txt", "w");
+        for (wr_rdoqD64LastZero_j = 0; wr_rdoqD64LastZero_j < 32; wr_rdoqD64LastZero_j = wr_rdoqD64LastZero_j + 1) begin
+            for (wr_rdoqD64LastZero_k = 0; wr_rdoqD64LastZero_k < 32; wr_rdoqD64LastZero_k = wr_rdoqD64LastZero_k + 1) begin
+                rdoqD64LastZero_data[wr_rdoqD64LastZero_k] = rdoqD64LastZero[wr_rdoqD64LastZero_k];
+            end
+            #2;
+            $fwrite(fp_rdoqD64LastZero_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            rdoqD64LastZero_data[0 ], rdoqD64LastZero_data[1 ], rdoqD64LastZero_data[2 ], rdoqD64LastZero_data[3 ], rdoqD64LastZero_data[4 ], rdoqD64LastZero_data[5 ], rdoqD64LastZero_data[6 ], rdoqD64LastZero_data[7 ],
+            rdoqD64LastZero_data[8 ], rdoqD64LastZero_data[9 ], rdoqD64LastZero_data[10], rdoqD64LastZero_data[11], rdoqD64LastZero_data[12], rdoqD64LastZero_data[13], rdoqD64LastZero_data[14], rdoqD64LastZero_data[15], 
+            rdoqD64LastZero_data[16], rdoqD64LastZero_data[17], rdoqD64LastZero_data[18], rdoqD64LastZero_data[19], rdoqD64LastZero_data[20], rdoqD64LastZero_data[21], rdoqD64LastZero_data[22], rdoqD64LastZero_data[23], 
+            rdoqD64LastZero_data[24], rdoqD64LastZero_data[25], rdoqD64LastZero_data[26], rdoqD64LastZero_data[27], rdoqD64LastZero_data[28], rdoqD64LastZero_data[29], rdoqD64LastZero_data[30], rdoqD64LastZero_data[31]);
+        end
+        $fclose(fp_rdoqD64LastZero_w1);
+    end
+
+
+    initial begin 
+    integer fp_endPosCost_w1;
+    integer wr_endPosCost_j,wr_endPosCost_k;
+    reg     signed  [63: 0]     endPosCost_data        [0 : 63]    ;
+        #52;
+        fp_endPosCost_w1 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_32x32.txt", "w");
+        for (wr_endPosCost_j = 0; wr_endPosCost_j < 32; wr_endPosCost_j = wr_endPosCost_j + 1) begin
+            for (wr_endPosCost_k = 0; wr_endPosCost_k < 32; wr_endPosCost_k = wr_endPosCost_k + 1) begin
+                endPosCost_data[wr_endPosCost_k] = endPosCost[wr_endPosCost_k];
+            end
+            #2;
+            $fwrite(fp_endPosCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            endPosCost_data[0 ], endPosCost_data[1 ], endPosCost_data[2 ], endPosCost_data[3 ], endPosCost_data[4 ], endPosCost_data[5 ], endPosCost_data[6 ], endPosCost_data[7 ],
+            endPosCost_data[8 ], endPosCost_data[9 ], endPosCost_data[10], endPosCost_data[11], endPosCost_data[12], endPosCost_data[13], endPosCost_data[14], endPosCost_data[15], 
+            endPosCost_data[16], endPosCost_data[17], endPosCost_data[18], endPosCost_data[19], endPosCost_data[20], endPosCost_data[21], endPosCost_data[22], endPosCost_data[23], 
+            endPosCost_data[24], endPosCost_data[25], endPosCost_data[26], endPosCost_data[27], endPosCost_data[28], endPosCost_data[29], endPosCost_data[30], endPosCost_data[31]);
+        end
+        $fclose(fp_endPosCost_w1);
+    end
+
+    initial begin 
+    integer fp_rdoq_last_x_w1;
+    integer wr_rdoq_last_x_j,wr_rdoq_last_x_k;
+    reg     signed  [63: 0]     rdoq_last_x_data        [0 : 63]    ;
+        #52;
+        fp_rdoq_last_x_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_32x32.txt", "w");
+        for (wr_rdoq_last_x_j = 0; wr_rdoq_last_x_j < 32; wr_rdoq_last_x_j = wr_rdoq_last_x_j + 1) begin
+            for (wr_rdoq_last_x_k = 0; wr_rdoq_last_x_k < 32; wr_rdoq_last_x_k = wr_rdoq_last_x_k + 1) begin
+                rdoq_last_x_data[wr_rdoq_last_x_k] = rdoq_last_x[wr_rdoq_last_x_k];
+            end
+            #2;
+            $fwrite(fp_rdoq_last_x_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            rdoq_last_x_data[0 ], rdoq_last_x_data[1 ], rdoq_last_x_data[2 ], rdoq_last_x_data[3 ], rdoq_last_x_data[4 ], rdoq_last_x_data[5 ], rdoq_last_x_data[6 ], rdoq_last_x_data[7 ],
+            rdoq_last_x_data[8 ], rdoq_last_x_data[9 ], rdoq_last_x_data[10], rdoq_last_x_data[11], rdoq_last_x_data[12], rdoq_last_x_data[13], rdoq_last_x_data[14], rdoq_last_x_data[15], 
+            rdoq_last_x_data[16], rdoq_last_x_data[17], rdoq_last_x_data[18], rdoq_last_x_data[19], rdoq_last_x_data[20], rdoq_last_x_data[21], rdoq_last_x_data[22], rdoq_last_x_data[23], 
+            rdoq_last_x_data[24], rdoq_last_x_data[25], rdoq_last_x_data[26], rdoq_last_x_data[27], rdoq_last_x_data[28], rdoq_last_x_data[29], rdoq_last_x_data[30], rdoq_last_x_data[31]);
+        end
+        $fclose(fp_rdoq_last_x_w1);
+    end
+
+    initial begin 
+    integer fp_rdoq_last_y_w1;
+    integer wr_rdoq_last_y_j,wr_rdoq_last_y_k;
+    reg     signed  [63: 0]     rdoq_last_y_data        [0 : 63]    ;
+        #52;
+        fp_rdoq_last_y_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_32x32.txt", "w");
+        for (wr_rdoq_last_y_j = 0; wr_rdoq_last_y_j < 32; wr_rdoq_last_y_j = wr_rdoq_last_y_j + 1) begin
+            for (wr_rdoq_last_y_k = 0; wr_rdoq_last_y_k < 32; wr_rdoq_last_y_k = wr_rdoq_last_y_k + 1) begin
+                rdoq_last_y_data[wr_rdoq_last_y_k] = rdoq_last_y[wr_rdoq_last_y_k];
+            end
+            #2;
+            $fwrite(fp_rdoq_last_y_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            rdoq_last_y_data[0 ], rdoq_last_y_data[1 ], rdoq_last_y_data[2 ], rdoq_last_y_data[3 ], rdoq_last_y_data[4 ], rdoq_last_y_data[5 ], rdoq_last_y_data[6 ], rdoq_last_y_data[7 ],
+            rdoq_last_y_data[8 ], rdoq_last_y_data[9 ], rdoq_last_y_data[10], rdoq_last_y_data[11], rdoq_last_y_data[12], rdoq_last_y_data[13], rdoq_last_y_data[14], rdoq_last_y_data[15], 
+            rdoq_last_y_data[16], rdoq_last_y_data[17], rdoq_last_y_data[18], rdoq_last_y_data[19], rdoq_last_y_data[20], rdoq_last_y_data[21], rdoq_last_y_data[22], rdoq_last_y_data[23], 
+            rdoq_last_y_data[24], rdoq_last_y_data[25], rdoq_last_y_data[26], rdoq_last_y_data[27], rdoq_last_y_data[28], rdoq_last_y_data[29], rdoq_last_y_data[30], rdoq_last_y_data[31]);
+        end
+        $fclose(fp_rdoq_last_y_w1);
+    end
+
+
+
+//8x8
+    initial begin 
+    integer fp_tempCost_w1;
+    integer wr_tempCost_j,wr_tempCost_k;
+    reg     signed  [63: 0]     tempCost_data        [0 : 63]    ;
+        #116;
+        fp_tempCost_w1 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_8x8.txt", "w");
+        for (wr_tempCost_j = 0; wr_tempCost_j < 8; wr_tempCost_j = wr_tempCost_j + 1) begin
+            for (wr_tempCost_k = 0; wr_tempCost_k < 8; wr_tempCost_k = wr_tempCost_k + 1) begin
+                tempCost_data[wr_tempCost_k] = tempCost[wr_tempCost_k];
+            end
+            #2;
+            $fwrite(fp_tempCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                tempCost_data[0 ], tempCost_data[1 ], tempCost_data[2 ], tempCost_data[3 ], tempCost_data[4 ], tempCost_data[5 ], tempCost_data[6 ], tempCost_data[7 ]);
+        end
+        $fclose(fp_tempCost_w1);
+    end
+
+
+    initial begin 
+    integer fp_rdoqD64LastOne_w1;
+    integer wr_rdoqD64LastOne_j,wr_rdoqD64LastOne_k;
+    reg     signed  [63: 0]     rdoqD64LastOne_data        [0 : 63]    ;
+        #116;
+        fp_rdoqD64LastOne_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_8x8.txt", "w");
+        for (wr_rdoqD64LastOne_j = 0; wr_rdoqD64LastOne_j < 8; wr_rdoqD64LastOne_j = wr_rdoqD64LastOne_j + 1) begin
+            for (wr_rdoqD64LastOne_k = 0; wr_rdoqD64LastOne_k < 8; wr_rdoqD64LastOne_k = wr_rdoqD64LastOne_k + 1) begin
+                rdoqD64LastOne_data[wr_rdoqD64LastOne_k] = rdoqD64LastOne[wr_rdoqD64LastOne_k];
+            end
+            #2;
+            $fwrite(fp_rdoqD64LastOne_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoqD64LastOne_data[0 ], rdoqD64LastOne_data[1 ], rdoqD64LastOne_data[2 ], rdoqD64LastOne_data[3 ], rdoqD64LastOne_data[4 ], rdoqD64LastOne_data[5 ], rdoqD64LastOne_data[6 ], rdoqD64LastOne_data[7 ]);
+        end
+        $fclose(fp_rdoqD64LastOne_w1);
+    end
+
+    initial begin 
+    integer fp_rdoqD64LastZero_w1;
+    integer wr_rdoqD64LastZero_j,wr_rdoqD64LastZero_k;
+    reg     signed  [63: 0]     rdoqD64LastZero_data        [0 : 63]    ;
+        #116;
+        fp_rdoqD64LastZero_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_8x8.txt", "w");
+        for (wr_rdoqD64LastZero_j = 0; wr_rdoqD64LastZero_j < 8; wr_rdoqD64LastZero_j = wr_rdoqD64LastZero_j + 1) begin
+            for (wr_rdoqD64LastZero_k = 0; wr_rdoqD64LastZero_k < 8; wr_rdoqD64LastZero_k = wr_rdoqD64LastZero_k + 1) begin
+                rdoqD64LastZero_data[wr_rdoqD64LastZero_k] = rdoqD64LastZero[wr_rdoqD64LastZero_k];
+            end
+            #2;
+            $fwrite(fp_rdoqD64LastZero_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoqD64LastZero_data[0 ], rdoqD64LastZero_data[1 ], rdoqD64LastZero_data[2 ], rdoqD64LastZero_data[3 ], rdoqD64LastZero_data[4 ], rdoqD64LastZero_data[5 ], rdoqD64LastZero_data[6 ], rdoqD64LastZero_data[7 ]);
+        end
+        $fclose(fp_rdoqD64LastZero_w1);
+    end
+
+
+    initial begin 
+    integer fp_endPosCost_w1;
+    integer wr_endPosCost_j,wr_endPosCost_k;
+    reg     signed  [63: 0]     endPosCost_data        [0 : 63]    ;
+        #116;
+        fp_endPosCost_w1 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_8x8.txt", "w");
+        for (wr_endPosCost_j = 0; wr_endPosCost_j < 8; wr_endPosCost_j = wr_endPosCost_j + 1) begin
+            for (wr_endPosCost_k = 0; wr_endPosCost_k < 8; wr_endPosCost_k = wr_endPosCost_k + 1) begin
+                endPosCost_data[wr_endPosCost_k] = endPosCost[wr_endPosCost_k];
+            end
+            #2;
+            $fwrite(fp_endPosCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                endPosCost_data[0 ], endPosCost_data[1 ], endPosCost_data[2 ], endPosCost_data[3 ], endPosCost_data[4 ], endPosCost_data[5 ], endPosCost_data[6 ], endPosCost_data[7 ]);
+        end
+        $fclose(fp_endPosCost_w1);
+    end
+
+    initial begin 
+    integer fp_rdoq_last_x_w1;
+    integer wr_rdoq_last_x_j,wr_rdoq_last_x_k;
+    reg     signed  [63: 0]     rdoq_last_x_data        [0 : 63]    ;
+        #116;
+        fp_rdoq_last_x_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_8x8.txt", "w");
+        for (wr_rdoq_last_x_j = 0; wr_rdoq_last_x_j < 8; wr_rdoq_last_x_j = wr_rdoq_last_x_j + 1) begin
+            for (wr_rdoq_last_x_k = 0; wr_rdoq_last_x_k < 8; wr_rdoq_last_x_k = wr_rdoq_last_x_k + 1) begin
+                rdoq_last_x_data[wr_rdoq_last_x_k] = rdoq_last_x[wr_rdoq_last_x_k];
+            end
+            #2;
+            $fwrite(fp_rdoq_last_x_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoq_last_x_data[0 ], rdoq_last_x_data[1 ], rdoq_last_x_data[2 ], rdoq_last_x_data[3 ], rdoq_last_x_data[4 ], rdoq_last_x_data[5 ], rdoq_last_x_data[6 ], rdoq_last_x_data[7 ]);
+        end
+        $fclose(fp_rdoq_last_x_w1);
+    end
+
+    initial begin 
+    integer fp_rdoq_last_y_w1;
+    integer wr_rdoq_last_y_j,wr_rdoq_last_y_k;
+    reg     signed  [63: 0]     rdoq_last_y_data        [0 : 63]    ;
+        #116;
+        fp_rdoq_last_y_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_8x8.txt", "w");
+        for (wr_rdoq_last_y_j = 0; wr_rdoq_last_y_j < 8; wr_rdoq_last_y_j = wr_rdoq_last_y_j + 1) begin
+            for (wr_rdoq_last_y_k = 0; wr_rdoq_last_y_k < 8; wr_rdoq_last_y_k = wr_rdoq_last_y_k + 1) begin
+                rdoq_last_y_data[wr_rdoq_last_y_k] = rdoq_last_y[wr_rdoq_last_y_k];
+            end
+            #2;
+            $fwrite(fp_rdoq_last_y_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoq_last_y_data[0 ], rdoq_last_y_data[1 ], rdoq_last_y_data[2 ], rdoq_last_y_data[3 ], rdoq_last_y_data[4 ], rdoq_last_y_data[5 ], rdoq_last_y_data[6 ], rdoq_last_y_data[7 ]);
+        end
+        $fclose(fp_rdoq_last_y_w1);
+    end
+
+
+
+//4x4
+    initial begin 
+    integer fp_tempCost_w1;
+    integer wr_tempCost_j,wr_tempCost_k;
+    reg     signed  [63: 0]     tempCost_data        [0 : 63]    ;
+        #132;
+        fp_tempCost_w1 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_4x4.txt", "w");
+        for (wr_tempCost_j = 0; wr_tempCost_j < 4; wr_tempCost_j = wr_tempCost_j + 1) begin
+            for (wr_tempCost_k = 0; wr_tempCost_k < 4; wr_tempCost_k = wr_tempCost_k + 1) begin
+                tempCost_data[wr_tempCost_k] = tempCost[wr_tempCost_k];
+            end
+            #2;
+            $fwrite(fp_tempCost_w1, "%6d %6d %6d %6d \n", 
+                tempCost_data[0 ], tempCost_data[1 ], tempCost_data[2 ], tempCost_data[3 ]);
+        end
+        $fclose(fp_tempCost_w1);
+    end
+
+
+    initial begin 
+    integer fp_rdoqD64LastOne_w1;
+    integer wr_rdoqD64LastOne_j,wr_rdoqD64LastOne_k;
+    reg     signed  [63: 0]     rdoqD64LastOne_data        [0 : 63]    ;
+        #132;
+        fp_rdoqD64LastOne_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_4x4.txt", "w");
+        for (wr_rdoqD64LastOne_j = 0; wr_rdoqD64LastOne_j < 4; wr_rdoqD64LastOne_j = wr_rdoqD64LastOne_j + 1) begin
+            for (wr_rdoqD64LastOne_k = 0; wr_rdoqD64LastOne_k < 4; wr_rdoqD64LastOne_k = wr_rdoqD64LastOne_k + 1) begin
+                rdoqD64LastOne_data[wr_rdoqD64LastOne_k] = rdoqD64LastOne[wr_rdoqD64LastOne_k];
+            end
+            #2;
+            $fwrite(fp_rdoqD64LastOne_w1, "%6d %6d %6d %6d \n", 
+                rdoqD64LastOne_data[0 ], rdoqD64LastOne_data[1 ], rdoqD64LastOne_data[2 ], rdoqD64LastOne_data[3 ]);
+        end
+        $fclose(fp_rdoqD64LastOne_w1);
+    end
+
+    initial begin 
+    integer fp_rdoqD64LastZero_w1;
+    integer wr_rdoqD64LastZero_j,wr_rdoqD64LastZero_k;
+    reg     signed  [63: 0]     rdoqD64LastZero_data        [0 : 63]    ;
+        #132;
+        fp_rdoqD64LastZero_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_4x4.txt", "w");
+        for (wr_rdoqD64LastZero_j = 0; wr_rdoqD64LastZero_j < 4; wr_rdoqD64LastZero_j = wr_rdoqD64LastZero_j + 1) begin
+            for (wr_rdoqD64LastZero_k = 0; wr_rdoqD64LastZero_k < 4; wr_rdoqD64LastZero_k = wr_rdoqD64LastZero_k + 1) begin
+                rdoqD64LastZero_data[wr_rdoqD64LastZero_k] = rdoqD64LastZero[wr_rdoqD64LastZero_k];
+            end
+            #2;
+            $fwrite(fp_rdoqD64LastZero_w1, "%6d %6d %6d %6d \n", 
+                rdoqD64LastZero_data[0 ], rdoqD64LastZero_data[1 ], rdoqD64LastZero_data[2 ], rdoqD64LastZero_data[3 ]);
+        end
+        $fclose(fp_rdoqD64LastZero_w1);
+    end
+
+
+    initial begin 
+    integer fp_endPosCost_w1;
+    integer wr_endPosCost_j,wr_endPosCost_k;
+    reg     signed  [63: 0]     endPosCost_data        [0 : 63]    ;
+        #132;
+        fp_endPosCost_w1 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_4x4.txt", "w");
+        for (wr_endPosCost_j = 0; wr_endPosCost_j < 4; wr_endPosCost_j = wr_endPosCost_j + 1) begin
+            for (wr_endPosCost_k = 0; wr_endPosCost_k < 4; wr_endPosCost_k = wr_endPosCost_k + 1) begin
+                endPosCost_data[wr_endPosCost_k] = endPosCost[wr_endPosCost_k];
+            end
+            #2;
+            $fwrite(fp_endPosCost_w1, "%6d %6d %6d %6d \n", 
+                endPosCost_data[0 ], endPosCost_data[1 ], endPosCost_data[2 ], endPosCost_data[3 ]);
+        end
+        $fclose(fp_endPosCost_w1);
+    end
+
+    initial begin 
+    integer fp_rdoq_last_x_w1;
+    integer wr_rdoq_last_x_j,wr_rdoq_last_x_k;
+    reg     signed  [63: 0]     rdoq_last_x_data        [0 : 63]    ;
+        #132;
+        fp_rdoq_last_x_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_4x4.txt", "w");
+        for (wr_rdoq_last_x_j = 0; wr_rdoq_last_x_j < 4; wr_rdoq_last_x_j = wr_rdoq_last_x_j + 1) begin
+            for (wr_rdoq_last_x_k = 0; wr_rdoq_last_x_k < 4; wr_rdoq_last_x_k = wr_rdoq_last_x_k + 1) begin
+                rdoq_last_x_data[wr_rdoq_last_x_k] = rdoq_last_x[wr_rdoq_last_x_k];
+            end
+            #2;
+            $fwrite(fp_rdoq_last_x_w1, "%6d %6d %6d %6d \n", 
+                rdoq_last_x_data[0 ], rdoq_last_x_data[1 ], rdoq_last_x_data[2 ], rdoq_last_x_data[3 ]);
+        end
+        $fclose(fp_rdoq_last_x_w1);
+    end
+
+    initial begin 
+    integer fp_rdoq_last_y_w1;
+    integer wr_rdoq_last_y_j,wr_rdoq_last_y_k;
+    reg     signed  [63: 0]     rdoq_last_y_data        [0 : 63]    ;
+        #132;
+        fp_rdoq_last_y_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_4x4.txt", "w");
+        for (wr_rdoq_last_y_j = 0; wr_rdoq_last_y_j < 4; wr_rdoq_last_y_j = wr_rdoq_last_y_j + 1) begin
+            for (wr_rdoq_last_y_k = 0; wr_rdoq_last_y_k < 4; wr_rdoq_last_y_k = wr_rdoq_last_y_k + 1) begin
+                rdoq_last_y_data[wr_rdoq_last_y_k] = rdoq_last_y[wr_rdoq_last_y_k];
+            end
+            #2;
+            $fwrite(fp_rdoq_last_y_w1, "%6d %6d %6d %6d \n", 
+                rdoq_last_y_data[0 ], rdoq_last_y_data[1 ], rdoq_last_y_data[2 ], rdoq_last_y_data[3 ]);
+        end
+        $fclose(fp_rdoq_last_y_w1);
+    end
+
+
+
+
+
+
+
+
 `endif
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 endmodule
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
