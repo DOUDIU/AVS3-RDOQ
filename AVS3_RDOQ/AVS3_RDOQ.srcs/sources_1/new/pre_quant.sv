@@ -260,9 +260,6 @@ endgenerate
         end
     end
 
-
-
-
 //pipe 1
 
     always@(posedge clk or negedge rst_n)begin
@@ -277,8 +274,6 @@ endgenerate
             end
         end
     end
-
-
 
 //pipe 2
 
@@ -362,24 +357,31 @@ endgenerate
 
 `ifdef file_write    //test bench
 
+//16x16
     initial begin 
-    integer fp_pq_w1;
+    integer fp_pq_w0,fp_pq_w1;
     integer wr_pq_j,wr_pq_k;
     reg     signed  [63: 0]     pq_data        [0 : 63]    ;
         #10;
-        fp_pq_w1 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_16x16.txt", "w");
+        fp_pq_w0 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_16x16_0.txt", "w");
+        fp_pq_w1 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_16x16_1.txt", "w");
         for (wr_pq_j = 0; wr_pq_j < 16; wr_pq_j = wr_pq_j + 1) begin
-            for (wr_pq_k = 0; wr_pq_k < 16; wr_pq_k = wr_pq_k + 1) begin
+            for (wr_pq_k = 0; wr_pq_k < 32; wr_pq_k = wr_pq_k + 1) begin
                 pq_data[wr_pq_k] = o_data[wr_pq_k];
             end
             #2;
-            $fwrite(fp_pq_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            $fwrite(fp_pq_w0, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
                 pq_data[0 ], pq_data[1 ], pq_data[2 ], pq_data[3 ], pq_data[4 ], pq_data[5 ], pq_data[6 ], pq_data[7 ], 
                 pq_data[8 ], pq_data[9 ], pq_data[10], pq_data[11], pq_data[12], pq_data[13], pq_data[14], pq_data[15]);
+            $fwrite(fp_pq_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                pq_data[16], pq_data[17], pq_data[18], pq_data[19], pq_data[20], pq_data[21], pq_data[22], pq_data[23], 
+                pq_data[24], pq_data[25], pq_data[26], pq_data[27], pq_data[28], pq_data[29], pq_data[30], pq_data[31]);
         end
+        $fclose(fp_pq_w0);
         $fclose(fp_pq_w1);
     end
     
+//32x32
     initial begin 
     integer fp_pq_w1;
     integer wr_pq_j,wr_pq_k;
@@ -392,58 +394,89 @@ endgenerate
             end
             #2;
             $fwrite(fp_pq_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-            pq_data[0 ], pq_data[1 ], pq_data[2 ], pq_data[3 ], pq_data[4 ], pq_data[5 ], pq_data[6 ], pq_data[7 ],
-            pq_data[8 ], pq_data[9 ], pq_data[10], pq_data[11], pq_data[12], pq_data[13], pq_data[14], pq_data[15], 
-            pq_data[16], pq_data[17], pq_data[18], pq_data[19], pq_data[20], pq_data[21], pq_data[22], pq_data[23], 
-            pq_data[24], pq_data[25], pq_data[26], pq_data[27], pq_data[28], pq_data[29], pq_data[30], pq_data[31]);
+                pq_data[0 ], pq_data[1 ], pq_data[2 ], pq_data[3 ], pq_data[4 ], pq_data[5 ], pq_data[6 ], pq_data[7 ],
+                pq_data[8 ], pq_data[9 ], pq_data[10], pq_data[11], pq_data[12], pq_data[13], pq_data[14], pq_data[15], 
+                pq_data[16], pq_data[17], pq_data[18], pq_data[19], pq_data[20], pq_data[21], pq_data[22], pq_data[23], 
+                pq_data[24], pq_data[25], pq_data[26], pq_data[27], pq_data[28], pq_data[29], pq_data[30], pq_data[31]);
         end
         $fclose(fp_pq_w1);
     end
 
+//8x8
     initial begin 
-    integer fp_pq_w1;
+    integer fp_pq_w0,fp_pq_w1,fp_pq_w2,fp_pq_w3;
     integer wr_pq_j,wr_pq_k;
     reg     signed  [63: 0]     pq_data        [0 : 63]    ;
         #106;
-        fp_pq_w1 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_8x8.txt", "w");
+        fp_pq_w0 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_8x8_0.txt", "w");
+        fp_pq_w1 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_8x8_1.txt", "w");
+        fp_pq_w2 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_8x8_2.txt", "w");
+        fp_pq_w3 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_8x8_3.txt", "w");
         for (wr_pq_j = 0; wr_pq_j < 8; wr_pq_j = wr_pq_j + 1) begin
-            for (wr_pq_k = 0; wr_pq_k < 8; wr_pq_k = wr_pq_k + 1) begin
+            for (wr_pq_k = 0; wr_pq_k < 32; wr_pq_k = wr_pq_k + 1) begin
                 pq_data[wr_pq_k] = o_data[wr_pq_k];
             end
             #2;
+            $fwrite(fp_pq_w0, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                pq_data[0 ], pq_data[1 ], pq_data[2 ], pq_data[3 ], pq_data[4 ], pq_data[5 ], pq_data[6 ], pq_data[7 ]);
             $fwrite(fp_pq_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
-            pq_data[0 ], pq_data[1 ], pq_data[2 ], pq_data[3 ], pq_data[4 ], pq_data[5 ], pq_data[6 ], pq_data[7 ]);
+                pq_data[8 ], pq_data[9 ], pq_data[10], pq_data[11], pq_data[12], pq_data[13], pq_data[14], pq_data[15]);
+            $fwrite(fp_pq_w2, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                pq_data[16], pq_data[17], pq_data[18], pq_data[19], pq_data[20], pq_data[21], pq_data[22], pq_data[23]);
+            $fwrite(fp_pq_w3, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                pq_data[24], pq_data[25], pq_data[26], pq_data[27], pq_data[28], pq_data[29], pq_data[30], pq_data[31]);
         end
+        $fclose(fp_pq_w0);
         $fclose(fp_pq_w1);
+        $fclose(fp_pq_w2);
+        $fclose(fp_pq_w3);
     end
 
+//4x4
     initial begin 
-    integer fp_pq_w1;
+    integer fp_pq_w0,fp_pq_w1,fp_pq_w2,fp_pq_w3,fp_pq_w4,fp_pq_w5,fp_pq_w6,fp_pq_w7;
     integer wr_pq_j,wr_pq_k;
     reg     signed  [63: 0]     pq_data        [0 : 63]    ;
         #122;
-        fp_pq_w1 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_4x4.txt", "w");
+        fp_pq_w0 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_4x4_0.txt", "w");
+        fp_pq_w1 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_4x4_1.txt", "w");
+        fp_pq_w2 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_4x4_2.txt", "w");
+        fp_pq_w3 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_4x4_3.txt", "w");
+        fp_pq_w4 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_4x4_4.txt", "w");
+        fp_pq_w5 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_4x4_5.txt", "w");
+        fp_pq_w6 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_4x4_6.txt", "w");
+        fp_pq_w7 = $fopen("../../../../../result/pq/pq_fpga_coeff/pq_fpga_4x4_7.txt", "w");
         for (wr_pq_j = 0; wr_pq_j < 4; wr_pq_j = wr_pq_j + 1) begin
-            for (wr_pq_k = 0; wr_pq_k < 4; wr_pq_k = wr_pq_k + 1) begin
+            for (wr_pq_k = 0; wr_pq_k < 32; wr_pq_k = wr_pq_k + 1) begin
                 pq_data[wr_pq_k] = o_data[wr_pq_k];
             end
             #2;
+            $fwrite(fp_pq_w0, "%6d %6d %6d %6d \n", 
+                pq_data[0 ], pq_data[1 ], pq_data[2 ], pq_data[3 ]);
             $fwrite(fp_pq_w1, "%6d %6d %6d %6d \n", 
-            pq_data[0 ], pq_data[1 ], pq_data[2 ], pq_data[3 ]);
+                pq_data[4 ], pq_data[5 ], pq_data[6 ], pq_data[7 ]);
+            $fwrite(fp_pq_w2, "%6d %6d %6d %6d \n", 
+                pq_data[8 ], pq_data[9 ], pq_data[10], pq_data[11]);
+            $fwrite(fp_pq_w3, "%6d %6d %6d %6d \n", 
+                pq_data[12], pq_data[13], pq_data[14], pq_data[15]);
+            $fwrite(fp_pq_w4, "%6d %6d %6d %6d \n", 
+                pq_data[16], pq_data[17], pq_data[18], pq_data[19]);
+            $fwrite(fp_pq_w5, "%6d %6d %6d %6d \n", 
+                pq_data[20], pq_data[21], pq_data[22], pq_data[23]);
+            $fwrite(fp_pq_w6, "%6d %6d %6d %6d \n", 
+                pq_data[24], pq_data[25], pq_data[26], pq_data[27]);
+            $fwrite(fp_pq_w7, "%6d %6d %6d %6d \n", 
+                pq_data[28], pq_data[29], pq_data[30], pq_data[31]);
         end
+        $fclose(fp_pq_w0);
         $fclose(fp_pq_w1);
+        $fclose(fp_pq_w2);
+        $fclose(fp_pq_w3);
+        $fclose(fp_pq_w4);
+        $fclose(fp_pq_w5);
+        $fclose(fp_pq_w6);
+        $fclose(fp_pq_w7);
     end
-
-
-
-
-
-
-
-
-
-
-
 
 `endif
 

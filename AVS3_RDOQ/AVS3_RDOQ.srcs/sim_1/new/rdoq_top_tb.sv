@@ -235,7 +235,8 @@ initial begin
             rd_data[8 ], rd_data[9 ], rd_data[10], rd_data[11], rd_data[12], rd_data[13], rd_data[14], rd_data[15]);
 
             for (rd_k = 0; rd_k < 16; rd_k = rd_k + 1) begin
-                i_data[rd_k] = rd_data[rd_k];
+                i_data[rd_k     ] = rd_data[rd_k];
+                i_data[rd_k + 16] = rd_data[rd_k];
             end
             #2;
             i_valid = 0;
@@ -449,7 +450,10 @@ initial begin
             rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ], rd_data[4 ], rd_data[5 ], rd_data[6 ], rd_data[7 ]);
 
             for (rd_k = 0; rd_k < 8; rd_k = rd_k + 1) begin
-                i_data[rd_k] = rd_data[rd_k];
+                i_data[rd_k     ] = rd_data[rd_k];
+                i_data[rd_k + 8 ] = rd_data[rd_k];
+                i_data[rd_k + 16] = rd_data[rd_k];
+                i_data[rd_k + 24] = rd_data[rd_k];
             end
             #2;
             i_valid = 0;
@@ -550,7 +554,14 @@ initial begin
             rd_data[0 ], rd_data[1 ], rd_data[2 ], rd_data[3 ]);
 
             for (rd_k = 0; rd_k < 4; rd_k = rd_k + 1) begin
-                i_data[rd_k] = rd_data[rd_k];
+                i_data[rd_k     ] = rd_data[rd_k];
+                i_data[rd_k + 4 ] = rd_data[rd_k];
+                i_data[rd_k + 8 ] = rd_data[rd_k];
+                i_data[rd_k + 12] = rd_data[rd_k];
+                i_data[rd_k + 16] = rd_data[rd_k];
+                i_data[rd_k + 20] = rd_data[rd_k];
+                i_data[rd_k + 24] = rd_data[rd_k];
+                i_data[rd_k + 28] = rd_data[rd_k];
             end
             #2;
             i_valid = 0;

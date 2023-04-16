@@ -191,44 +191,78 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
             for(i = 4 ; i < 7 ; i = i + 1)begin
                 tempCost_tem[i]     <=   tempCost[i + 1];   
             end
-            for(i = 8 ; i < 15 ; i = i + 1)begin
+            for(i = 8 ; i < 11; i = i + 1)begin
                 tempCost_tem[i]     <=   tempCost[i + 1];   
             end
-            for(i = 16; i < 31; i = i + 1)begin
+            for(i = 12 ; i < 15 ; i = i + 1)begin
+                tempCost_tem[i]     <=   tempCost[i + 1];   
+            end
+            for(i = 16; i < 19; i = i + 1)begin
+                tempCost_tem[i]     <=   tempCost[i + 1];   
+            end
+            for(i = 20; i < 23; i = i + 1)begin
+                tempCost_tem[i]     <=   tempCost[i + 1];   
+            end
+            for(i = 24; i < 27; i = i + 1)begin
+                tempCost_tem[i]     <=   tempCost[i + 1];   
+            end
+            for(i = 28; i < 31; i = i + 1)begin
                 tempCost_tem[i]     <=   tempCost[i + 1];   
             end
 
             case(i_height_log2_d2)
                 3'd2    : begin    
                         tempCost_tem[3 ]    <=  tempCost[3 ];
-                        tempCost_tem[7 ]    <=  0;//pending, not used
-                        tempCost_tem[15]    <=  0;//pending, not used
-                        tempCost_tem[31]    <=  0;//pending, not used
+                        tempCost_tem[7 ]    <=  tempCost[7 ];
+                        tempCost_tem[11]    <=  tempCost[11];
+                        tempCost_tem[15]    <=  tempCost[15];
+                        tempCost_tem[19]    <=  tempCost[19];
+                        tempCost_tem[23]    <=  tempCost[23];
+                        tempCost_tem[27]    <=  tempCost[27];
+                        tempCost_tem[31]    <=  tempCost[31];
                     end
                 3'd3    : begin
                         tempCost_tem[3 ]    <=  tempCost[4 ];
-                        tempCost_tem[7 ]    <=  tempCost[7 ];//pending, not used
-                        tempCost_tem[15]    <=  0;//pending, not used
-                        tempCost_tem[31]    <=  0;//pending, not used
+                        tempCost_tem[7 ]    <=  tempCost[7 ];
 
+                        tempCost_tem[11]    <=  tempCost[12];
+                        tempCost_tem[15]    <=  tempCost[15];
+
+                        tempCost_tem[19]    <=  tempCost[20];
+                        tempCost_tem[23]    <=  tempCost[23];
+
+                        tempCost_tem[27]    <=  tempCost[28];
+                        tempCost_tem[31]    <=  tempCost[31];
                     end
                 3'd4    : begin
                         tempCost_tem[3 ]    <=  tempCost[4 ];
                         tempCost_tem[7 ]    <=  tempCost[8 ];
+                        tempCost_tem[11]    <=  tempCost[12];
                         tempCost_tem[15]    <=  tempCost[15];
-                        tempCost_tem[31]    <=  0;//pending, not used
-
+                        
+                        tempCost_tem[19]    <=  tempCost[20];
+                        tempCost_tem[23]    <=  tempCost[24];
+                        tempCost_tem[27]    <=  tempCost[28];
+                        tempCost_tem[31]    <=  tempCost[31];
                     end
                 3'd5    : begin
                         tempCost_tem[3 ]    <=  tempCost[4 ];
                         tempCost_tem[7 ]    <=  tempCost[8 ];
+                        tempCost_tem[11]    <=  tempCost[12];
                         tempCost_tem[15]    <=  tempCost[16];
+                        tempCost_tem[19]    <=  tempCost[20];
+                        tempCost_tem[23]    <=  tempCost[24];
+                        tempCost_tem[27]    <=  tempCost[28];
                         tempCost_tem[31]    <=  tempCost[31];
                     end
                 default : begin
                         tempCost_tem[3 ]    <=  0;
                         tempCost_tem[7 ]    <=  0;
+                        tempCost_tem[11]    <=  0;
                         tempCost_tem[15]    <=  0;
+                        tempCost_tem[19]    <=  0;
+                        tempCost_tem[23]    <=  0;
+                        tempCost_tem[27]    <=  0;
                         tempCost_tem[31]    <=  0;
                     end
             endcase
@@ -254,42 +288,78 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
             for(i = 4 ; i < 7 ; i = i + 1)begin
                 tempCost[i]     <=  i_base_cost_buffer_tmp_d1[i] + tempCost_tem[i];
             end
-            for(i = 8 ; i < 15; i = i + 1)begin
+            for(i = 8 ; i < 11; i = i + 1)begin
                 tempCost[i]     <=  i_base_cost_buffer_tmp_d1[i] + tempCost_tem[i];
-            end            
-            for(i = 16; i < 31; i = i + 1)begin
+            end         
+            for(i = 12; i < 15; i = i + 1)begin
+                tempCost[i]     <=  i_base_cost_buffer_tmp_d1[i] + tempCost_tem[i];
+            end        
+            for(i = 16; i < 19; i = i + 1)begin
+                tempCost[i]     <=  i_base_cost_buffer_tmp_d1[i] + tempCost_tem[i];
+            end
+            for(i = 20; i < 23; i = i + 1)begin
+                tempCost[i]     <=  i_base_cost_buffer_tmp_d1[i] + tempCost_tem[i];
+            end
+            for(i = 24; i < 27; i = i + 1)begin
+                tempCost[i]     <=  i_base_cost_buffer_tmp_d1[i] + tempCost_tem[i];
+            end
+            for(i = 28; i < 31; i = i + 1)begin
                 tempCost[i]     <=  i_base_cost_buffer_tmp_d1[i] + tempCost_tem[i];
             end
             //determine the value of the last row 
             case(i_height_log2_d1)
                 3'd2: begin    
                         tempCost[3 ]    <=  i_base_cost_buffer_tmp_d1[3 ];
-                        tempCost[7 ]    <=  0;//pending, not used
-                        tempCost[15]    <=  0;//pending, not used
-                        tempCost[31]    <=  0;//pending, not used
+                        tempCost[7 ]    <=  i_base_cost_buffer_tmp_d1[7 ];
+                        tempCost[11]    <=  i_base_cost_buffer_tmp_d1[11];
+                        tempCost[15]    <=  i_base_cost_buffer_tmp_d1[15];
+                        tempCost[19]    <=  i_base_cost_buffer_tmp_d1[19];
+                        tempCost[23]    <=  i_base_cost_buffer_tmp_d1[23];
+                        tempCost[27]    <=  i_base_cost_buffer_tmp_d1[27];
+                        tempCost[31]    <=  i_base_cost_buffer_tmp_d1[31];
                     end
                 3'd3: begin
                         tempCost[3 ]    <=  i_base_cost_buffer_tmp_d1[3 ] + tempCost_tem[3 ];
                         tempCost[7 ]    <=  i_base_cost_buffer_tmp_d1[7 ];
-                        tempCost[15]    <=  0;//pending, not used
-                        tempCost[31]    <=  0;//pending, not used
+
+                        tempCost[11]    <=  i_base_cost_buffer_tmp_d1[11] + tempCost_tem[11];
+                        tempCost[15]    <=  i_base_cost_buffer_tmp_d1[15];
+
+                        tempCost[19]    <=  i_base_cost_buffer_tmp_d1[19] + tempCost_tem[19];
+                        tempCost[23]    <=  i_base_cost_buffer_tmp_d1[23];
+
+                        tempCost[27]    <=  i_base_cost_buffer_tmp_d1[27] + tempCost_tem[27];
+                        tempCost[31]    <=  i_base_cost_buffer_tmp_d1[31];
                     end
                 3'd4: begin
                         tempCost[3 ]    <=  i_base_cost_buffer_tmp_d1[3 ] + tempCost_tem[3 ];
                         tempCost[7 ]    <=  i_base_cost_buffer_tmp_d1[7 ] + tempCost_tem[7 ];
+                        tempCost[11]    <=  i_base_cost_buffer_tmp_d1[11] + tempCost_tem[11];
                         tempCost[15]    <=  i_base_cost_buffer_tmp_d1[15];
-                        tempCost[31]    <=  0;//pending, not used
+
+                        tempCost[19]    <=  i_base_cost_buffer_tmp_d1[19] + tempCost_tem[19];
+                        tempCost[23]    <=  i_base_cost_buffer_tmp_d1[23] + tempCost_tem[23];
+                        tempCost[27]    <=  i_base_cost_buffer_tmp_d1[27] + tempCost_tem[27];
+                        tempCost[31]    <=  i_base_cost_buffer_tmp_d1[31];
                     end
                 3'd5: begin
                         tempCost[3 ]    <=  i_base_cost_buffer_tmp_d1[3 ] + tempCost_tem[3 ];
                         tempCost[7 ]    <=  i_base_cost_buffer_tmp_d1[7 ] + tempCost_tem[7 ];
+                        tempCost[11]    <=  i_base_cost_buffer_tmp_d1[11] + tempCost_tem[11];
                         tempCost[15]    <=  i_base_cost_buffer_tmp_d1[15] + tempCost_tem[15];
+                        tempCost[19]    <=  i_base_cost_buffer_tmp_d1[19] + tempCost_tem[19];
+                        tempCost[23]    <=  i_base_cost_buffer_tmp_d1[23] + tempCost_tem[23];
+                        tempCost[27]    <=  i_base_cost_buffer_tmp_d1[27] + tempCost_tem[27];
                         tempCost[31]    <=  i_base_cost_buffer_tmp_d1[31];
                     end
                 default : begin
                         tempCost[3 ]    <=  0;
                         tempCost[7 ]    <=  0;
+                        tempCost[11]    <=  0;
                         tempCost[15]    <=  0;
+                        tempCost[19]    <=  0;
+                        tempCost[23]    <=  0;
+                        tempCost[27]    <=  0;
                         tempCost[31]    <=  0;
                     end
             endcase
@@ -311,44 +381,78 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
             for(i = 4 ; i < 7 ; i = i + 1)begin
                 rdoqD64LastOne_tem[i]     <=   rdoqD64LastOne[i + 1];   
             end
-            for(i = 8 ; i < 15 ; i = i + 1)begin
+            for(i = 8 ; i < 11 ; i = i + 1)begin
                 rdoqD64LastOne_tem[i]     <=   rdoqD64LastOne[i + 1];   
             end
-            for(i = 16; i < 31; i = i + 1)begin
+            for(i = 12; i < 15 ; i = i + 1)begin
+                rdoqD64LastOne_tem[i]     <=   rdoqD64LastOne[i + 1];   
+            end
+            for(i = 16; i < 19; i = i + 1)begin
+                rdoqD64LastOne_tem[i]     <=   rdoqD64LastOne[i + 1];   
+            end
+            for(i = 20; i < 23; i = i + 1)begin
+                rdoqD64LastOne_tem[i]     <=   rdoqD64LastOne[i + 1];   
+            end
+            for(i = 24; i < 27; i = i + 1)begin
+                rdoqD64LastOne_tem[i]     <=   rdoqD64LastOne[i + 1];   
+            end
+            for(i = 28; i < 31; i = i + 1)begin
                 rdoqD64LastOne_tem[i]     <=   rdoqD64LastOne[i + 1];   
             end
 
             case(i_height_log2_d2)
                 3'd2    : begin    
                         rdoqD64LastOne_tem[3 ]    <=  rdoqD64LastOne[3 ];
-                        rdoqD64LastOne_tem[7 ]    <=  0;//pending, not used
-                        rdoqD64LastOne_tem[15]    <=  0;//pending, not used
-                        rdoqD64LastOne_tem[31]    <=  0;//pending, not used
+                        rdoqD64LastOne_tem[7 ]    <=  rdoqD64LastOne[7 ];
+                        rdoqD64LastOne_tem[11]    <=  rdoqD64LastOne[11];
+                        rdoqD64LastOne_tem[15]    <=  rdoqD64LastOne[15];
+                        rdoqD64LastOne_tem[19]    <=  rdoqD64LastOne[19];
+                        rdoqD64LastOne_tem[23]    <=  rdoqD64LastOne[23];
+                        rdoqD64LastOne_tem[27]    <=  rdoqD64LastOne[27];
+                        rdoqD64LastOne_tem[31]    <=  rdoqD64LastOne[31];
                     end
                 3'd3    : begin
                         rdoqD64LastOne_tem[3 ]    <=  rdoqD64LastOne[4 ];
-                        rdoqD64LastOne_tem[7 ]    <=  rdoqD64LastOne[7 ];//pending, not used
-                        rdoqD64LastOne_tem[15]    <=  0;//pending, not used
-                        rdoqD64LastOne_tem[31]    <=  0;//pending, not used
+                        rdoqD64LastOne_tem[7 ]    <=  rdoqD64LastOne[7 ];
 
+                        rdoqD64LastOne_tem[11]    <=  rdoqD64LastOne[12];
+                        rdoqD64LastOne_tem[15]    <=  rdoqD64LastOne[15];
+
+                        rdoqD64LastOne_tem[19]    <=  rdoqD64LastOne[20];
+                        rdoqD64LastOne_tem[23]    <=  rdoqD64LastOne[23];
+
+                        rdoqD64LastOne_tem[27]    <=  rdoqD64LastOne[28];
+                        rdoqD64LastOne_tem[31]    <=  rdoqD64LastOne[31];
                     end
                 3'd4    : begin
                         rdoqD64LastOne_tem[3 ]    <=  rdoqD64LastOne[4 ];
                         rdoqD64LastOne_tem[7 ]    <=  rdoqD64LastOne[8 ];
+                        rdoqD64LastOne_tem[11]    <=  rdoqD64LastOne[12];
                         rdoqD64LastOne_tem[15]    <=  rdoqD64LastOne[15];
-                        rdoqD64LastOne_tem[31]    <=  0;//pending, not used
 
+                        rdoqD64LastOne_tem[19]    <=  rdoqD64LastOne[20];
+                        rdoqD64LastOne_tem[23]    <=  rdoqD64LastOne[24];
+                        rdoqD64LastOne_tem[27]    <=  rdoqD64LastOne[28];
+                        rdoqD64LastOne_tem[31]    <=  rdoqD64LastOne[31];
                     end
                 3'd5    : begin
                         rdoqD64LastOne_tem[3 ]    <=  rdoqD64LastOne[4 ];
                         rdoqD64LastOne_tem[7 ]    <=  rdoqD64LastOne[8 ];
+                        rdoqD64LastOne_tem[11]    <=  rdoqD64LastOne[12];
                         rdoqD64LastOne_tem[15]    <=  rdoqD64LastOne[16];
+                        rdoqD64LastOne_tem[19]    <=  rdoqD64LastOne[20];
+                        rdoqD64LastOne_tem[23]    <=  rdoqD64LastOne[24];
+                        rdoqD64LastOne_tem[27]    <=  rdoqD64LastOne[28];
                         rdoqD64LastOne_tem[31]    <=  rdoqD64LastOne[31];
                     end
                 default : begin
                         rdoqD64LastOne_tem[3 ]    <=  0;
                         rdoqD64LastOne_tem[7 ]    <=  0;
+                        rdoqD64LastOne_tem[11]    <=  0;
                         rdoqD64LastOne_tem[15]    <=  0;
+                        rdoqD64LastOne_tem[19]    <=  0;
+                        rdoqD64LastOne_tem[23]    <=  0;
+                        rdoqD64LastOne_tem[27]    <=  0;
                         rdoqD64LastOne_tem[31]    <=  0;
                     end
             endcase
@@ -368,50 +472,83 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
             for(i = 4 ; i < 7 ; i = i + 1)begin
                 rdoqD64LastZero_tem[i]     <=   rdoqD64LastZero[i + 1];   
             end
-            for(i = 8 ; i < 15 ; i = i + 1)begin
+            for(i = 8 ; i < 11 ; i = i + 1)begin
                 rdoqD64LastZero_tem[i]     <=   rdoqD64LastZero[i + 1];   
             end
-            for(i = 16; i < 31; i = i + 1)begin
+            for(i = 12; i < 15 ; i = i + 1)begin
+                rdoqD64LastZero_tem[i]     <=   rdoqD64LastZero[i + 1];   
+            end
+            for(i = 16; i < 19; i = i + 1)begin
+                rdoqD64LastZero_tem[i]     <=   rdoqD64LastZero[i + 1];   
+            end
+            for(i = 20; i < 23; i = i + 1)begin
+                rdoqD64LastZero_tem[i]     <=   rdoqD64LastZero[i + 1];   
+            end
+            for(i = 24; i < 27; i = i + 1)begin
+                rdoqD64LastZero_tem[i]     <=   rdoqD64LastZero[i + 1];   
+            end
+            for(i = 28; i < 31; i = i + 1)begin
                 rdoqD64LastZero_tem[i]     <=   rdoqD64LastZero[i + 1];   
             end
 
             case(i_height_log2_d2)
                 3'd2    : begin    
                         rdoqD64LastZero_tem[3 ]    <=  rdoqD64LastZero[3 ];
-                        rdoqD64LastZero_tem[7 ]    <=  0;//pending, not used
-                        rdoqD64LastZero_tem[15]    <=  0;//pending, not used
-                        rdoqD64LastZero_tem[31]    <=  0;//pending, not used
+                        rdoqD64LastZero_tem[7 ]    <=  rdoqD64LastZero[7 ];
+                        rdoqD64LastZero_tem[11]    <=  rdoqD64LastZero[11];
+                        rdoqD64LastZero_tem[15]    <=  rdoqD64LastZero[15];
+                        rdoqD64LastZero_tem[19]    <=  rdoqD64LastZero[19];
+                        rdoqD64LastZero_tem[23]    <=  rdoqD64LastZero[23];
+                        rdoqD64LastZero_tem[27]    <=  rdoqD64LastZero[27];
+                        rdoqD64LastZero_tem[31]    <=  rdoqD64LastZero[31];
                     end
                 3'd3    : begin
                         rdoqD64LastZero_tem[3 ]    <=  rdoqD64LastZero[4 ];
-                        rdoqD64LastZero_tem[7 ]    <=  rdoqD64LastZero[7 ];//pending, not used
-                        rdoqD64LastZero_tem[15]    <=  0;//pending, not used
-                        rdoqD64LastZero_tem[31]    <=  0;//pending, not used
+                        rdoqD64LastZero_tem[7 ]    <=  rdoqD64LastZero[7 ];
 
+                        rdoqD64LastZero_tem[11]    <=  rdoqD64LastZero[12];
+                        rdoqD64LastZero_tem[15]    <=  rdoqD64LastZero[15];
+
+                        rdoqD64LastZero_tem[19]    <=  rdoqD64LastZero[20];
+                        rdoqD64LastZero_tem[23]    <=  rdoqD64LastZero[23];
+
+                        rdoqD64LastZero_tem[27]    <=  rdoqD64LastZero[28];
+                        rdoqD64LastZero_tem[31]    <=  rdoqD64LastZero[31];
                     end
                 3'd4    : begin
                         rdoqD64LastZero_tem[3 ]    <=  rdoqD64LastZero[4 ];
                         rdoqD64LastZero_tem[7 ]    <=  rdoqD64LastZero[8 ];
+                        rdoqD64LastZero_tem[11]    <=  rdoqD64LastZero[12];
                         rdoqD64LastZero_tem[15]    <=  rdoqD64LastZero[15];
-                        rdoqD64LastZero_tem[31]    <=  0;//pending, not used
 
+                        rdoqD64LastZero_tem[19]    <=  rdoqD64LastZero[20];
+                        rdoqD64LastZero_tem[23]    <=  rdoqD64LastZero[24];
+                        rdoqD64LastZero_tem[27]    <=  rdoqD64LastZero[28];
+                        rdoqD64LastZero_tem[31]    <=  rdoqD64LastZero[31];
                     end
                 3'd5    : begin
                         rdoqD64LastZero_tem[3 ]    <=  rdoqD64LastZero[4 ];
                         rdoqD64LastZero_tem[7 ]    <=  rdoqD64LastZero[8 ];
+                        rdoqD64LastZero_tem[11]    <=  rdoqD64LastZero[12];
                         rdoqD64LastZero_tem[15]    <=  rdoqD64LastZero[16];
+                        rdoqD64LastZero_tem[19]    <=  rdoqD64LastZero[20];
+                        rdoqD64LastZero_tem[23]    <=  rdoqD64LastZero[24];
+                        rdoqD64LastZero_tem[27]    <=  rdoqD64LastZero[28];
                         rdoqD64LastZero_tem[31]    <=  rdoqD64LastZero[31];
                     end
                 default : begin
                         rdoqD64LastZero_tem[3 ]    <=  0;
                         rdoqD64LastZero_tem[7 ]    <=  0;
+                        rdoqD64LastZero_tem[11]    <=  0;
                         rdoqD64LastZero_tem[15]    <=  0;
+                        rdoqD64LastZero_tem[19]    <=  0;
+                        rdoqD64LastZero_tem[23]    <=  0;
+                        rdoqD64LastZero_tem[27]    <=  0;
                         rdoqD64LastZero_tem[31]    <=  0;
                     end
             endcase
         end
     end
-
     //calculate rdoqD64LastOne and rdoqD64LastZero
     always@(posedge clk or negedge rst_n)begin
         if(!rst_n)begin
@@ -445,7 +582,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
             end
 
             //odd rows except the last row of each matrix
-            for(i = 1; i < 3; i = i + 2)begin
+            for(i = 1; i < 3; i = i + 4)begin
                 if(i_level_opt_d1[i])begin
                     if(rdoq_last_y_tem[i] != -1)begin
                         if( (tempCost_tem[i] + i_base_cost_buffer_tmp_d1[i] + i_d64_cost_last_one_d1[i] - i_d64_cost_last_zero_d1[i]) < (endPosCost_tem[i] + rdoqD64LastOne_tem[i] - rdoqD64LastZero_tem[i]) )begin
@@ -467,7 +604,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                     rdoqD64LastZero[i]      <=      rdoqD64LastZero_tem[i]  ;
                 end
             end
-            for(i = 5; i < 7; i = i + 2)begin
+            for(i = 5; i < 7; i = i + 4)begin
                 if(i_level_opt_d1[i])begin
                     if(rdoq_last_y_tem[i] != -1)begin
                         if( (tempCost_tem[i] + i_base_cost_buffer_tmp_d1[i] + i_d64_cost_last_one_d1[i] - i_d64_cost_last_zero_d1[i]) < (endPosCost_tem[i] + rdoqD64LastOne_tem[i] - rdoqD64LastZero_tem[i]) )begin
@@ -489,7 +626,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                     rdoqD64LastZero[i]      <=      rdoqD64LastZero_tem[i]  ;
                 end
             end
-            for(i = 9; i < 15; i = i + 2)begin
+            for(i = 9; i < 15; i = i + 4)begin
                 if(i_level_opt_d1[i])begin
                     if(rdoq_last_y_tem[i] != -1)begin
                         if( (tempCost_tem[i] + i_base_cost_buffer_tmp_d1[i] + i_d64_cost_last_one_d1[i] - i_d64_cost_last_zero_d1[i]) < (endPosCost_tem[i] + rdoqD64LastOne_tem[i] - rdoqD64LastZero_tem[i]) )begin
@@ -511,7 +648,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                     rdoqD64LastZero[i]      <=      rdoqD64LastZero_tem[i]  ;
                 end
             end            
-            for(i = 17; i < 31; i = i + 2)begin
+            for(i = 17; i < 31; i = i + 4)begin
                 if(i_level_opt_d1[i])begin
                     if(rdoq_last_y_tem[i] != -1)begin
                         if( (tempCost_tem[i] + i_base_cost_buffer_tmp_d1[i] + i_d64_cost_last_one_d1[i] - i_d64_cost_last_zero_d1[i]) < (endPosCost_tem[i] + rdoqD64LastOne_tem[i] - rdoqD64LastZero_tem[i]) )begin
@@ -537,19 +674,76 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
             case(i_height_log2_d1)
                 3'd2    : begin    
                         if(i_level_opt_d1[ 3])begin
-                            rdoqD64LastOne  [ 3]    <=  i_d64_cost_last_one_d1 [ 3]  ;
-                            rdoqD64LastZero [ 3]    <=  i_d64_cost_last_zero_d1[ 3]  ;
+                            rdoqD64LastOne  [ 3]    <=  i_d64_cost_last_one_d1 [ 3] ;
+                            rdoqD64LastZero [ 3]    <=  i_d64_cost_last_zero_d1[ 3] ;
                         end
                         else begin
-                            rdoqD64LastOne  [ 3]    <=  rdoqD64LastOne_tem[ 3]       ;
-                            rdoqD64LastZero [ 3]    <=  rdoqD64LastZero_tem[ 3]      ;
+                            rdoqD64LastOne  [ 3]    <=  rdoqD64LastOne_tem [ 3]     ;
+                            rdoqD64LastZero [ 3]    <=  rdoqD64LastZero_tem[ 3]     ;
                         end
-                        rdoqD64LastOne  [ 7]    <=  0;//pending, not used
-                        rdoqD64LastZero [ 7]    <=  0;//pending, not used
-                        rdoqD64LastOne  [15]    <=  0;//pending, not used
-                        rdoqD64LastZero [15]    <=  0;//pending, not used
-                        rdoqD64LastOne  [31]    <=  0;//pending, not used
-                        rdoqD64LastZero [31]    <=  0;//pending, not used
+
+                        if(i_level_opt_d1[ 7])begin
+                            rdoqD64LastOne  [ 7]    <=  i_d64_cost_last_one_d1 [ 7] ;
+                            rdoqD64LastZero [ 7]    <=  i_d64_cost_last_zero_d1[ 7] ;
+                        end
+                        else begin
+                            rdoqD64LastOne  [ 7]    <=  rdoqD64LastOne_tem [ 7]     ;
+                            rdoqD64LastZero [ 7]    <=  rdoqD64LastZero_tem[ 7]     ;
+                        end
+                        
+                        if(i_level_opt_d1[11])begin
+                            rdoqD64LastOne  [11]    <=  i_d64_cost_last_one_d1 [11] ;
+                            rdoqD64LastZero [11]    <=  i_d64_cost_last_zero_d1[11] ;
+                        end
+                        else begin
+                            rdoqD64LastOne  [11]    <=  rdoqD64LastOne_tem [11]     ;
+                            rdoqD64LastZero [11]    <=  rdoqD64LastZero_tem[11]     ;
+                        end
+                        
+                        if(i_level_opt_d1[15])begin
+                            rdoqD64LastOne  [15]    <=  i_d64_cost_last_one_d1 [15] ;
+                            rdoqD64LastZero [15]    <=  i_d64_cost_last_zero_d1[15] ;
+                        end
+                        else begin
+                            rdoqD64LastOne  [15]    <=  rdoqD64LastOne_tem [15]     ;
+                            rdoqD64LastZero [15]    <=  rdoqD64LastZero_tem[15]     ;
+                        end
+                        
+                        if(i_level_opt_d1[19])begin
+                            rdoqD64LastOne  [19]    <=  i_d64_cost_last_one_d1 [19] ;
+                            rdoqD64LastZero [19]    <=  i_d64_cost_last_zero_d1[19] ;
+                        end
+                        else begin
+                            rdoqD64LastOne  [19]    <=  rdoqD64LastOne_tem [19]     ;
+                            rdoqD64LastZero [19]    <=  rdoqD64LastZero_tem[19]     ;
+                        end
+
+                        if(i_level_opt_d1[23])begin
+                            rdoqD64LastOne  [23]    <=  i_d64_cost_last_one_d1 [23] ;
+                            rdoqD64LastZero [23]    <=  i_d64_cost_last_zero_d1[23] ;
+                        end
+                        else begin
+                            rdoqD64LastOne  [23]    <=  rdoqD64LastOne_tem [23]     ;
+                            rdoqD64LastZero [23]    <=  rdoqD64LastZero_tem[23]     ;
+                        end
+
+                        if(i_level_opt_d1[27])begin
+                            rdoqD64LastOne  [27]    <=  i_d64_cost_last_one_d1 [27] ;
+                            rdoqD64LastZero [27]    <=  i_d64_cost_last_zero_d1[27] ;
+                        end
+                        else begin
+                            rdoqD64LastOne  [27]    <=  rdoqD64LastOne_tem [27]     ;
+                            rdoqD64LastZero [27]    <=  rdoqD64LastZero_tem[27]     ;
+                        end
+
+                        if(i_level_opt_d1[31])begin
+                            rdoqD64LastOne  [31]    <=  i_d64_cost_last_one_d1 [31] ;
+                            rdoqD64LastZero [31]    <=  i_d64_cost_last_zero_d1[31] ;
+                        end
+                        else begin
+                            rdoqD64LastOne  [31]    <=  rdoqD64LastOne_tem [31]     ;
+                            rdoqD64LastZero [31]    <=  rdoqD64LastZero_tem[31]     ;
+                        end
                     end
                 3'd3    : begin
                         if(i_level_opt_d1[ 3])begin
@@ -582,10 +776,96 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                             rdoqD64LastZero [ 7]    <=  rdoqD64LastZero_tem[ 7]      ;
                         end
 
-                        rdoqD64LastOne  [15]    <=  0;//pending, not used
-                        rdoqD64LastZero [15]    <=  0;//pending, not used
-                        rdoqD64LastOne  [31]    <=  0;//pending, not used
-                        rdoqD64LastZero [31]    <=  0;//pending, not used
+                        if(i_level_opt_d1[11])begin
+                            if(rdoq_last_y_tem[11] != -1)begin
+                                if( (tempCost_tem[11] + i_base_cost_buffer_tmp_d1[11] + i_d64_cost_last_one_d1[11] - i_d64_cost_last_zero_d1[11]) < (endPosCost_tem[11] + rdoqD64LastOne_tem[11] - rdoqD64LastZero_tem[11]) )begin
+                                    rdoqD64LastOne [11]     <=      i_d64_cost_last_one_d1 [11] ;
+                                    rdoqD64LastZero[11]     <=      i_d64_cost_last_zero_d1[11] ;
+                                end
+                                else begin
+                                    rdoqD64LastOne  [11]    <=  rdoqD64LastOne_tem[11]       ;
+                                    rdoqD64LastZero [11]    <=  rdoqD64LastZero_tem[11]      ;
+                                end
+                            end
+                            else begin
+                                rdoqD64LastOne [11]     <=      i_d64_cost_last_one_d1 [11] ;
+                                rdoqD64LastZero[11]     <=      i_d64_cost_last_zero_d1[11] ;
+                            end
+                        end
+                        else begin
+                            rdoqD64LastOne  [11]    <=  rdoqD64LastOne_tem [11]      ;
+                            rdoqD64LastZero [11]    <=  rdoqD64LastZero_tem[11]      ;
+                        end
+
+                        if(i_level_opt_d1[15])begin
+                            rdoqD64LastOne  [15]    <=  i_d64_cost_last_one_d1 [15]  ;
+                            rdoqD64LastZero [15]    <=  i_d64_cost_last_zero_d1[15]  ;
+                        end
+                        else begin
+                            rdoqD64LastOne  [15]    <=  rdoqD64LastOne_tem [15]      ;
+                            rdoqD64LastZero [15]    <=  rdoqD64LastZero_tem[15]      ;
+                        end
+
+                        if(i_level_opt_d1[19])begin
+                            if(rdoq_last_y_tem[19] != -1)begin
+                                if( (tempCost_tem[19] + i_base_cost_buffer_tmp_d1[19] + i_d64_cost_last_one_d1[19] - i_d64_cost_last_zero_d1[19]) < (endPosCost_tem[19] + rdoqD64LastOne_tem[19] - rdoqD64LastZero_tem[19]) )begin
+                                    rdoqD64LastOne [19]     <=      i_d64_cost_last_one_d1 [19] ;
+                                    rdoqD64LastZero[19]     <=      i_d64_cost_last_zero_d1[19] ;
+                                end
+                                else begin
+                                    rdoqD64LastOne  [19]    <=  rdoqD64LastOne_tem[19]       ;
+                                    rdoqD64LastZero [19]    <=  rdoqD64LastZero_tem[19]      ;
+                                end
+                            end
+                            else begin
+                                rdoqD64LastOne [19]     <=      i_d64_cost_last_one_d1 [19] ;
+                                rdoqD64LastZero[19]     <=      i_d64_cost_last_zero_d1[19] ;
+                            end
+                        end
+                        else begin
+                            rdoqD64LastOne  [19]    <=  rdoqD64LastOne_tem [19]      ;
+                            rdoqD64LastZero [19]    <=  rdoqD64LastZero_tem[19]      ;
+                        end
+
+                        if(i_level_opt_d1[23])begin
+                            rdoqD64LastOne  [23]    <=  i_d64_cost_last_one_d1 [23]  ;
+                            rdoqD64LastZero [23]    <=  i_d64_cost_last_zero_d1[23]  ;
+                        end
+                        else begin
+                            rdoqD64LastOne  [23]    <=  rdoqD64LastOne_tem [23]      ;
+                            rdoqD64LastZero [23]    <=  rdoqD64LastZero_tem[23]      ;
+                        end
+
+                        if(i_level_opt_d1[27])begin
+                            if(rdoq_last_y_tem[27] != -1)begin
+                                if( (tempCost_tem[27] + i_base_cost_buffer_tmp_d1[27] + i_d64_cost_last_one_d1[27] - i_d64_cost_last_zero_d1[27]) < (endPosCost_tem[27] + rdoqD64LastOne_tem[27] - rdoqD64LastZero_tem[27]) )begin
+                                    rdoqD64LastOne [27]     <=      i_d64_cost_last_one_d1 [27] ;
+                                    rdoqD64LastZero[27]     <=      i_d64_cost_last_zero_d1[27] ;
+                                end
+                                else begin
+                                    rdoqD64LastOne  [27]    <=  rdoqD64LastOne_tem[27]       ;
+                                    rdoqD64LastZero [27]    <=  rdoqD64LastZero_tem[27]      ;
+                                end
+                            end
+                            else begin
+                                rdoqD64LastOne [27]     <=      i_d64_cost_last_one_d1 [27] ;
+                                rdoqD64LastZero[27]     <=      i_d64_cost_last_zero_d1[27] ;
+                            end
+                        end
+                        else begin
+                            rdoqD64LastOne  [27]    <=  rdoqD64LastOne_tem [27]      ;
+                            rdoqD64LastZero [27]    <=  rdoqD64LastZero_tem[27]      ;
+                        end
+
+                        if(i_level_opt_d1[31])begin
+                            rdoqD64LastOne  [31]    <=  i_d64_cost_last_one_d1 [31]  ;
+                            rdoqD64LastZero [31]    <=  i_d64_cost_last_zero_d1[31]  ;
+                        end
+                        else begin
+                            rdoqD64LastOne  [31]    <=  rdoqD64LastOne_tem [31]      ;
+                            rdoqD64LastZero [31]    <=  rdoqD64LastZero_tem[31]      ;
+                        end
+                        
                     end
                 3'd4    : begin
                         if(i_level_opt_d1[ 3])begin
@@ -630,6 +910,27 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                             rdoqD64LastZero [ 7]    <=  rdoqD64LastZero_tem[ 7]      ;
                         end
 
+                        if(i_level_opt_d1[11])begin
+                            if(rdoq_last_y_tem[11] != -1)begin
+                                if( (tempCost_tem[11] + i_base_cost_buffer_tmp_d1[11] + i_d64_cost_last_one_d1[11] - i_d64_cost_last_zero_d1[11]) < (endPosCost_tem[11] + rdoqD64LastOne_tem[11] - rdoqD64LastZero_tem[11]) )begin
+                                    rdoqD64LastOne [11]     <=      i_d64_cost_last_one_d1 [11] ;
+                                    rdoqD64LastZero[11]     <=      i_d64_cost_last_zero_d1[11] ;
+                                end
+                                else begin
+                                    rdoqD64LastOne  [11]    <=  rdoqD64LastOne_tem[11]       ;
+                                    rdoqD64LastZero [11]    <=  rdoqD64LastZero_tem[11]      ;
+                                end
+                            end
+                            else begin
+                                rdoqD64LastOne [11]     <=      i_d64_cost_last_one_d1 [11] ;
+                                rdoqD64LastZero[11]     <=      i_d64_cost_last_zero_d1[11] ;
+                            end
+                        end
+                        else begin
+                            rdoqD64LastOne  [11]    <=  rdoqD64LastOne_tem [11]      ;
+                            rdoqD64LastZero [11]    <=  rdoqD64LastZero_tem[11]      ;
+                        end
+
                         if(i_level_opt_d1[15])begin
                             rdoqD64LastOne  [15]    <=  i_d64_cost_last_one_d1 [15]  ;
                             rdoqD64LastZero [15]    <=  i_d64_cost_last_zero_d1[15]  ;
@@ -639,8 +940,78 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                             rdoqD64LastZero [15]    <=  rdoqD64LastZero_tem[15]      ;
                         end
 
-                        rdoqD64LastOne  [31]    <=  0;//pending, not used
-                        rdoqD64LastZero [31]    <=  0;//pending, not used
+
+                        if(i_level_opt_d1[19])begin
+                            if(rdoq_last_y_tem[19] != -1)begin
+                                if( (tempCost_tem[19] + i_base_cost_buffer_tmp_d1[19] + i_d64_cost_last_one_d1[19] - i_d64_cost_last_zero_d1[19]) < (endPosCost_tem[19] + rdoqD64LastOne_tem[19] - rdoqD64LastZero_tem[19]) )begin
+                                    rdoqD64LastOne [19]     <=      i_d64_cost_last_one_d1 [19] ;
+                                    rdoqD64LastZero[19]     <=      i_d64_cost_last_zero_d1[19] ;
+                                end
+                                else begin
+                                    rdoqD64LastOne  [19]    <=  rdoqD64LastOne_tem[19]       ;
+                                    rdoqD64LastZero [19]    <=  rdoqD64LastZero_tem[19]      ;
+                                end
+                            end
+                            else begin
+                                rdoqD64LastOne [19]     <=      i_d64_cost_last_one_d1 [19] ;
+                                rdoqD64LastZero[19]     <=      i_d64_cost_last_zero_d1[19] ;
+                            end
+                        end
+                        else begin
+                            rdoqD64LastOne  [19]    <=  rdoqD64LastOne_tem [19]      ;
+                            rdoqD64LastZero [19]    <=  rdoqD64LastZero_tem[19]      ;
+                        end
+
+                        if(i_level_opt_d1[23])begin
+                            if(rdoq_last_y_tem[23] != -1)begin
+                                if( (tempCost_tem[23] + i_base_cost_buffer_tmp_d1[23] + i_d64_cost_last_one_d1[23] - i_d64_cost_last_zero_d1[23]) < (endPosCost_tem[23] + rdoqD64LastOne_tem[23] - rdoqD64LastZero_tem[23]) )begin
+                                    rdoqD64LastOne [23]     <=      i_d64_cost_last_one_d1 [23] ;
+                                    rdoqD64LastZero[23]     <=      i_d64_cost_last_zero_d1[23] ;
+                                end
+                                else begin
+                                    rdoqD64LastOne  [23]    <=  rdoqD64LastOne_tem[23]       ;
+                                    rdoqD64LastZero [23]    <=  rdoqD64LastZero_tem[23]      ;
+                                end
+                            end
+                            else begin
+                                rdoqD64LastOne [23]     <=      i_d64_cost_last_one_d1 [23] ;
+                                rdoqD64LastZero[23]     <=      i_d64_cost_last_zero_d1[23] ;
+                            end
+                        end
+                        else begin
+                            rdoqD64LastOne  [23]    <=  rdoqD64LastOne_tem[23]       ;
+                            rdoqD64LastZero [23]    <=  rdoqD64LastZero_tem[23]      ;
+                        end
+
+                        if(i_level_opt_d1[27])begin
+                            if(rdoq_last_y_tem[27] != -1)begin
+                                if( (tempCost_tem[27] + i_base_cost_buffer_tmp_d1[27] + i_d64_cost_last_one_d1[27] - i_d64_cost_last_zero_d1[27]) < (endPosCost_tem[27] + rdoqD64LastOne_tem[27] - rdoqD64LastZero_tem[27]) )begin
+                                    rdoqD64LastOne [27]     <=      i_d64_cost_last_one_d1 [27] ;
+                                    rdoqD64LastZero[27]     <=      i_d64_cost_last_zero_d1[27] ;
+                                end
+                                else begin
+                                    rdoqD64LastOne  [27]    <=  rdoqD64LastOne_tem[27]       ;
+                                    rdoqD64LastZero [27]    <=  rdoqD64LastZero_tem[27]      ;
+                                end
+                            end
+                            else begin
+                                rdoqD64LastOne [27]     <=      i_d64_cost_last_one_d1 [27] ;
+                                rdoqD64LastZero[27]     <=      i_d64_cost_last_zero_d1[27] ;
+                            end
+                        end
+                        else begin
+                            rdoqD64LastOne  [27]    <=  rdoqD64LastOne_tem [27]      ;
+                            rdoqD64LastZero [27]    <=  rdoqD64LastZero_tem[27]      ;
+                        end
+
+                        if(i_level_opt_d1[31])begin
+                            rdoqD64LastOne  [31]    <=  i_d64_cost_last_one_d1 [31]  ;
+                            rdoqD64LastZero [31]    <=  i_d64_cost_last_zero_d1[31]  ;
+                        end
+                        else begin
+                            rdoqD64LastOne  [31]    <=  rdoqD64LastOne_tem [31]      ;
+                            rdoqD64LastZero [31]    <=  rdoqD64LastZero_tem[31]      ;
+                        end
                     end
                 3'd5    : begin
                         if(i_level_opt_d1[ 3])begin
@@ -685,6 +1056,26 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                             rdoqD64LastZero [ 7]    <=  rdoqD64LastZero_tem[ 7]      ;
                         end
 
+                        if(i_level_opt_d1[11])begin
+                            if(rdoq_last_y_tem[11] != -1)begin
+                                if( (tempCost_tem[11] + i_base_cost_buffer_tmp_d1[11] + i_d64_cost_last_one_d1[11] - i_d64_cost_last_zero_d1[11]) < (endPosCost_tem[11] + rdoqD64LastOne_tem[11] - rdoqD64LastZero_tem[11]) )begin
+                                    rdoqD64LastOne [11]     <=      i_d64_cost_last_one_d1 [11] ;
+                                    rdoqD64LastZero[11]     <=      i_d64_cost_last_zero_d1[11] ;
+                                end
+                                else begin
+                                    rdoqD64LastOne  [11]    <=  rdoqD64LastOne_tem[11]       ;
+                                    rdoqD64LastZero [11]    <=  rdoqD64LastZero_tem[11]      ;
+                                end
+                            end
+                            else begin
+                                rdoqD64LastOne [11]     <=      i_d64_cost_last_one_d1 [11] ;
+                                rdoqD64LastZero[11]     <=      i_d64_cost_last_zero_d1[11] ;
+                            end
+                        end
+                        else begin
+                            rdoqD64LastOne  [11]    <=  rdoqD64LastOne_tem [11]      ;
+                            rdoqD64LastZero [11]    <=  rdoqD64LastZero_tem[11]      ;
+                        end
 
                         if(i_level_opt_d1[15])begin
                             if(rdoq_last_y_tem[15] != -1)begin
@@ -707,6 +1098,69 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                             rdoqD64LastZero [15]    <=  rdoqD64LastZero_tem[15]      ;
                         end
 
+                        if(i_level_opt_d1[19])begin
+                            if(rdoq_last_y_tem[19] != -1)begin
+                                if( (tempCost_tem[19] + i_base_cost_buffer_tmp_d1[19] + i_d64_cost_last_one_d1[19] - i_d64_cost_last_zero_d1[19]) < (endPosCost_tem[19] + rdoqD64LastOne_tem[19] - rdoqD64LastZero_tem[19]) )begin
+                                    rdoqD64LastOne [19]     <=      i_d64_cost_last_one_d1 [19] ;
+                                    rdoqD64LastZero[19]     <=      i_d64_cost_last_zero_d1[19] ;
+                                end
+                                else begin
+                                    rdoqD64LastOne  [19]    <=  rdoqD64LastOne_tem[19]       ;
+                                    rdoqD64LastZero [19]    <=  rdoqD64LastZero_tem[19]      ;
+                                end
+                            end
+                            else begin
+                                rdoqD64LastOne [19]     <=      i_d64_cost_last_one_d1 [19] ;
+                                rdoqD64LastZero[19]     <=      i_d64_cost_last_zero_d1[19] ;
+                            end
+                        end
+                        else begin
+                            rdoqD64LastOne  [19]    <=  rdoqD64LastOne_tem [19]      ;
+                            rdoqD64LastZero [19]    <=  rdoqD64LastZero_tem[19]      ;
+                        end
+
+                        if(i_level_opt_d1[23])begin
+                            if(rdoq_last_y_tem[23] != -1)begin
+                                if( (tempCost_tem[23] + i_base_cost_buffer_tmp_d1[23] + i_d64_cost_last_one_d1[23] - i_d64_cost_last_zero_d1[23]) < (endPosCost_tem[23] + rdoqD64LastOne_tem[23] - rdoqD64LastZero_tem[23]) )begin
+                                    rdoqD64LastOne [23]     <=      i_d64_cost_last_one_d1 [23] ;
+                                    rdoqD64LastZero[23]     <=      i_d64_cost_last_zero_d1[23] ;
+                                end
+                                else begin
+                                    rdoqD64LastOne  [23]    <=  rdoqD64LastOne_tem[23]       ;
+                                    rdoqD64LastZero [23]    <=  rdoqD64LastZero_tem[23]      ;
+                                end
+                            end
+                            else begin
+                                rdoqD64LastOne [23]     <=      i_d64_cost_last_one_d1 [23] ;
+                                rdoqD64LastZero[23]     <=      i_d64_cost_last_zero_d1[23] ;
+                            end
+                        end
+                        else begin
+                            rdoqD64LastOne  [23]    <=  rdoqD64LastOne_tem[23]       ;
+                            rdoqD64LastZero [23]    <=  rdoqD64LastZero_tem[23]      ;
+                        end
+
+                        if(i_level_opt_d1[27])begin
+                            if(rdoq_last_y_tem[27] != -1)begin
+                                if( (tempCost_tem[27] + i_base_cost_buffer_tmp_d1[27] + i_d64_cost_last_one_d1[27] - i_d64_cost_last_zero_d1[27]) < (endPosCost_tem[27] + rdoqD64LastOne_tem[27] - rdoqD64LastZero_tem[27]) )begin
+                                    rdoqD64LastOne [27]     <=      i_d64_cost_last_one_d1 [27] ;
+                                    rdoqD64LastZero[27]     <=      i_d64_cost_last_zero_d1[27] ;
+                                end
+                                else begin
+                                    rdoqD64LastOne  [27]    <=  rdoqD64LastOne_tem[27]       ;
+                                    rdoqD64LastZero [27]    <=  rdoqD64LastZero_tem[27]      ;
+                                end
+                            end
+                            else begin
+                                rdoqD64LastOne [27]     <=      i_d64_cost_last_one_d1 [27] ;
+                                rdoqD64LastZero[27]     <=      i_d64_cost_last_zero_d1[27] ;
+                            end
+                        end
+                        else begin
+                            rdoqD64LastOne  [27]    <=  rdoqD64LastOne_tem [27]      ;
+                            rdoqD64LastZero [27]    <=  rdoqD64LastZero_tem[27]      ;
+                        end
+
                         if(i_level_opt_d1[31])begin
                             rdoqD64LastOne  [31]    <=  i_d64_cost_last_one_d1 [31]  ;
                             rdoqD64LastZero [31]    <=  i_d64_cost_last_zero_d1[31]  ;
@@ -717,8 +1171,16 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         rdoqD64LastZero [ 3]    <=  0;
                         rdoqD64LastOne  [ 7]    <=  0;
                         rdoqD64LastZero [ 7]    <=  0;
+                        rdoqD64LastOne  [11]    <=  0;
+                        rdoqD64LastZero [11]    <=  0;
                         rdoqD64LastOne  [15]    <=  0;
-                        rdoqD64LastZero [15]    <=  0;
+                        rdoqD64LastOne  [15]    <=  0;
+                        rdoqD64LastZero [19]    <=  0;
+                        rdoqD64LastZero [19]    <=  0;
+                        rdoqD64LastOne  [23]    <=  0;
+                        rdoqD64LastOne  [23]    <=  0;
+                        rdoqD64LastZero [27]    <=  0;
+                        rdoqD64LastZero [27]    <=  0;
                         rdoqD64LastOne  [31]    <=  0;
                         rdoqD64LastZero [31]    <=  0;
                     end
@@ -763,7 +1225,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                 end
 
                 //odd rows except the last row of each matrix
-                for(i = 1; i < 3; i = i + 2)begin
+                for(i = 1; i < 3; i = i + 4)begin
                     if(i_level_opt_d1[i])begin
                         if(rdoq_last_y_tem[i] != -1)begin
                             if(tempCost_tem[i] - endPosCost_tem[i] + rdoqD64LastOne_tem[i] - i_d64_cost_last_one_d1[i] + i_d64_cost_last_zero_d1[i] - rdoqD64LastZero_tem[i] > 0)begin
@@ -785,7 +1247,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         rdoqD64LastZero[i]      <=      rdoqD64LastZero_tem [i];
                     end
                 end
-                for(i = 5; i < 7; i = i + 2)begin
+                for(i = 5; i < 7; i = i + 4)begin
                     if(i_level_opt_d1[i])begin
                         if(rdoq_last_y_tem[i] != -1)begin
                             if(tempCost_tem[i] - endPosCost_tem[i] + rdoqD64LastOne_tem[i] - i_d64_cost_last_one_d1[i] + i_d64_cost_last_zero_d1[i] - rdoqD64LastZero_tem[i] > 0)begin
@@ -807,7 +1269,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         rdoqD64LastZero[i]      <=      rdoqD64LastZero_tem [i];
                     end
                 end
-                for(i = 9; i < 15; i = i + 2)begin
+                for(i = 9; i < 15; i = i + 4)begin
                     if(i_level_opt_d1[i])begin
                         if(rdoq_last_y_tem[i] != -1)begin
                             if(tempCost_tem[i] - endPosCost_tem[i] + rdoqD64LastOne_tem[i] - i_d64_cost_last_one_d1[i] + i_d64_cost_last_zero_d1[i] - rdoqD64LastZero_tem[i] > 0)begin
@@ -829,7 +1291,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         rdoqD64LastZero[i]      <=      rdoqD64LastZero_tem [i];
                     end
                 end            
-                for(i = 17; i < 31; i = i + 2)begin
+                for(i = 17; i < 31; i = i + 4)begin
                     if(i_level_opt_d1[i])begin
                         if(rdoq_last_y_tem[i] != -1)begin
                             if(tempCost_tem[i] - endPosCost_tem[i] + rdoqD64LastOne_tem[i] - i_d64_cost_last_one_d1[i] + i_d64_cost_last_zero_d1[i] - rdoqD64LastZero_tem[i] > 0)begin
@@ -853,113 +1315,121 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                 end
                 //determine the value of the last row 
                 case(i_height_log2_d1)
-                    3'd2    : begin    
-                            if(i_level_opt_d1[ 3])begin
-                                rdoqD64LastOne  [ 3]    <=  i_d64_cost_last_one_d1 [ 3]  ;
-                                rdoqD64LastZero [ 3]    <=  i_d64_cost_last_zero_d1[ 3]  ;
+                    3'd2    : begin                                
+                            for(i = 0; i < 8; i = i + 1)begin
+                                if(i_level_opt_d1[ 3 + i * 4])begin
+                                    rdoqD64LastOne  [ 3 + i * 4]    <=  i_d64_cost_last_one_d1 [ 3 + i * 4]  ;
+                                    rdoqD64LastZero [ 3 + i * 4]    <=  i_d64_cost_last_zero_d1[ 3 + i * 4]  ;
+                                end
                             end
-                            else begin
-                                rdoqD64LastOne  [ 3]    <=  rdoqD64LastOne_tem  [ 3]    ;
-                                rdoqD64LastZero [ 3]    <=  rdoqD64LastZero_tem [ 3]    ;
-                            end
-                            rdoqD64LastOne  [ 7]    <=  0;//pending, not used
-                            rdoqD64LastZero [ 7]    <=  0;//pending, not used
-                            rdoqD64LastOne  [15]    <=  0;//pending, not used
-                            rdoqD64LastZero [15]    <=  0;//pending, not used
-                            rdoqD64LastOne  [31]    <=  0;//pending, not used
-                            rdoqD64LastZero [31]    <=  0;//pending, not used
                         end
                     3'd3    : begin
-                            if(i_level_opt_d1[ 3])begin
-                                if(rdoq_last_y_tem[ 3] != -1)begin
-                                    if(tempCost_tem[ 3] - endPosCost_tem[ 3] + rdoqD64LastOne_tem[ 3] - i_d64_cost_last_one_d1[ 3] + i_d64_cost_last_zero_d1[ 3] - rdoqD64LastZero_tem[ 3] > 0)begin
-                                        rdoqD64LastOne [ 3]     <=      i_d64_cost_last_one_d1 [ 3] ;
-                                        rdoqD64LastZero[ 3]     <=      i_d64_cost_last_zero_d1[ 3] ;
+                            for(i = 0; i < 4; i = i + 1)begin
+                                if(i_level_opt_d1[ 3 + i * 8])begin
+                                    if(rdoq_last_y_tem[ 3 + i * 8] != -1)begin
+                                        if(tempCost_tem[ 3 + i * 8] - endPosCost_tem[ 3 + i * 8] + rdoqD64LastOne_tem[ 3 + i * 8] - i_d64_cost_last_one_d1[ 3 + i * 8] + i_d64_cost_last_zero_d1[ 3 + i * 8] - rdoqD64LastZero_tem[ 3 + i * 8] > 0)begin
+                                            rdoqD64LastOne [ 3 + i * 8]     <=      i_d64_cost_last_one_d1 [ 3 + i * 8] ;
+                                            rdoqD64LastZero[ 3 + i * 8]     <=      i_d64_cost_last_zero_d1[ 3 + i * 8] ;
+                                        end
+                                        else begin 
+                                            rdoqD64LastOne [ 3 + i * 8]     <=      rdoqD64LastOne_tem  [ 3 + i * 8]    ;
+                                            rdoqD64LastZero[ 3 + i * 8]     <=      rdoqD64LastZero_tem [ 3 + i * 8]    ;
+                                        end
                                     end
-                                    else begin 
-                                        rdoqD64LastOne [ 3]     <=      rdoqD64LastOne_tem  [ 3]    ;
-                                        rdoqD64LastZero[ 3]     <=      rdoqD64LastZero_tem [ 3]    ;
+                                    else begin
+                                        rdoqD64LastOne [ 3 + i * 8]     <=      i_d64_cost_last_one_d1 [ 3 + i * 8] ;
+                                        rdoqD64LastZero[ 3 + i * 8]     <=      i_d64_cost_last_zero_d1[ 3 + i * 8] ;
                                     end
+                                end
+                                else begin 
+                                    rdoqD64LastOne [ 3 + i * 8]     <=      rdoqD64LastOne_tem [ 3 + i * 8]    ;
+                                    rdoqD64LastZero[ 3 + i * 8]     <=      rdoqD64LastZero_tem[ 3 + i * 8]    ;
+                                end
+
+                                if(i_level_opt_d1[ 7 + i * 8])begin
+                                    rdoqD64LastOne  [ 7 + i * 8]    <=  i_d64_cost_last_one_d1 [ 7 + i * 8]  ;
+                                    rdoqD64LastZero [ 7 + i * 8]    <=  i_d64_cost_last_zero_d1[ 7 + i * 8]  ;
                                 end
                                 else begin
-                                    rdoqD64LastOne [ 3]     <=      i_d64_cost_last_one_d1 [ 3] ;
-                                    rdoqD64LastZero[ 3]     <=      i_d64_cost_last_zero_d1[ 3] ;
+                                    rdoqD64LastOne  [ 7 + i * 8]    <=  rdoqD64LastOne_tem [ 7 + i * 8]  ;
+                                    rdoqD64LastZero [ 7 + i * 8]    <=  rdoqD64LastZero_tem[ 7 + i * 8]  ;
                                 end
                             end
-                            else begin 
-                                rdoqD64LastOne [ 3]     <=      rdoqD64LastOne_tem [ 3]    ;
-                                rdoqD64LastZero[ 3]     <=      rdoqD64LastZero_tem[ 3]    ;
-                            end
-
-                            if(i_level_opt_d1[ 7])begin
-                                rdoqD64LastOne  [ 7]    <=  i_d64_cost_last_one_d1 [ 7]  ;
-                                rdoqD64LastZero [ 7]    <=  i_d64_cost_last_zero_d1[ 7]  ;
-                            end
-                            else begin
-                                rdoqD64LastOne  [ 7]    <=  rdoqD64LastOne_tem [ 7]  ;
-                                rdoqD64LastZero [ 7]    <=  rdoqD64LastZero_tem[ 7]  ;
-                            end
-
-                            rdoqD64LastOne  [15]    <=  0;//pending, not used
-                            rdoqD64LastZero [15]    <=  0;//pending, not used
-                            rdoqD64LastOne  [31]    <=  0;//pending, not used
-                            rdoqD64LastZero [31]    <=  0;//pending, not used
                         end
-                    3'd4    : begin
-                            if(i_level_opt_d1[ 3])begin
-                                if(rdoq_last_y_tem[ 3] != -1)begin
-                                    if(tempCost_tem[ 3] - endPosCost_tem[ 3] + rdoqD64LastOne_tem[ 3] - i_d64_cost_last_one_d1[ 3] + i_d64_cost_last_zero_d1[ 3] - rdoqD64LastZero_tem[ 3] > 0)begin
-                                        rdoqD64LastOne [ 3]     <=      i_d64_cost_last_one_d1 [ 3] ;
-                                        rdoqD64LastZero[ 3]     <=      i_d64_cost_last_zero_d1[ 3] ;
+                    3'd4    : begin                            
+                            for(i = 0; i < 2; i = i + 1)begin
+                                if(i_level_opt_d1[ 3 + i * 16])begin
+                                    if(rdoq_last_y_tem[ 3 + i * 16] != -1)begin
+                                        if(tempCost_tem[ 3 + i * 16] - endPosCost_tem[ 3 + i * 16] + rdoqD64LastOne_tem[ 3 + i * 16] - i_d64_cost_last_one_d1[ 3 + i * 16] + i_d64_cost_last_zero_d1[ 3 + i * 16] - rdoqD64LastZero_tem[ 3 + i * 16] > 0)begin
+                                            rdoqD64LastOne [ 3 + i * 16]     <=      i_d64_cost_last_one_d1 [ 3 + i * 16] ;
+                                            rdoqD64LastZero[ 3 + i * 16]     <=      i_d64_cost_last_zero_d1[ 3 + i * 16] ;
+                                        end
+                                        else begin 
+                                            rdoqD64LastOne [ 3 + i * 16]     <=      rdoqD64LastOne_tem  [ 3 + i * 16]    ;
+                                            rdoqD64LastZero[ 3 + i * 16]     <=      rdoqD64LastZero_tem [ 3 + i * 16]    ;
+                                        end
                                     end
-                                    else begin 
-                                        rdoqD64LastOne [ 3]     <=      rdoqD64LastOne_tem  [ 3]    ;
-                                        rdoqD64LastZero[ 3]     <=      rdoqD64LastZero_tem [ 3]    ;
+                                    else begin
+                                        rdoqD64LastOne [ 3 + i * 16]     <=      i_d64_cost_last_one_d1 [ 3 + i * 16] ;
+                                        rdoqD64LastZero[ 3 + i * 16]     <=      i_d64_cost_last_zero_d1[ 3 + i * 16] ;
                                     end
+                                end
+                                else begin 
+                                    rdoqD64LastOne [ 3 + i * 16]     <=      rdoqD64LastOne_tem [ 3 + i * 16]    ;
+                                    rdoqD64LastZero[ 3 + i * 16]     <=      rdoqD64LastZero_tem[ 3 + i * 16]    ;
+                                end
+
+                                if(i_level_opt_d1[ 7 + i * 16])begin
+                                    if(rdoq_last_y_tem[ 7 + i * 16] != -1)begin
+                                        if(tempCost_tem[ 7 + i * 16] - endPosCost_tem[ 7 + i * 16] + rdoqD64LastOne_tem[ 7 + i * 16] - i_d64_cost_last_one_d1[ 7 + i * 16] + i_d64_cost_last_zero_d1[ 7 + i * 16] - rdoqD64LastZero_tem[ 7 + i * 16] > 0)begin
+                                            rdoqD64LastOne [ 7 + i * 16]     <=      i_d64_cost_last_one_d1 [ 7 + i * 16] ;
+                                            rdoqD64LastZero[ 7 + i * 16]     <=      i_d64_cost_last_zero_d1[ 7 + i * 16] ;
+                                        end
+                                        else begin 
+                                            rdoqD64LastOne [ 7 + i * 16]     <=      rdoqD64LastOne_tem  [ 7 + i * 16]    ;
+                                            rdoqD64LastZero[ 7 + i * 16]     <=      rdoqD64LastZero_tem [ 7 + i * 16]    ;
+                                        end
+                                    end
+                                    else begin
+                                        rdoqD64LastOne [ 7 + i * 16]     <=      i_d64_cost_last_one_d1 [ 7 + i * 16] ;
+                                        rdoqD64LastZero[ 7 + i * 16]     <=      i_d64_cost_last_zero_d1[ 7 + i * 16] ;
+                                    end
+                                end
+                                else begin 
+                                    rdoqD64LastOne [ 7 + i * 16]     <=      rdoqD64LastOne_tem [ 7 + i * 16]    ;
+                                    rdoqD64LastZero[ 7 + i * 16]     <=      rdoqD64LastZero_tem[ 7 + i * 16]    ;
+                                end
+                                
+                                if(i_level_opt_d1[11 + i * 16])begin
+                                    if(rdoq_last_y_tem[11 + i * 16] != -1)begin
+                                        if(tempCost_tem[11 + i * 16] - endPosCost_tem[11 + i * 16] + rdoqD64LastOne_tem[11 + i * 16] - i_d64_cost_last_one_d1[11 + i * 16] + i_d64_cost_last_zero_d1[11 + i * 16] - rdoqD64LastZero_tem[11 + i * 16] > 0)begin
+                                            rdoqD64LastOne [11 + i * 16]     <=      i_d64_cost_last_one_d1 [11 + i * 16] ;
+                                            rdoqD64LastZero[11 + i * 16]     <=      i_d64_cost_last_zero_d1[11 + i * 16] ;
+                                        end
+                                        else begin 
+                                            rdoqD64LastOne [11 + i * 16]     <=      rdoqD64LastOne_tem  [11 + i * 16]    ;
+                                            rdoqD64LastZero[11 + i * 16]     <=      rdoqD64LastZero_tem [11 + i * 16]    ;
+                                        end
+                                    end
+                                    else begin
+                                        rdoqD64LastOne [11 + i * 16]     <=      i_d64_cost_last_one_d1 [11 + i * 16] ;
+                                        rdoqD64LastZero[11 + i * 16]     <=      i_d64_cost_last_zero_d1[11 + i * 16] ;
+                                    end
+                                end
+                                else begin 
+                                    rdoqD64LastOne [11 + i * 16]     <=      rdoqD64LastOne_tem [11 + i * 16]    ;
+                                    rdoqD64LastZero[11 + i * 16]     <=      rdoqD64LastZero_tem[11 + i * 16]    ;
+                                end
+
+                                if(i_level_opt_d1[15])begin
+                                    rdoqD64LastOne  [15]    <=  i_d64_cost_last_one_d1 [15]  ;
+                                    rdoqD64LastZero [15]    <=  i_d64_cost_last_zero_d1[15]  ;
                                 end
                                 else begin
-                                    rdoqD64LastOne [ 3]     <=      i_d64_cost_last_one_d1 [ 3] ;
-                                    rdoqD64LastZero[ 3]     <=      i_d64_cost_last_zero_d1[ 3] ;
+                                    rdoqD64LastOne  [15]    <=  rdoqD64LastOne_tem [15]  ;
+                                    rdoqD64LastZero [15]    <=  rdoqD64LastZero_tem[15]  ;
                                 end
                             end
-                            else begin 
-                                rdoqD64LastOne [ 3]     <=      rdoqD64LastOne_tem [ 3]    ;
-                                rdoqD64LastZero[ 3]     <=      rdoqD64LastZero_tem[ 3]    ;
-                            end
-
-                            if(i_level_opt_d1[ 7])begin
-                                if(rdoq_last_y_tem[ 7] != -1)begin
-                                    if(tempCost_tem[ 7] - endPosCost_tem[ 7] + rdoqD64LastOne_tem[ 7] - i_d64_cost_last_one_d1[ 7] + i_d64_cost_last_zero_d1[ 7] - rdoqD64LastZero_tem[ 7] > 0)begin
-                                        rdoqD64LastOne [ 7]     <=      i_d64_cost_last_one_d1 [ 7] ;
-                                        rdoqD64LastZero[ 7]     <=      i_d64_cost_last_zero_d1[ 7] ;
-                                    end
-                                    else begin 
-                                        rdoqD64LastOne [ 7]     <=      rdoqD64LastOne_tem  [ 7]    ;
-                                        rdoqD64LastZero[ 7]     <=      rdoqD64LastZero_tem [ 7]    ;
-                                    end
-                                end
-                                else begin
-                                    rdoqD64LastOne [ 7]     <=      i_d64_cost_last_one_d1 [ 7] ;
-                                    rdoqD64LastZero[ 7]     <=      i_d64_cost_last_zero_d1[ 7] ;
-                                end
-                            end
-                            else begin 
-                                rdoqD64LastOne [ 7]     <=      rdoqD64LastOne_tem [ 7]    ;
-                                rdoqD64LastZero[ 7]     <=      rdoqD64LastZero_tem[ 7]    ;
-                            end
-                            
-                            if(i_level_opt_d1[15])begin
-                                rdoqD64LastOne  [15]    <=  i_d64_cost_last_one_d1 [15]  ;
-                                rdoqD64LastZero [15]    <=  i_d64_cost_last_zero_d1[15]  ;
-                            end
-                            else begin
-                                rdoqD64LastOne  [15]    <=  rdoqD64LastOne_tem [15]  ;
-                                rdoqD64LastZero [15]    <=  rdoqD64LastZero_tem[15]  ;
-                            end
-
-
-                            rdoqD64LastOne  [31]    <=  0;//pending, not used
-                            rdoqD64LastZero [31]    <=  0;//pending, not used
                         end
                     3'd5    : begin
                             if(i_level_opt_d1[ 3])begin
@@ -1002,6 +1472,27 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                             else begin 
                                 rdoqD64LastOne [ 7]     <=      rdoqD64LastOne_tem [ 7]    ;
                                 rdoqD64LastZero[ 7]     <=      rdoqD64LastZero_tem[ 7]    ;
+                            end
+
+                            if(i_level_opt_d1[11])begin
+                                if(rdoq_last_y_tem[11] != -1)begin
+                                    if(tempCost_tem[11] - endPosCost_tem[11] + rdoqD64LastOne_tem[11] - i_d64_cost_last_one_d1[11] + i_d64_cost_last_zero_d1[11] - rdoqD64LastZero_tem[11] > 0)begin
+                                        rdoqD64LastOne [11]     <=      i_d64_cost_last_one_d1 [11] ;
+                                        rdoqD64LastZero[11]     <=      i_d64_cost_last_zero_d1[11] ;
+                                    end
+                                    else begin 
+                                        rdoqD64LastOne [11]     <=      rdoqD64LastOne_tem  [11]    ;
+                                        rdoqD64LastZero[11]     <=      rdoqD64LastZero_tem [11]    ;
+                                    end
+                                end
+                                else begin
+                                    rdoqD64LastOne [11]     <=      i_d64_cost_last_one_d1 [11] ;
+                                    rdoqD64LastZero[11]     <=      i_d64_cost_last_zero_d1[11] ;
+                                end
+                            end
+                            else begin 
+                                rdoqD64LastOne [11]     <=      rdoqD64LastOne_tem [11]    ;
+                                rdoqD64LastZero[11]     <=      rdoqD64LastZero_tem[11]    ;
                             end
 
                             if(i_level_opt_d1[15])begin
@@ -1025,6 +1516,69 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                                 rdoqD64LastZero[15]     <=      rdoqD64LastZero_tem[15]    ;
                             end
 
+                            if(i_level_opt_d1[19])begin
+                                if(rdoq_last_y_tem[19] != -1)begin
+                                    if(tempCost_tem[19] - endPosCost_tem[19] + rdoqD64LastOne_tem[19] - i_d64_cost_last_one_d1[19] + i_d64_cost_last_zero_d1[19] - rdoqD64LastZero_tem[19] > 0)begin
+                                        rdoqD64LastOne [19]     <=      i_d64_cost_last_one_d1 [19] ;
+                                        rdoqD64LastZero[19]     <=      i_d64_cost_last_zero_d1[19] ;
+                                    end
+                                    else begin 
+                                        rdoqD64LastOne [19]     <=      rdoqD64LastOne_tem  [19]    ;
+                                        rdoqD64LastZero[19]     <=      rdoqD64LastZero_tem [19]    ;
+                                    end
+                                end
+                                else begin
+                                    rdoqD64LastOne [19]     <=      i_d64_cost_last_one_d1 [19] ;
+                                    rdoqD64LastZero[19]     <=      i_d64_cost_last_zero_d1[19] ;
+                                end
+                            end
+                            else begin 
+                                rdoqD64LastOne [19]     <=      rdoqD64LastOne_tem [19]    ;
+                                rdoqD64LastZero[19]     <=      rdoqD64LastZero_tem[19]    ;
+                            end
+
+                            if(i_level_opt_d1[23])begin
+                                if(rdoq_last_y_tem[23] != -1)begin
+                                    if(tempCost_tem[23] - endPosCost_tem[23] + rdoqD64LastOne_tem[23] - i_d64_cost_last_one_d1[23] + i_d64_cost_last_zero_d1[23] - rdoqD64LastZero_tem[23] > 0)begin
+                                        rdoqD64LastOne [23]     <=      i_d64_cost_last_one_d1 [23] ;
+                                        rdoqD64LastZero[23]     <=      i_d64_cost_last_zero_d1[23] ;
+                                    end
+                                    else begin 
+                                        rdoqD64LastOne [23]     <=      rdoqD64LastOne_tem  [23]    ;
+                                        rdoqD64LastZero[23]     <=      rdoqD64LastZero_tem [23]    ;
+                                    end
+                                end
+                                else begin
+                                    rdoqD64LastOne [23]     <=      i_d64_cost_last_one_d1 [23] ;
+                                    rdoqD64LastZero[23]     <=      i_d64_cost_last_zero_d1[23] ;
+                                end
+                            end
+                            else begin 
+                                rdoqD64LastOne [23]     <=      rdoqD64LastOne_tem [23]    ;
+                                rdoqD64LastZero[23]     <=      rdoqD64LastZero_tem[23]    ;
+                            end
+
+                            if(i_level_opt_d1[27])begin
+                                if(rdoq_last_y_tem[27] != -1)begin
+                                    if(tempCost_tem[27] - endPosCost_tem[27] + rdoqD64LastOne_tem[27] - i_d64_cost_last_one_d1[27] + i_d64_cost_last_zero_d1[27] - rdoqD64LastZero_tem[27] > 0)begin
+                                        rdoqD64LastOne [27]     <=      i_d64_cost_last_one_d1 [27] ;
+                                        rdoqD64LastZero[27]     <=      i_d64_cost_last_zero_d1[27] ;
+                                    end
+                                    else begin 
+                                        rdoqD64LastOne [27]     <=      rdoqD64LastOne_tem  [27]    ;
+                                        rdoqD64LastZero[27]     <=      rdoqD64LastZero_tem [27]    ;
+                                    end
+                                end
+                                else begin
+                                    rdoqD64LastOne [27]     <=      i_d64_cost_last_one_d1 [27] ;
+                                    rdoqD64LastZero[27]     <=      i_d64_cost_last_zero_d1[27] ;
+                                end
+                            end
+                            else begin 
+                                rdoqD64LastOne [27]     <=      rdoqD64LastOne_tem [27]    ;
+                                rdoqD64LastZero[27]     <=      rdoqD64LastZero_tem[27]    ;
+                            end
+
                             if(i_level_opt_d1[31])begin
                                 rdoqD64LastOne  [31]    <=  i_d64_cost_last_one_d1 [31]  ;
                                 rdoqD64LastZero [31]    <=  i_d64_cost_last_zero_d1[31]  ;
@@ -1039,8 +1593,16 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                             rdoqD64LastZero [ 3]    <=  0;
                             rdoqD64LastOne  [ 7]    <=  0;
                             rdoqD64LastZero [ 7]    <=  0;
+                            rdoqD64LastOne  [11]    <=  0;
+                            rdoqD64LastZero [11]    <=  0;
                             rdoqD64LastOne  [15]    <=  0;
-                            rdoqD64LastZero [15]    <=  0;
+                            rdoqD64LastOne  [15]    <=  0;
+                            rdoqD64LastZero [19]    <=  0;
+                            rdoqD64LastZero [19]    <=  0;
+                            rdoqD64LastOne  [23]    <=  0;
+                            rdoqD64LastOne  [23]    <=  0;
+                            rdoqD64LastZero [27]    <=  0;
+                            rdoqD64LastZero [27]    <=  0;
                             rdoqD64LastOne  [31]    <=  0;
                             rdoqD64LastZero [31]    <=  0;
                         end
@@ -1057,50 +1619,51 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
             end
         end
         else begin
-            for(i = 0 ; i < 3 ; i = i + 1)begin
-                rdoq_last_x_tem[i]     <=   rdoq_last_x[i + 1];   
+            for(j = 0; j < 8; j = j + 1)begin
+                for(i = 0 ; i < 3 ; i = i + 1)begin
+                    rdoq_last_x_tem[i + j * 4]     <=   rdoq_last_x[i + 1 + j * 4];   
+                end
             end
-            for(i = 4 ; i < 7 ; i = i + 1)begin
-                rdoq_last_x_tem[i]     <=   rdoq_last_x[i + 1];   
-            end
-            for(i = 8 ; i < 15 ; i = i + 1)begin
-                rdoq_last_x_tem[i]     <=   rdoq_last_x[i + 1];   
-            end
-            for(i = 16; i < 31; i = i + 1)begin
-                rdoq_last_x_tem[i]     <=   rdoq_last_x[i + 1];   
-            end
-
             case(i_height_log2_d2)
                 3'd2    : begin    
-                        rdoq_last_x_tem[3 ]    <=  rdoq_last_x[3 ];
-                        rdoq_last_x_tem[7 ]    <=  0;//pending, not used
-                        rdoq_last_x_tem[15]    <=  0;//pending, not used
-                        rdoq_last_x_tem[31]    <=  0;//pending, not used
+                        for(i = 0; i < 8; i = i + 1)begin
+                            rdoq_last_x_tem[3 + i * 4]    <=  rdoq_last_x[3 + i * 4];
+                        end
                     end
                 3'd3    : begin
-                        rdoq_last_x_tem[3 ]    <=  rdoq_last_x[4 ];
-                        rdoq_last_x_tem[7 ]    <=  rdoq_last_x[7 ];//pending, not used
-                        rdoq_last_x_tem[15]    <=  0;//pending, not used
-                        rdoq_last_x_tem[31]    <=  0;//pending, not used
-
+                        for(i = 0; i < 4; i = i + 1)begin
+                            rdoq_last_x_tem[3 + i * 8]    <=  rdoq_last_x[4 + i * 8];
+                        end
+                        for(i = 0; i < 4; i = i + 1)begin
+                            rdoq_last_x_tem[7 + i * 8]    <=  rdoq_last_x[7 + i * 8];
+                        end
                     end
                 3'd4    : begin
-                        rdoq_last_x_tem[3 ]    <=  rdoq_last_x[4 ];
-                        rdoq_last_x_tem[7 ]    <=  rdoq_last_x[8 ];
-                        rdoq_last_x_tem[15]    <=  rdoq_last_x[15];
-                        rdoq_last_x_tem[31]    <=  0;//pending, not used
-
+                        for(i = 0; i < 2; i = i + 1)begin
+                            rdoq_last_x_tem[3  + i * 16]    <=  rdoq_last_x[4  + i * 16];
+                            rdoq_last_x_tem[7  + i * 16]    <=  rdoq_last_x[8  + i * 16];
+                            rdoq_last_x_tem[11 + i * 16]    <=  rdoq_last_x[12 + i * 16];
+                            rdoq_last_x_tem[15 + i * 16]    <=  rdoq_last_x[15 + i * 16];
+                        end
                     end
                 3'd5    : begin
                         rdoq_last_x_tem[3 ]    <=  rdoq_last_x[4 ];
                         rdoq_last_x_tem[7 ]    <=  rdoq_last_x[8 ];
+                        rdoq_last_x_tem[11]    <=  rdoq_last_x[12];
                         rdoq_last_x_tem[15]    <=  rdoq_last_x[16];
+                        rdoq_last_x_tem[19]    <=  rdoq_last_x[20];
+                        rdoq_last_x_tem[23]    <=  rdoq_last_x[24];
+                        rdoq_last_x_tem[27]    <=  rdoq_last_x[28];
                         rdoq_last_x_tem[31]    <=  rdoq_last_x[31];
                     end
                 default : begin
                         rdoq_last_x_tem[3 ]    <=  0;
                         rdoq_last_x_tem[7 ]    <=  0;
+                        rdoq_last_x_tem[11]    <=  0;
                         rdoq_last_x_tem[15]    <=  0;
+                        rdoq_last_x_tem[19]    <=  0;
+                        rdoq_last_x_tem[23]    <=  0;
+                        rdoq_last_x_tem[27]    <=  0;
                         rdoq_last_x_tem[31]    <=  0;
                     end
             endcase
@@ -1114,50 +1677,51 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
             end
         end
         else begin
-            for(i = 0 ; i < 3 ; i = i + 1)begin
-                rdoq_last_y_tem[i]     <=   rdoq_last_y[i + 1];   
+            for(j = 0; j < 8; j = j + 1)begin
+                for(i = 0 ; i < 3 ; i = i + 1)begin
+                    rdoq_last_y_tem[i + j * 4]     <=   rdoq_last_y[i + 1 + j * 4];   
+                end
             end
-            for(i = 4 ; i < 7 ; i = i + 1)begin
-                rdoq_last_y_tem[i]     <=   rdoq_last_y[i + 1];   
-            end
-            for(i = 8 ; i < 15 ; i = i + 1)begin
-                rdoq_last_y_tem[i]     <=   rdoq_last_y[i + 1];   
-            end
-            for(i = 16; i < 31; i = i + 1)begin
-                rdoq_last_y_tem[i]     <=   rdoq_last_y[i + 1];   
-            end
-
             case(i_height_log2_d2)
                 3'd2    : begin    
-                        rdoq_last_y_tem[3 ]    <=  rdoq_last_y[3 ];
-                        rdoq_last_y_tem[7 ]    <=  0;//pending, not used
-                        rdoq_last_y_tem[15]    <=  0;//pending, not used
-                        rdoq_last_y_tem[31]    <=  0;//pending, not used
+                        for(i = 0; i < 8; i = i + 1)begin
+                            rdoq_last_y_tem[3 + i * 4]    <=  rdoq_last_y[3 + i * 4];
+                        end
                     end
                 3'd3    : begin
-                        rdoq_last_y_tem[3 ]    <=  rdoq_last_y[4 ];
-                        rdoq_last_y_tem[7 ]    <=  rdoq_last_y[7 ];//pending, not used
-                        rdoq_last_y_tem[15]    <=  0;//pending, not used
-                        rdoq_last_y_tem[31]    <=  0;//pending, not used
-
+                        for(i = 0; i < 4; i = i + 1)begin
+                            rdoq_last_y_tem[3 + i * 8]    <=  rdoq_last_y[4 + i * 8];
+                        end
+                        for(i = 0; i < 4; i = i + 1)begin
+                            rdoq_last_y_tem[7 + i * 8]    <=  rdoq_last_y[7 + i * 8];
+                        end
                     end
                 3'd4    : begin
-                        rdoq_last_y_tem[3 ]    <=  rdoq_last_y[4 ];
-                        rdoq_last_y_tem[7 ]    <=  rdoq_last_y[8 ];
-                        rdoq_last_y_tem[15]    <=  rdoq_last_y[15];
-                        rdoq_last_y_tem[31]    <=  0;//pending, not used
-
+                        for(i = 0; i < 2; i = i + 1)begin
+                            rdoq_last_y_tem[3  + i * 16]    <=  rdoq_last_y[4  + i * 16];
+                            rdoq_last_y_tem[7  + i * 16]    <=  rdoq_last_y[8  + i * 16];
+                            rdoq_last_y_tem[11 + i * 16]    <=  rdoq_last_y[12 + i * 16];
+                            rdoq_last_y_tem[15 + i * 16]    <=  rdoq_last_y[15 + i * 16];
+                        end
                     end
                 3'd5    : begin
                         rdoq_last_y_tem[3 ]    <=  rdoq_last_y[4 ];
                         rdoq_last_y_tem[7 ]    <=  rdoq_last_y[8 ];
+                        rdoq_last_y_tem[11]    <=  rdoq_last_y[12];
                         rdoq_last_y_tem[15]    <=  rdoq_last_y[16];
+                        rdoq_last_y_tem[19]    <=  rdoq_last_y[20];
+                        rdoq_last_y_tem[23]    <=  rdoq_last_y[24];
+                        rdoq_last_y_tem[27]    <=  rdoq_last_y[28];
                         rdoq_last_y_tem[31]    <=  rdoq_last_y[31];
                     end
                 default : begin
                         rdoq_last_y_tem[3 ]    <=  0;
                         rdoq_last_y_tem[7 ]    <=  0;
+                        rdoq_last_y_tem[11]    <=  0;
                         rdoq_last_y_tem[15]    <=  0;
+                        rdoq_last_y_tem[19]    <=  0;
+                        rdoq_last_y_tem[23]    <=  0;
+                        rdoq_last_y_tem[27]    <=  0;
                         rdoq_last_y_tem[31]    <=  0;
                     end
             endcase
@@ -1177,7 +1741,23 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                 if(i_level_opt_d1[i])begin
                     if(rdoq_last_y_tem[i] != -1)begin
                         if(tempCost_tem[i] - endPosCost_tem[i] + rdoqD64LastOne_tem[i] - i_d64_cost_last_one_d1[i] + i_d64_cost_last_zero_d1[i] - rdoqD64LastZero_tem[i] > 0)begin
-                            rdoq_last_x[i]      <=      i                   ;
+                            case(i_height_log2_d1)
+                                3'd2: begin
+                                    rdoq_last_x[i]  <=  i % 4;
+                                end
+                                3'd3: begin
+                                    rdoq_last_x[i]  <=  i % 8;
+                                end
+                                3'd4: begin
+                                    rdoq_last_x[i]  <=  i % 16;
+                                end
+                                3'd5: begin
+                                    rdoq_last_x[i]  <=  i;
+                                end
+                                default : begin
+                                    rdoq_last_x[i]  <=  0;
+                                end
+                            endcase
                             rdoq_last_y[i]      <=      column_cnt          ;
                         end
                         else begin
@@ -1186,7 +1766,23 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         end
                     end
                     else begin
-                        rdoq_last_x[i]      <=      i           ;
+                        case(i_height_log2_d1)
+                            3'd2: begin
+                                rdoq_last_x[i]  <=  i % 4;
+                            end
+                            3'd3: begin
+                                rdoq_last_x[i]  <=  i % 8;
+                            end
+                            3'd4: begin
+                                rdoq_last_x[i]  <=  i % 16;
+                            end
+                            3'd5: begin
+                                rdoq_last_x[i]  <=  i;
+                            end
+                            default : begin
+                                rdoq_last_x[i]  <=  0;
+                            end
+                        endcase
                         rdoq_last_y[i]      <=      column_cnt  ;
                     end
                 end
@@ -1197,113 +1793,185 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
             end
             
             //odd rows except the last row of each matrix
-            for(i = 1; i < 3; i = i + 2)begin
-                if(i_level_opt_d1[i])begin
-                    if(rdoq_last_y_tem[i] != -1)begin
-                        if( (tempCost_tem[i] + i_base_cost_buffer_tmp_d1[i] + i_d64_cost_last_one_d1[i] - i_d64_cost_last_zero_d1[i]) < (endPosCost_tem[i] + rdoqD64LastOne_tem[i] - rdoqD64LastZero_tem[i]) )begin
-                            rdoq_last_x[i]      <=      i           ;
-                            rdoq_last_y[i]      <=      column_cnt  ;
+            for(j = 0; j < 8; j = j + 1)begin
+                for(i = 1; i < 3; i = i + 2)begin
+                    if(i_level_opt_d1[i + j * 4])begin
+                        if(rdoq_last_y_tem[i + j * 4] != -1)begin
+                            if( (tempCost_tem[i + j * 4] + i_base_cost_buffer_tmp_d1[i + j * 4] + i_d64_cost_last_one_d1[i + j * 4] - i_d64_cost_last_zero_d1[i + j * 4]) < (endPosCost_tem[i + j * 4] + rdoqD64LastOne_tem[i + j * 4] - rdoqD64LastZero_tem[i + j * 4]) )begin
+                                case(i_height_log2_d1)
+                                    3'd2: begin
+                                        rdoq_last_x[i + j * 4]      <=      i;
+                                    end
+                                    3'd3: begin
+                                        rdoq_last_x[i + j * 4]      <=      (i + j * 4) % 8;
+                                    end
+                                    3'd4: begin
+                                        rdoq_last_x[i + j * 4]      <=      (i + j * 4) % 16;
+                                    end
+                                    3'd5: begin
+                                        rdoq_last_x[i + j * 4]      <=      i + j * 4;
+                                    end
+                                    default : begin
+                                        rdoq_last_x[i + j * 4]      <=      0;
+                                    end
+                                endcase
+                                rdoq_last_y[i + j * 4]      <=      column_cnt  ;
+                            end
+                            else begin
+                                rdoq_last_x[i + j * 4]      <=      rdoq_last_x_tem[i + j * 4]  ;
+                                rdoq_last_y[i + j * 4]      <=      rdoq_last_y_tem[i + j * 4]  ;
+                            end
                         end
                         else begin
-                            rdoq_last_x[i]      <=      rdoq_last_x_tem[i]  ;
-                            rdoq_last_y[i]      <=      rdoq_last_y_tem[i]  ;
+                            case(i_height_log2_d1)
+                                3'd2: begin
+                                    rdoq_last_x[i + j * 4]      <=      i;
+                                end
+                                3'd3: begin
+                                    rdoq_last_x[i + j * 4]      <=      (i + j * 4) % 8;
+                                end
+                                3'd4: begin
+                                    rdoq_last_x[i + j * 4]      <=      (i + j * 4) % 16;
+                                end
+                                3'd5: begin
+                                    rdoq_last_x[i + j * 4]      <=      i + j * 4;
+                                end
+                                default : begin
+                                    rdoq_last_x[i + j * 4]      <=      0;
+                                end
+                            endcase
+                            rdoq_last_y[i + j * 4]      <=      column_cnt  ;
                         end
                     end
                     else begin
-                        rdoq_last_x[i]      <=      i           ;
-                        rdoq_last_y[i]      <=      column_cnt  ;
+                        rdoq_last_x[i + j * 4]      <=      rdoq_last_x_tem[i + j * 4]  ;
+                        rdoq_last_y[i + j * 4]      <=      rdoq_last_y_tem[i + j * 4]  ;
                     end
-                end
-                else begin
-                    rdoq_last_x[i]      <=      rdoq_last_x_tem[i]  ;
-                    rdoq_last_y[i]      <=      rdoq_last_y_tem[i]  ;
-                end
-            end
-            for(i = 5; i < 7; i = i + 2)begin
-                if(i_level_opt_d1[i])begin
-                    if(rdoq_last_y_tem[i] != -1)begin
-                        if( (tempCost_tem[i] + i_base_cost_buffer_tmp_d1[i] + i_d64_cost_last_one_d1[i] - i_d64_cost_last_zero_d1[i]) < (endPosCost_tem[i] + rdoqD64LastOne_tem[i] - rdoqD64LastZero_tem[i]) )begin
-                            rdoq_last_x[i]      <=      i           ;
-                            rdoq_last_y[i]      <=      column_cnt  ;
-                        end
-                        else begin
-                            rdoq_last_x[i]      <=      rdoq_last_x_tem[i]  ;
-                            rdoq_last_y[i]      <=      rdoq_last_y_tem[i]  ;
-                        end
-                    end
-                    else begin
-                        rdoq_last_x[i]      <=      i           ;
-                        rdoq_last_y[i]      <=      column_cnt  ;
-                    end
-                end
-                else begin
-                    rdoq_last_x[i]      <=      rdoq_last_x_tem[i]  ;
-                    rdoq_last_y[i]      <=      rdoq_last_y_tem[i]  ;
-                end
-            end
-            for(i = 9; i < 15; i = i + 2)begin
-                if(i_level_opt_d1[i])begin
-                    if(rdoq_last_y_tem[i] != -1)begin
-                        if( (tempCost_tem[i] + i_base_cost_buffer_tmp_d1[i] + i_d64_cost_last_one_d1[i] - i_d64_cost_last_zero_d1[i]) < (endPosCost_tem[i] + rdoqD64LastOne_tem[i] - rdoqD64LastZero_tem[i]) )begin
-                            rdoq_last_x[i]      <=      i           ;
-                            rdoq_last_y[i]      <=      column_cnt  ;
-                        end
-                        else begin
-                            rdoq_last_x[i]      <=      rdoq_last_x_tem[i]  ;
-                            rdoq_last_y[i]      <=      rdoq_last_y_tem[i]  ;
-                        end
-                    end
-                    else begin
-                        rdoq_last_x[i]      <=      i           ;
-                        rdoq_last_y[i]      <=      column_cnt  ;
-                    end
-                end
-                else begin
-                    rdoq_last_x[i]      <=      rdoq_last_x_tem[i]  ;
-                    rdoq_last_y[i]      <=      rdoq_last_y_tem[i]  ;
-                end
-            end            
-            for(i = 17; i < 31; i = i + 2)begin
-                if(i_level_opt_d1[i])begin
-                    if(rdoq_last_y_tem[i] != -1)begin
-                        if( (tempCost_tem[i] + i_base_cost_buffer_tmp_d1[i] + i_d64_cost_last_one_d1[i] - i_d64_cost_last_zero_d1[i]) < (endPosCost_tem[i] + rdoqD64LastOne_tem[i] - rdoqD64LastZero_tem[i]) )begin
-                            rdoq_last_x[i]      <=      i           ;
-                            rdoq_last_y[i]      <=      column_cnt  ;
-                        end
-                        else begin
-                            rdoq_last_x[i]      <=      rdoq_last_x_tem[i]  ;
-                            rdoq_last_y[i]      <=      rdoq_last_y_tem[i]  ;
-                        end
-                    end
-                    else begin
-                        rdoq_last_x[i]      <=      i           ;
-                        rdoq_last_y[i]      <=      column_cnt  ;
-                    end
-                end
-                else begin
-                    rdoq_last_x[i]      <=      rdoq_last_x_tem[i]  ;
-                    rdoq_last_y[i]      <=      rdoq_last_y_tem[i]  ;
                 end
             end
             //determine the value of the last row 
             case(i_height_log2_d1)
                 3'd2    : begin    
-                        if(i_level_opt_d1[ 3])begin
-                            rdoq_last_x[ 3]    <=  3            ;
-                            rdoq_last_y[ 3]    <=  column_cnt   ;
+                        for(i = 0; i < 8; i = i + 1)begin
+                            if(i_level_opt_d1[ 3 + i * 4])begin
+                                rdoq_last_x[ 3 + i * 4]    <=  3            ;
+                                rdoq_last_y[ 3 + i * 4]    <=  column_cnt   ;
+                            end
+                            else begin
+                                rdoq_last_x[ 3 + i * 4]    <=  -1   ;
+                                rdoq_last_y[ 3 + i * 4]    <=  -1   ;
+                            end
                         end
-                        else begin
-                            rdoq_last_x[ 3]    <=  -1   ;
-                            rdoq_last_y[ 3]    <=  -1   ;
-                        end
-                        rdoq_last_x[ 7]    <=  0;//pending, not used
-                        rdoq_last_y[ 7]    <=  0;//pending, not used
-                        rdoq_last_x[15]    <=  0;//pending, not used
-                        rdoq_last_y[15]    <=  0;//pending, not used
-                        rdoq_last_x[31]    <=  0;//pending, not used
-                        rdoq_last_y[31]    <=  0;//pending, not used
                     end
-                3'd3    : begin
+                3'd3    : begin                        
+                        for(i = 0; i < 4; i = i + 1)begin
+                            if(i_level_opt_d1[ 3 + i * 8])begin
+                                if(rdoq_last_y_tem[ 3 + i * 8] != -1)begin
+                                    if( (tempCost_tem[ 3 + i * 8] + i_base_cost_buffer_tmp_d1[ 3 + i * 8] + i_d64_cost_last_one_d1[ 3 + i * 8] - i_d64_cost_last_zero_d1[ 3 + i * 8]) < (endPosCost_tem[ 3 + i * 8] + rdoqD64LastOne_tem[ 3 + i * 8] - rdoqD64LastZero_tem[ 3 + i * 8]) )begin
+                                        rdoq_last_x[ 3 + i * 8]      <=      3          ;
+                                        rdoq_last_y[ 3 + i * 8]      <=      column_cnt ;
+                                    end
+                                    else begin
+                                        rdoq_last_x[ 3 + i * 8]      <=      rdoq_last_x_tem[ 3 + i * 8]  ;
+                                        rdoq_last_y[ 3 + i * 8]      <=      rdoq_last_y_tem[ 3 + i * 8]  ;
+                                    end
+                                end
+                                else begin
+                                    rdoq_last_x[ 3 + i * 8]      <=      3          ;
+                                    rdoq_last_y[ 3 + i * 8]      <=      column_cnt ;
+                                end
+                            end
+                            else begin
+                                rdoq_last_x[ 3 + i * 8]      <=      rdoq_last_x_tem[ 3 + i * 8]  ;
+                                rdoq_last_y[ 3 + i * 8]      <=      rdoq_last_y_tem[ 3 + i * 8]  ;
+                            end
+
+                            if(i_level_opt_d1[ 7 + i * 8])begin
+                                rdoq_last_x[ 7 + i * 8]    <=  7            ;
+                                rdoq_last_y[ 7 + i * 8]    <=  column_cnt   ;
+                            end
+                            else begin
+                                rdoq_last_x[ 7 + i * 8]    <=  -1   ;
+                                rdoq_last_y[ 7 + i * 8]    <=  -1   ;
+                            end
+                        end
+                    end
+                3'd4    : begin                        
+                    for(i = 0; i < 2; i = i + 1)begin
+                            if(i_level_opt_d1[ 3 + 16 * i])begin
+                                if(rdoq_last_y_tem[ 3 + 16 * i] != -1)begin
+                                    if( (tempCost_tem[ 3 + 16 * i] + i_base_cost_buffer_tmp_d1[ 3 + 16 * i] + i_d64_cost_last_one_d1[ 3 + 16 * i] - i_d64_cost_last_zero_d1[ 3 + 16 * i]) < (endPosCost_tem[ 3 + 16 * i] + rdoqD64LastOne_tem[ 3 + 16 * i] - rdoqD64LastZero_tem[ 3 + 16 * i]) )begin
+                                        rdoq_last_x[ 3 + 16 * i]      <=      3             ;
+                                        rdoq_last_y[ 3 + 16 * i]      <=      column_cnt    ;
+                                    end
+                                    else begin
+                                        rdoq_last_x[ 3 + 16 * i]      <=      rdoq_last_x_tem[ 3 + 16 * i]  ;
+                                        rdoq_last_y[ 3 + 16 * i]      <=      rdoq_last_y_tem[ 3 + 16 * i]  ;
+                                    end
+                                end
+                                else begin
+                                    rdoq_last_x[ 3 + 16 * i]      <=      3             ;
+                                    rdoq_last_y[ 3 + 16 * i]      <=      column_cnt    ;
+                                end
+                            end
+                            else begin
+                                rdoq_last_x[ 3 + 16 * i]      <=      rdoq_last_x_tem[ 3 + 16 * i]  ;
+                                rdoq_last_y[ 3 + 16 * i]      <=      rdoq_last_y_tem[ 3 + 16 * i]  ;
+                            end
+
+                            if(i_level_opt_d1[ 7 + 16 * i])begin
+                                if(rdoq_last_y_tem[ 7 + 16 * i] != -1)begin
+                                    if( (tempCost_tem[ 7 + 16 * i] + i_base_cost_buffer_tmp_d1[ 7 + 16 * i] + i_d64_cost_last_one_d1[ 7 + 16 * i] - i_d64_cost_last_zero_d1[ 7 + 16 * i]) < (endPosCost_tem[ 7 + 16 * i] + rdoqD64LastOne_tem[ 7 + 16 * i] - rdoqD64LastZero_tem[ 7 + 16 * i]) )begin
+                                        rdoq_last_x[ 7 + 16 * i]      <=      7             ;
+                                        rdoq_last_y[ 7 + 16 * i]      <=      column_cnt    ;
+                                    end
+                                    else begin
+                                        rdoq_last_x[ 7 + 16 * i]      <=      rdoq_last_x_tem[ 7 + 16 * i]  ;
+                                        rdoq_last_y[ 7 + 16 * i]      <=      rdoq_last_y_tem[ 7 + 16 * i]  ;
+                                    end
+                                end
+                                else begin
+                                    rdoq_last_x[ 7 + 16 * i]      <=      7             ;
+                                    rdoq_last_y[ 7 + 16 * i]      <=      column_cnt    ;
+                                end
+                            end
+                            else begin
+                                rdoq_last_x[ 7 + 16 * i]      <=      rdoq_last_x_tem[ 7 + 16 * i]  ;
+                                rdoq_last_y[ 7 + 16 * i]      <=      rdoq_last_y_tem[ 7 + 16 * i]  ;
+                            end
+
+                            if(i_level_opt_d1[11 + 16 * i])begin
+                                if(rdoq_last_y_tem[11 + 16 * i] != -1)begin
+                                    if( (tempCost_tem[11 + 16 * i] + i_base_cost_buffer_tmp_d1[11 + 16 * i] + i_d64_cost_last_one_d1[11 + 16 * i] - i_d64_cost_last_zero_d1[11 + 16 * i]) < (endPosCost_tem[11 + 16 * i] + rdoqD64LastOne_tem[11 + 16 * i] - rdoqD64LastZero_tem[11 + 16 * i]) )begin
+                                        rdoq_last_x[11 + 16 * i]      <=    11          ;
+                                        rdoq_last_y[11 + 16 * i]      <=    column_cnt  ;
+                                    end
+                                    else begin
+                                        rdoq_last_x[11 + 16 * i]      <=      rdoq_last_x_tem[11 + 16 * i]  ;
+                                        rdoq_last_y[11 + 16 * i]      <=      rdoq_last_y_tem[11 + 16 * i]  ;
+                                    end
+                                end
+                                else begin
+                                    rdoq_last_x[11 + 16 * i]      <=    11          ;
+                                    rdoq_last_y[11 + 16 * i]      <=    column_cnt  ;
+                                end
+                            end
+                            else begin
+                                rdoq_last_x[11 + 16 * i]      <=      rdoq_last_x_tem[11 + 16 * i]  ;
+                                rdoq_last_y[11 + 16 * i]      <=      rdoq_last_y_tem[11 + 16 * i]  ;
+                            end
+
+                            if(i_level_opt_d1[15 + 16 * i])begin
+                                rdoq_last_x[15 + 16 * i]    <=  15          ;
+                                rdoq_last_y[15 + 16 * i]    <=  column_cnt  ;
+                            end
+                            else begin
+                                rdoq_last_x[15 + 16 * i]    <=  -1   ;
+                                rdoq_last_y[15 + 16 * i]    <=  -1   ;
+                            end
+                        end
+                    end
+                3'd5    : begin                        
                         if(i_level_opt_d1[ 3])begin
                             if(rdoq_last_y_tem[ 3] != -1)begin
                                 if( (tempCost_tem[ 3] + i_base_cost_buffer_tmp_d1[ 3] + i_d64_cost_last_one_d1[ 3] - i_d64_cost_last_zero_d1[ 3]) < (endPosCost_tem[ 3] + rdoqD64LastOne_tem[ 3] - rdoqD64LastZero_tem[ 3]) )begin
@@ -1326,41 +1994,6 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         end
 
                         if(i_level_opt_d1[ 7])begin
-                            rdoq_last_x[ 7]    <=  7            ;
-                            rdoq_last_y[ 7]    <=  column_cnt   ;
-                        end
-                        else begin
-                            rdoq_last_x[ 7]    <=  -1   ;
-                            rdoq_last_y[ 7]    <=  -1   ;
-                        end
-                        rdoq_last_x[15]    <=  0;//pending, not used
-                        rdoq_last_y[15]    <=  0;//pending, not used
-                        rdoq_last_x[31]    <=  0;//pending, not used
-                        rdoq_last_y[31]    <=  0;//pending, not used
-                    end
-                3'd4    : begin
-                        if(i_level_opt_d1[ 3])begin
-                            if(rdoq_last_y_tem[ 3] != -1)begin
-                                if( (tempCost_tem[ 3] + i_base_cost_buffer_tmp_d1[ 3] + i_d64_cost_last_one_d1[ 3] - i_d64_cost_last_zero_d1[ 3]) < (endPosCost_tem[ 3] + rdoqD64LastOne_tem[ 3] - rdoqD64LastZero_tem[ 3]) )begin
-                                    rdoq_last_x[ 3]      <=      3           ;
-                                    rdoq_last_y[ 3]      <=      column_cnt  ;
-                                end
-                                else begin
-                                    rdoq_last_x[ 3]      <=      8;//rdoq_last_x_tem[ 3]  ;
-                                    rdoq_last_y[ 3]      <=      8;//rdoq_last_y_tem[ 3]  ;
-                                end
-                            end
-                            else begin
-                                rdoq_last_x[ 3]      <=      3           ;
-                                rdoq_last_y[ 3]      <=      column_cnt  ;
-                            end
-                        end
-                        else begin
-                            rdoq_last_x[ 3]      <=      rdoq_last_x_tem[ 3]  ;
-                            rdoq_last_y[ 3]      <=      rdoq_last_y_tem[ 3]  ;
-                        end
-
-                        if(i_level_opt_d1[ 7])begin
                             if(rdoq_last_y_tem[ 7] != -1)begin
                                 if( (tempCost_tem[ 7] + i_base_cost_buffer_tmp_d1[ 7] + i_d64_cost_last_one_d1[ 7] - i_d64_cost_last_zero_d1[ 7]) < (endPosCost_tem[ 7] + rdoqD64LastOne_tem[ 7] - rdoqD64LastZero_tem[ 7]) )begin
                                     rdoq_last_x[ 7]      <=      7           ;
@@ -1381,65 +2014,32 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                             rdoq_last_y[ 7]      <=      rdoq_last_y_tem[ 7]  ;
                         end
 
-                        if(i_level_opt_d1[15])begin
-                            rdoq_last_x[15]    <=  15           ;
-                            rdoq_last_y[15]    <=  column_cnt   ;
-                        end
-                        else begin
-                            rdoq_last_x[15]    <=  -1   ;
-                            rdoq_last_y[15]    <=  -1   ;
-                        end
-                        rdoq_last_x[31]    <=  0;//pending, not used
-                        rdoq_last_y[31]    <=  0;//pending, not used
-                    end
-                3'd5    : begin
-                        if(i_level_opt_d1[ 3])begin
-                            if(rdoq_last_y_tem[ 3] != -1)begin
-                                if( (tempCost_tem[ 3] + i_base_cost_buffer_tmp_d1[ 3] + i_d64_cost_last_one_d1[ 3] - i_d64_cost_last_zero_d1[ 3]) < (endPosCost_tem[ 3] + rdoqD64LastOne_tem[ 3] - rdoqD64LastZero_tem[ 3]) )begin
-                                    rdoq_last_x[ 3]      <=      3           ;
-                                    rdoq_last_y[ 3]      <=      column_cnt  ;
+                        if(i_level_opt_d1[11])begin
+                            if(rdoq_last_y_tem[11] != -1)begin
+                                if( (tempCost_tem[11] + i_base_cost_buffer_tmp_d1[11] + i_d64_cost_last_one_d1[11] - i_d64_cost_last_zero_d1[11]) < (endPosCost_tem[11] + rdoqD64LastOne_tem[11] - rdoqD64LastZero_tem[11]) )begin
+                                    rdoq_last_x[11]      <=     11          ;
+                                    rdoq_last_y[11]      <=     column_cnt  ;
                                 end
                                 else begin
-                                    rdoq_last_x[ 3]      <=      8;//rdoq_last_x_tem[ 3]  ;
-                                    rdoq_last_y[ 3]      <=      8;//rdoq_last_y_tem[ 3]  ;
+                                    rdoq_last_x[11]      <=      rdoq_last_x_tem[11]  ;
+                                    rdoq_last_y[11]      <=      rdoq_last_y_tem[11]  ;
                                 end
                             end
                             else begin
-                                rdoq_last_x[ 3]      <=      3           ;
-                                rdoq_last_y[ 3]      <=      column_cnt  ;
+                                rdoq_last_x[11]      <=     11          ;
+                                rdoq_last_y[11]      <=     column_cnt  ;
                             end
                         end
                         else begin
-                            rdoq_last_x[ 3]      <=      rdoq_last_x_tem[ 3]  ;
-                            rdoq_last_y[ 3]      <=      rdoq_last_y_tem[ 3]  ;
-                        end
-
-                        if(i_level_opt_d1[ 7])begin
-                            if(rdoq_last_y_tem[ 7] != -1)begin
-                                if( (tempCost_tem[ 7] + i_base_cost_buffer_tmp_d1[ 7] + i_d64_cost_last_one_d1[ 7] - i_d64_cost_last_zero_d1[ 7]) < (endPosCost_tem[ 7] + rdoqD64LastOne_tem[ 7] - rdoqD64LastZero_tem[ 7]) )begin
-                                    rdoq_last_x[ 7]      <=      7           ;
-                                    rdoq_last_y[ 7]      <=      column_cnt  ;
-                                end
-                                else begin
-                                    rdoq_last_x[ 7]      <=      rdoq_last_x_tem[ 7]  ;
-                                    rdoq_last_y[ 7]      <=      rdoq_last_y_tem[ 7]  ;
-                                end
-                            end
-                            else begin
-                                rdoq_last_x[ 7]      <=      7           ;
-                                rdoq_last_y[ 7]      <=      column_cnt  ;
-                            end
-                        end
-                        else begin
-                            rdoq_last_x[ 7]      <=      rdoq_last_x_tem[ 7]  ;
-                            rdoq_last_y[ 7]      <=      rdoq_last_y_tem[ 7]  ;
+                            rdoq_last_x[11]      <=      rdoq_last_x_tem[11]  ;
+                            rdoq_last_y[11]      <=      rdoq_last_y_tem[11]  ;
                         end
 
                         if(i_level_opt_d1[15])begin
                             if(rdoq_last_y_tem[15] != -1)begin
                                 if( (tempCost_tem[15] + i_base_cost_buffer_tmp_d1[15] + i_d64_cost_last_one_d1[15] - i_d64_cost_last_zero_d1[15]) < (endPosCost_tem[15] + rdoqD64LastOne_tem[15] - rdoqD64LastZero_tem[15]) )begin
-                                    rdoq_last_x[15]      <=     15           ;
-                                    rdoq_last_y[15]      <=      column_cnt  ;
+                                    rdoq_last_x[15]      <=     15          ;
+                                    rdoq_last_y[15]      <=     column_cnt  ;
                                 end
                                 else begin
                                     rdoq_last_x[15]      <=      rdoq_last_x_tem[15]  ;
@@ -1447,13 +2047,76 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                                 end
                             end
                             else begin
-                                rdoq_last_x[15]      <=     15           ;
-                                rdoq_last_y[15]      <=      column_cnt  ;
+                                rdoq_last_x[15]      <=     15          ;
+                                rdoq_last_y[15]      <=     column_cnt  ;
                             end
                         end
                         else begin
                             rdoq_last_x[15]      <=      rdoq_last_x_tem[15]  ;
                             rdoq_last_y[15]      <=      rdoq_last_y_tem[15]  ;
+                        end
+                        
+                        if(i_level_opt_d1[19])begin
+                            if(rdoq_last_y_tem[19] != -1)begin
+                                if( (tempCost_tem[19] + i_base_cost_buffer_tmp_d1[19] + i_d64_cost_last_one_d1[19] - i_d64_cost_last_zero_d1[19]) < (endPosCost_tem[19] + rdoqD64LastOne_tem[19] - rdoqD64LastZero_tem[19]) )begin
+                                    rdoq_last_x[19]      <=     19          ;
+                                    rdoq_last_y[19]      <=     column_cnt  ;
+                                end
+                                else begin
+                                    rdoq_last_x[19]      <=     rdoq_last_x_tem[19]  ;
+                                    rdoq_last_y[19]      <=     rdoq_last_y_tem[19]  ;
+                                end
+                            end
+                            else begin
+                                rdoq_last_x[19]      <=     19          ;
+                                rdoq_last_y[19]      <=     column_cnt  ;
+                            end
+                        end
+                        else begin
+                            rdoq_last_x[19]      <=      rdoq_last_x_tem[19]  ;
+                            rdoq_last_y[19]      <=      rdoq_last_y_tem[19]  ;
+                        end
+                        
+                        if(i_level_opt_d1[23])begin
+                            if(rdoq_last_y_tem[23] != -1)begin
+                                if( (tempCost_tem[23] + i_base_cost_buffer_tmp_d1[23] + i_d64_cost_last_one_d1[23] - i_d64_cost_last_zero_d1[23]) < (endPosCost_tem[23] + rdoqD64LastOne_tem[23] - rdoqD64LastZero_tem[23]) )begin
+                                    rdoq_last_x[23]      <=     23          ;
+                                    rdoq_last_y[23]      <=     column_cnt  ;
+                                end
+                                else begin
+                                    rdoq_last_x[23]      <=      rdoq_last_x_tem[23]  ;
+                                    rdoq_last_y[23]      <=      rdoq_last_y_tem[23]  ;
+                                end
+                            end
+                            else begin
+                                rdoq_last_x[23]      <=     23          ;
+                                rdoq_last_y[23]      <=     column_cnt  ;
+                            end
+                        end
+                        else begin
+                            rdoq_last_x[23]      <=      rdoq_last_x_tem[23]  ;
+                            rdoq_last_y[23]      <=      rdoq_last_y_tem[23]  ;
+                        end
+                        
+                        if(i_level_opt_d1[27])begin
+                            if(rdoq_last_y_tem[27] != -1)begin
+                                if( (tempCost_tem[27] + i_base_cost_buffer_tmp_d1[27] + i_d64_cost_last_one_d1[27] - i_d64_cost_last_zero_d1[27]) < (endPosCost_tem[27] + rdoqD64LastOne_tem[27] - rdoqD64LastZero_tem[27]) )begin
+                                    rdoq_last_x[27]      <=     27          ;
+                                    rdoq_last_y[27]      <=     column_cnt  ;
+                                end
+                                else begin
+                                    rdoq_last_x[27]      <=      rdoq_last_x_tem[27]  ;
+                                    rdoq_last_y[27]      <=      rdoq_last_y_tem[27]  ;
+                                end
+                            end
+                            else begin
+                                rdoq_last_x[27]      <=     27          ;
+                                rdoq_last_y[27]      <=     column_cnt  ;
+                            end
+                        end
+                        else begin
+                            rdoq_last_x[27]      <=      rdoq_last_x_tem[27]  ;
+                            rdoq_last_y[27]      <=      rdoq_last_y_tem[27]  ;
                         end
 
                         if(i_level_opt_d1[31])begin
@@ -1470,8 +2133,16 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         rdoq_last_y[ 3]    <=  0;
                         rdoq_last_x[ 7]    <=  0;
                         rdoq_last_y[ 7]    <=  0;
+                        rdoq_last_x[11]    <=  0;
+                        rdoq_last_y[11]    <=  0;
                         rdoq_last_x[15]    <=  0;
                         rdoq_last_y[15]    <=  0;
+                        rdoq_last_x[19]    <=  0;
+                        rdoq_last_y[19]    <=  0;
+                        rdoq_last_x[23]    <=  0;
+                        rdoq_last_y[23]    <=  0;
+                        rdoq_last_x[27]    <=  0;
+                        rdoq_last_y[27]    <=  0;
                         rdoq_last_x[31]    <=  0;
                         rdoq_last_y[31]    <=  0;
                     end
@@ -1482,7 +2153,23 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
             if(column_cnt == 0)begin
                 for(i = 0; i < 32; i = i + 1)begin
                     if(i_level_opt_d1[i])begin
-                            rdoq_last_x[i]      <=      i           ;
+                            case(i_height_log2_d1)
+                                3'd2: begin
+                                    rdoq_last_x[i]  <=  i % 4;
+                                end
+                                3'd3: begin
+                                    rdoq_last_x[i]  <=  i % 8;
+                                end
+                                3'd4: begin
+                                    rdoq_last_x[i]  <=  i % 16;
+                                end
+                                3'd5: begin
+                                    rdoq_last_x[i]  <=  i;
+                                end
+                                default : begin
+                                    rdoq_last_x[i]  <=  0;
+                                end
+                            endcase
                             rdoq_last_y[i]      <=      column_cnt  ;
                     end
                     else begin
@@ -1497,7 +2184,23 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                     if(i_level_opt_d1[i])begin
                         if(rdoq_last_y_tem[i] != -1)begin
                             if( (tempCost_tem[i] + i_base_cost_buffer_tmp_d1[i] + i_d64_cost_last_one_d1[i] - i_d64_cost_last_zero_d1[i]) < (endPosCost_tem[i] + rdoqD64LastOne_tem[i] - rdoqD64LastZero_tem[i]) )begin
-                                rdoq_last_x[i]      <=      i           ;
+                                case(i_height_log2_d1)
+                                    3'd2: begin
+                                        rdoq_last_x[i]  <=  i % 4;
+                                    end
+                                    3'd3: begin
+                                        rdoq_last_x[i]  <=  i % 8;
+                                    end
+                                    3'd4: begin
+                                        rdoq_last_x[i]  <=  i % 16;
+                                    end
+                                    3'd5: begin
+                                        rdoq_last_x[i]  <=  i;
+                                    end
+                                    default : begin
+                                        rdoq_last_x[i]  <=  0;
+                                    end
+                                endcase
                                 rdoq_last_y[i]      <=      column_cnt  ;
                             end
                             else begin
@@ -1506,7 +2209,23 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                             end
                         end
                         else begin
-                            rdoq_last_x[i]      <=      i           ;
+                            case(i_height_log2_d1)
+                                3'd2: begin
+                                    rdoq_last_x[i]  <=  i % 4;
+                                end
+                                3'd3: begin
+                                    rdoq_last_x[i]  <=  i % 8;
+                                end
+                                3'd4: begin
+                                    rdoq_last_x[i]  <=  i % 16;
+                                end
+                                3'd5: begin
+                                    rdoq_last_x[i]  <=  i;
+                                end
+                                default : begin
+                                    rdoq_last_x[i]  <=  0;
+                                end
+                            endcase
                             rdoq_last_y[i]      <=      column_cnt  ;
                         end
                     end
@@ -1517,11 +2236,27 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                 end
 
                 //odd rows except the last row of each matrix
-                for(i = 1; i < 3; i = i + 2)begin
+                for(i = 1; i < 3; i = i + 4)begin
                     if(i_level_opt_d1[i])begin
                         if(rdoq_last_y_tem[i] != -1)begin
                             if(tempCost_tem[i] - endPosCost_tem[i] + rdoqD64LastOne_tem[i] - i_d64_cost_last_one_d1[i] + i_d64_cost_last_zero_d1[i] - rdoqD64LastZero_tem[i] > 0)begin
-                                rdoq_last_x[i]      <=      i           ;
+                            case(i_height_log2_d1)
+                                3'd2: begin
+                                    rdoq_last_x[i]  <=  i % 4;
+                                end
+                                3'd3: begin
+                                    rdoq_last_x[i]  <=  i % 8;
+                                end
+                                3'd4: begin
+                                    rdoq_last_x[i]  <=  i % 16;
+                                end
+                                3'd5: begin
+                                    rdoq_last_x[i]  <=  i;
+                                end
+                                default : begin
+                                    rdoq_last_x[i]  <=  0;
+                                end
+                            endcase
                                 rdoq_last_y[i]      <=      column_cnt  ;
                             end
                             else begin
@@ -1530,7 +2265,23 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                             end
                         end
                         else begin
-                            rdoq_last_x[i]      <=      i           ;
+                            case(i_height_log2_d1)
+                                3'd2: begin
+                                    rdoq_last_x[i]  <=  i % 4;
+                                end
+                                3'd3: begin
+                                    rdoq_last_x[i]  <=  i % 8;
+                                end
+                                3'd4: begin
+                                    rdoq_last_x[i]  <=  i % 16;
+                                end
+                                3'd5: begin
+                                    rdoq_last_x[i]  <=  i;
+                                end
+                                default : begin
+                                    rdoq_last_x[i]  <=  0;
+                                end
+                            endcase
                             rdoq_last_y[i]      <=      column_cnt  ;
                         end
                     end
@@ -1539,11 +2290,27 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         rdoq_last_y[i]      <=      rdoq_last_y_tem[i]  ;
                     end
                 end
-                for(i = 5; i < 7; i = i + 2)begin
+                for(i = 5; i < 7; i = i + 4)begin
                     if(i_level_opt_d1[i])begin
                         if(rdoq_last_y_tem[i] != -1)begin
                             if(tempCost_tem[i] - endPosCost_tem[i] + rdoqD64LastOne_tem[i] - i_d64_cost_last_one_d1[i] + i_d64_cost_last_zero_d1[i] - rdoqD64LastZero_tem[i] > 0)begin
-                                rdoq_last_x[i]      <=      i           ;
+                            case(i_height_log2_d1)
+                                3'd2: begin
+                                    rdoq_last_x[i]  <=  i % 4;
+                                end
+                                3'd3: begin
+                                    rdoq_last_x[i]  <=  i % 8;
+                                end
+                                3'd4: begin
+                                    rdoq_last_x[i]  <=  i % 16;
+                                end
+                                3'd5: begin
+                                    rdoq_last_x[i]  <=  i;
+                                end
+                                default : begin
+                                    rdoq_last_x[i]  <=  0;
+                                end
+                            endcase
                                 rdoq_last_y[i]      <=      column_cnt  ;
                             end
                             else begin
@@ -1552,7 +2319,23 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                             end
                         end
                         else begin
-                            rdoq_last_x[i]      <=      i           ;
+                            case(i_height_log2_d1)
+                                3'd2: begin
+                                    rdoq_last_x[i]  <=  i % 4;
+                                end
+                                3'd3: begin
+                                    rdoq_last_x[i]  <=  i % 8;
+                                end
+                                3'd4: begin
+                                    rdoq_last_x[i]  <=  i % 16;
+                                end
+                                3'd5: begin
+                                    rdoq_last_x[i]  <=  i;
+                                end
+                                default : begin
+                                    rdoq_last_x[i]  <=  0;
+                                end
+                            endcase
                             rdoq_last_y[i]      <=      column_cnt  ;
                         end
                     end
@@ -1561,11 +2344,27 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         rdoq_last_y[i]      <=      rdoq_last_y_tem[i]  ;
                     end
                 end
-                for(i = 9; i < 15; i = i + 2)begin
+                for(i = 9; i < 15; i = i + 4)begin
                     if(i_level_opt_d1[i])begin
                         if(rdoq_last_y_tem[i] != -1)begin
                             if(tempCost_tem[i] - endPosCost_tem[i] + rdoqD64LastOne_tem[i] - i_d64_cost_last_one_d1[i] + i_d64_cost_last_zero_d1[i] - rdoqD64LastZero_tem[i] > 0)begin
-                                rdoq_last_x[i]      <=      i           ;
+                            case(i_height_log2_d1)
+                                3'd2: begin
+                                    rdoq_last_x[i]  <=  i % 4;
+                                end
+                                3'd3: begin
+                                    rdoq_last_x[i]  <=  i % 8;
+                                end
+                                3'd4: begin
+                                    rdoq_last_x[i]  <=  i % 16;
+                                end
+                                3'd5: begin
+                                    rdoq_last_x[i]  <=  i;
+                                end
+                                default : begin
+                                    rdoq_last_x[i]  <=  0;
+                                end
+                            endcase
                                 rdoq_last_y[i]      <=      column_cnt  ;
                             end
                             else begin
@@ -1574,7 +2373,23 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                             end
                         end
                         else begin
-                            rdoq_last_x[i]      <=      i           ;
+                            case(i_height_log2_d1)
+                                3'd2: begin
+                                    rdoq_last_x[i]  <=  i % 4;
+                                end
+                                3'd3: begin
+                                    rdoq_last_x[i]  <=  i % 8;
+                                end
+                                3'd4: begin
+                                    rdoq_last_x[i]  <=  i % 16;
+                                end
+                                3'd5: begin
+                                    rdoq_last_x[i]  <=  i;
+                                end
+                                default : begin
+                                    rdoq_last_x[i]  <=  0;
+                                end
+                            endcase
                             rdoq_last_y[i]      <=      column_cnt  ;
                         end
                     end
@@ -1583,11 +2398,27 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         rdoq_last_y[i]      <=      rdoq_last_y_tem[i]  ;
                     end
                 end            
-                for(i = 17; i < 31; i = i + 2)begin
+                for(i = 17; i < 31; i = i + 4)begin
                     if(i_level_opt_d1[i])begin
                         if(rdoq_last_y_tem[i] != -1)begin
                             if(tempCost_tem[i] - endPosCost_tem[i] + rdoqD64LastOne_tem[i] - i_d64_cost_last_one_d1[i] + i_d64_cost_last_zero_d1[i] - rdoqD64LastZero_tem[i] > 0)begin
-                                rdoq_last_x[i]      <=      i           ;
+                            case(i_height_log2_d1)
+                                3'd2: begin
+                                    rdoq_last_x[i]  <=  i % 4;
+                                end
+                                3'd3: begin
+                                    rdoq_last_x[i]  <=  i % 8;
+                                end
+                                3'd4: begin
+                                    rdoq_last_x[i]  <=  i % 16;
+                                end
+                                3'd5: begin
+                                    rdoq_last_x[i]  <=  i;
+                                end
+                                default : begin
+                                    rdoq_last_x[i]  <=  0;
+                                end
+                            endcase
                                 rdoq_last_y[i]      <=      column_cnt  ;
                             end
                             else begin
@@ -1596,7 +2427,23 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                             end
                         end
                         else begin
-                            rdoq_last_x[i]      <=      i           ;
+                            case(i_height_log2_d1)
+                                3'd2: begin
+                                    rdoq_last_x[i]  <=  i % 4;
+                                end
+                                3'd3: begin
+                                    rdoq_last_x[i]  <=  i % 8;
+                                end
+                                3'd4: begin
+                                    rdoq_last_x[i]  <=  i % 16;
+                                end
+                                3'd5: begin
+                                    rdoq_last_x[i]  <=  i;
+                                end
+                                default : begin
+                                    rdoq_last_x[i]  <=  0;
+                                end
+                            endcase
                             rdoq_last_y[i]      <=      column_cnt  ;
                         end
                     end
@@ -1608,107 +2455,124 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                 //determine the value of the last row 
                 case(i_height_log2_d1)
                     3'd2    : begin    
-                            if(i_level_opt_d1[ 3])begin
-                                rdoq_last_x[ 3]    <=  3            ;
-                                rdoq_last_y[ 3]    <=  column_cnt   ;
+                            for(i = 0; i < 8; i = i + 1)begin
+                                if(i_level_opt_d1[ 3 + 4 * i])begin
+                                    rdoq_last_x[ 3 + 4 * i]    <=  3            ;
+                                    rdoq_last_y[ 3 + 4 * i]    <=  column_cnt   ;
+                                end
+                                else begin
+                                    rdoq_last_x[ 3 + 4 * i]    <=  -1   ;
+                                    rdoq_last_y[ 3 + 4 * i]    <=  -1   ;
+                                end
                             end
-                            else begin
-                                rdoq_last_x[ 3]    <=  -1   ;
-                                rdoq_last_y[ 3]    <=  -1   ;
-                            end
-                            rdoq_last_x[ 7]    <=  0;//pending, not used
-                            rdoq_last_y[ 7]    <=  0;//pending, not used
-                            rdoq_last_x[15]    <=  0;//pending, not used
-                            rdoq_last_y[15]    <=  0;//pending, not used
-                            rdoq_last_x[31]    <=  0;//pending, not used
-                            rdoq_last_y[31]    <=  0;//pending, not used
                         end
-                    3'd3    : begin
-                            if(i_level_opt_d1[ 3])begin
-                                if(rdoq_last_y_tem[ 3] != -1)begin
-                                    if(tempCost_tem[ 3] - endPosCost_tem[ 3] + rdoqD64LastOne_tem[ 3] - i_d64_cost_last_one_d1[ 3] + i_d64_cost_last_zero_d1[ 3] - rdoqD64LastZero_tem[ 3] > 0)begin
-                                        rdoq_last_x[ 3]      <=      3           ;
-                                        rdoq_last_y[ 3]      <=      column_cnt  ;
+                    3'd3    : begin                            
+                            for(i = 0; i < 4; i = i + 1) begin
+                                if(i_level_opt_d1[ 3 + 8 * i])begin
+                                    if(rdoq_last_y_tem[ 3 + 8 * i] != -1)begin
+                                        if(tempCost_tem[ 3 + 8 * i] - endPosCost_tem[ 3 + 8 * i] + rdoqD64LastOne_tem[ 3 + 8 * i] - i_d64_cost_last_one_d1[ 3 + 8 * i] + i_d64_cost_last_zero_d1[ 3 + 8 * i] - rdoqD64LastZero_tem[ 3 + 8 * i] > 0)begin
+                                            rdoq_last_x[ 3 + 8 * i]      <=      3              ;
+                                            rdoq_last_y[ 3 + 8 * i]      <=      column_cnt     ;
+                                        end
+                                        else begin
+                                            rdoq_last_x[ 3 + 8 * i]      <=      rdoq_last_x_tem[ 3 + 8 * i];
+                                            rdoq_last_y[ 3 + 8 * i]      <=      rdoq_last_y_tem[ 3 + 8 * i];
+                                        end
                                     end
                                     else begin
-                                        rdoq_last_x[ 3]      <=      rdoq_last_x_tem[ 3];
-                                        rdoq_last_y[ 3]      <=      rdoq_last_y_tem[ 3];
+                                        rdoq_last_x[ 3 + 8 * i]      <=      3              ;
+                                        rdoq_last_y[ 3 + 8 * i]      <=      column_cnt     ;
                                     end
                                 end
                                 else begin
-                                    rdoq_last_x[ 3]      <=      3           ;
-                                    rdoq_last_y[ 3]      <=      column_cnt  ;
+                                    rdoq_last_x[ 3 + 8 * i]      <=      rdoq_last_x_tem[ 3 + 8 * i];
+                                    rdoq_last_y[ 3 + 8 * i]      <=      rdoq_last_y_tem[ 3 + 8 * i];
                                 end
-                            end
-                            else begin
-                                rdoq_last_x[ 3]      <=      rdoq_last_x_tem[ 3];
-                                rdoq_last_y[ 3]      <=      rdoq_last_y_tem[ 3];
-                            end
 
-                            if(i_level_opt_d1[ 7])begin
-                                rdoq_last_x[ 7]    <=  7            ;
-                                rdoq_last_y[ 7]    <=  column_cnt   ;
+                                if(i_level_opt_d1[ 7 + 8 * i])begin
+                                    rdoq_last_x[ 7 + 8 * i]    <=  7            ;
+                                    rdoq_last_y[ 7 + 8 * i]    <=  column_cnt   ;
+                                end
+                                else begin
+                                    rdoq_last_x[ 7 + 8 * i]    <=  -1   ;
+                                    rdoq_last_y[ 7 + 8 * i]    <=  -1   ;
+                                end
                             end
-                            else begin
-                                rdoq_last_x[ 7]    <=  -1   ;
-                                rdoq_last_y[ 7]    <=  -1   ;
-                            end
-                            rdoq_last_x[15]    <=  0;//pending, not used
-                            rdoq_last_y[15]    <=  0;//pending, not used
-                            rdoq_last_x[31]    <=  0;//pending, not used
-                            rdoq_last_y[31]    <=  0;//pending, not used
                         end
-                    3'd4    : begin
-                            if(i_level_opt_d1[ 3])begin
-                                if(rdoq_last_y_tem[ 3] != -1)begin
-                                    if(tempCost_tem[ 3] - endPosCost_tem[ 3] + rdoqD64LastOne_tem[ 3] - i_d64_cost_last_one_d1[ 3] + i_d64_cost_last_zero_d1[ 3] - rdoqD64LastZero_tem[ 3] > 0)begin
-                                        rdoq_last_x[ 3]      <=      3           ;
-                                        rdoq_last_y[ 3]      <=      column_cnt  ;
+                    3'd4    : begin                            
+                            for(i = 0; i < 2; i = i + 1)begin
+                                if(i_level_opt_d1[ 3 + i * 16])begin
+                                    if(rdoq_last_y_tem[ 3 + i * 16] != -1)begin
+                                        if(tempCost_tem[ 3 + i * 16] - endPosCost_tem[ 3 + i * 16] + rdoqD64LastOne_tem[ 3 + i * 16] - i_d64_cost_last_one_d1[ 3 + i * 16] + i_d64_cost_last_zero_d1[ 3 + i * 16] - rdoqD64LastZero_tem[ 3 + i * 16] > 0)begin
+                                            rdoq_last_x[ 3 + i * 16]      <=      3             ;
+                                            rdoq_last_y[ 3 + i * 16]      <=      column_cnt    ;
+                                        end
+                                        else begin
+                                            rdoq_last_x[ 3 + i * 16]      <=      rdoq_last_x_tem[ 3 + i * 16];
+                                            rdoq_last_y[ 3 + i * 16]      <=      rdoq_last_y_tem[ 3 + i * 16];
+                                        end
                                     end
                                     else begin
-                                        rdoq_last_x[ 3]      <=      rdoq_last_x_tem[ 3];
-                                        rdoq_last_y[ 3]      <=      rdoq_last_y_tem[ 3];
+                                        rdoq_last_x[ 3 + i * 16]      <=      3             ;
+                                        rdoq_last_y[ 3 + i * 16]      <=      column_cnt    ;
                                     end
                                 end
                                 else begin
-                                    rdoq_last_x[ 3]      <=      3           ;
-                                    rdoq_last_y[ 3]      <=      column_cnt  ;
+                                    rdoq_last_x[ 3 + i * 16]      <=      rdoq_last_x_tem[ 3 + i * 16];
+                                    rdoq_last_y[ 3 + i * 16]      <=      rdoq_last_y_tem[ 3 + i * 16];
                                 end
-                            end
-                            else begin
-                                rdoq_last_x[ 3]      <=      rdoq_last_x_tem[ 3];
-                                rdoq_last_y[ 3]      <=      rdoq_last_y_tem[ 3];
-                            end
-                            if(i_level_opt_d1[ 7])begin
-                                if(rdoq_last_y_tem[ 7] != -1)begin
-                                    if(tempCost_tem[ 7] - endPosCost_tem[ 7] + rdoqD64LastOne_tem[ 7] - i_d64_cost_last_one_d1[ 7] + i_d64_cost_last_zero_d1[ 7] - rdoqD64LastZero_tem[ 7] > 0)begin
-                                        rdoq_last_x[ 7]      <=      7           ;
-                                        rdoq_last_y[ 7]      <=      column_cnt  ;
+                                
+                                if(i_level_opt_d1[ 7 + i * 16])begin
+                                    if(rdoq_last_y_tem[ 7 + i * 16] != -1)begin
+                                        if(tempCost_tem[ 7 + i * 16] - endPosCost_tem[ 7 + i * 16] + rdoqD64LastOne_tem[ 7 + i * 16] - i_d64_cost_last_one_d1[ 7 + i * 16] + i_d64_cost_last_zero_d1[ 7 + i * 16] - rdoqD64LastZero_tem[ 7 + i * 16] > 0)begin
+                                            rdoq_last_x[ 7 + i * 16]      <=      7             ;
+                                            rdoq_last_y[ 7 + i * 16]      <=      column_cnt    ;
+                                        end
+                                        else begin
+                                            rdoq_last_x[ 7 + i * 16]      <=      rdoq_last_x_tem[ 7 + i * 16];
+                                            rdoq_last_y[ 7 + i * 16]      <=      rdoq_last_y_tem[ 7 + i * 16];
+                                        end
                                     end
                                     else begin
-                                        rdoq_last_x[ 7]      <=      rdoq_last_x_tem[ 7];
-                                        rdoq_last_y[ 7]      <=      rdoq_last_y_tem[ 7];
+                                        rdoq_last_x[ 7 + i * 16]      <=      7             ;
+                                        rdoq_last_y[ 7 + i * 16]      <=      column_cnt    ;
                                     end
                                 end
                                 else begin
-                                    rdoq_last_x[ 7]      <=      7           ;
-                                    rdoq_last_y[ 7]      <=      column_cnt  ;
+                                    rdoq_last_x[ 7 + i * 16]      <=      rdoq_last_x_tem[ 7 + i * 16];
+                                    rdoq_last_y[ 7 + i * 16]      <=      rdoq_last_y_tem[ 7 + i * 16];
+                                end
+                                
+                                if(i_level_opt_d1[11 + i * 16])begin
+                                    if(rdoq_last_y_tem[11 + i * 16] != -1)begin
+                                        if(tempCost_tem[11 + i * 16] - endPosCost_tem[11 + i * 16] + rdoqD64LastOne_tem[11 + i * 16] - i_d64_cost_last_one_d1[11 + i * 16] + i_d64_cost_last_zero_d1[11 + i * 16] - rdoqD64LastZero_tem[11 + i * 16] > 0)begin
+                                            rdoq_last_x[11 + i * 16]      <=     11             ;
+                                            rdoq_last_y[11 + i * 16]      <=     column_cnt     ;
+                                        end
+                                        else begin
+                                            rdoq_last_x[11 + i * 16]      <=      rdoq_last_x_tem[11 + i * 16];
+                                            rdoq_last_y[11 + i * 16]      <=      rdoq_last_y_tem[11 + i * 16];
+                                        end
+                                    end
+                                    else begin
+                                        rdoq_last_x[11 + i * 16]      <=     11             ;
+                                        rdoq_last_y[11 + i * 16]      <=     column_cnt     ;
+                                    end
+                                end
+                                else begin
+                                    rdoq_last_x[11 + i * 16]      <=      rdoq_last_x_tem[11 + i * 16];
+                                    rdoq_last_y[11 + i * 16]      <=      rdoq_last_y_tem[11 + i * 16];
+                                end
+
+                                if(i_level_opt_d1[15 + i * 16])begin
+                                    rdoq_last_x[15 + i * 16]    <=  15              ;
+                                    rdoq_last_y[15 + i * 16]    <=  column_cnt      ;
+                                end
+                                else begin
+                                    rdoq_last_x[15 + i * 16]    <=  -1   ;
+                                    rdoq_last_y[15 + i * 16]    <=  -1   ;
                                 end
                             end
-                            else begin
-                                rdoq_last_x[ 7]      <=      rdoq_last_x_tem[ 7];
-                                rdoq_last_y[ 7]      <=      rdoq_last_y_tem[ 7];
-                            end
-                            if(i_level_opt_d1[15])begin
-                                rdoq_last_x[15]    <=  15           ;
-                                rdoq_last_y[15]    <=  column_cnt   ;
-                            end
-                            else begin
-                                rdoq_last_x[15]    <=  -1   ;
-                                rdoq_last_y[15]    <=  -1   ;
-                            end
-                            rdoq_last_x[31]    <=  0;//pending, not used
-                            rdoq_last_y[31]    <=  0;//pending, not used
                         end
                     3'd5    : begin
                             if(i_level_opt_d1[ 3])begin
@@ -1731,6 +2595,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                                 rdoq_last_x[ 3]      <=      rdoq_last_x_tem[ 3];
                                 rdoq_last_y[ 3]      <=      rdoq_last_y_tem[ 3];
                             end
+
                             if(i_level_opt_d1[ 7])begin
                                 if(rdoq_last_y_tem[ 7] != -1)begin
                                     if(tempCost_tem[ 7] - endPosCost_tem[ 7] + rdoqD64LastOne_tem[ 7] - i_d64_cost_last_one_d1[ 7] + i_d64_cost_last_zero_d1[ 7] - rdoqD64LastZero_tem[ 7] > 0)begin
@@ -1751,6 +2616,28 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                                 rdoq_last_x[ 7]      <=      rdoq_last_x_tem[ 7];
                                 rdoq_last_y[ 7]      <=      rdoq_last_y_tem[ 7];
                             end
+                            
+                            if(i_level_opt_d1[11])begin
+                                if(rdoq_last_y_tem[11] != -1)begin
+                                    if(tempCost_tem[11] - endPosCost_tem[11] + rdoqD64LastOne_tem[11] - i_d64_cost_last_one_d1[11] + i_d64_cost_last_zero_d1[11] - rdoqD64LastZero_tem[11] > 0)begin
+                                        rdoq_last_x[11]      <=     11          ;
+                                        rdoq_last_y[11]      <=     column_cnt  ;
+                                    end
+                                    else begin
+                                        rdoq_last_x[11]      <=      rdoq_last_x_tem[11];
+                                        rdoq_last_y[11]      <=      rdoq_last_y_tem[11];
+                                    end
+                                end
+                                else begin
+                                    rdoq_last_x[11]      <=     11          ;
+                                    rdoq_last_y[11]      <=     column_cnt  ;
+                                end
+                            end
+                            else begin
+                                rdoq_last_x[11]      <=      rdoq_last_x_tem[11];
+                                rdoq_last_y[11]      <=      rdoq_last_y_tem[11];
+                            end
+
                             if(i_level_opt_d1[15])begin
                                 if(rdoq_last_y_tem[15] != -1)begin
                                     if(tempCost_tem[15] - endPosCost_tem[15] + rdoqD64LastOne_tem[15] - i_d64_cost_last_one_d1[15] + i_d64_cost_last_zero_d1[15] - rdoqD64LastZero_tem[15] > 0)begin
@@ -1771,6 +2658,70 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                                 rdoq_last_x[15]      <=      rdoq_last_x_tem[15];
                                 rdoq_last_y[15]      <=      rdoq_last_y_tem[15];
                             end
+
+                            if(i_level_opt_d1[19])begin
+                                if(rdoq_last_y_tem[19] != -1)begin
+                                    if(tempCost_tem[19] - endPosCost_tem[19] + rdoqD64LastOne_tem[19] - i_d64_cost_last_one_d1[19] + i_d64_cost_last_zero_d1[19] - rdoqD64LastZero_tem[19] > 0)begin
+                                        rdoq_last_x[19]      <=     19           ;
+                                        rdoq_last_y[19]      <=      column_cnt  ;
+                                    end
+                                    else begin
+                                        rdoq_last_x[19]      <=      rdoq_last_x_tem[19];
+                                        rdoq_last_y[19]      <=      rdoq_last_y_tem[19];
+                                    end
+                                end
+                                else begin
+                                    rdoq_last_x[19]      <=     19           ;
+                                    rdoq_last_y[19]      <=      column_cnt  ;
+                                end
+                            end
+                            else begin
+                                rdoq_last_x[19]      <=      rdoq_last_x_tem[19];
+                                rdoq_last_y[19]      <=      rdoq_last_y_tem[19];
+                            end
+
+                            if(i_level_opt_d1[23])begin
+                                if(rdoq_last_y_tem[23] != -1)begin
+                                    if(tempCost_tem[23] - endPosCost_tem[23] + rdoqD64LastOne_tem[23] - i_d64_cost_last_one_d1[23] + i_d64_cost_last_zero_d1[23] - rdoqD64LastZero_tem[23] > 0)begin
+                                        rdoq_last_x[23]      <=     23           ;
+                                        rdoq_last_y[23]      <=      column_cnt  ;
+                                    end
+                                    else begin
+                                        rdoq_last_x[23]      <=      rdoq_last_x_tem[23];
+                                        rdoq_last_y[23]      <=      rdoq_last_y_tem[23];
+                                    end
+                                end
+                                else begin
+                                    rdoq_last_x[23]      <=     23           ;
+                                    rdoq_last_y[23]      <=      column_cnt  ;
+                                end
+                            end
+                            else begin
+                                rdoq_last_x[23]      <=      rdoq_last_x_tem[23];
+                                rdoq_last_y[23]      <=      rdoq_last_y_tem[23];
+                            end
+
+                            if(i_level_opt_d1[27])begin
+                                if(rdoq_last_y_tem[27] != -1)begin
+                                    if(tempCost_tem[27] - endPosCost_tem[27] + rdoqD64LastOne_tem[27] - i_d64_cost_last_one_d1[27] + i_d64_cost_last_zero_d1[27] - rdoqD64LastZero_tem[27] > 0)begin
+                                        rdoq_last_x[27]      <=     27           ;
+                                        rdoq_last_y[27]      <=      column_cnt  ;
+                                    end
+                                    else begin
+                                        rdoq_last_x[27]      <=      rdoq_last_x_tem[27];
+                                        rdoq_last_y[27]      <=      rdoq_last_y_tem[27];
+                                    end
+                                end
+                                else begin
+                                    rdoq_last_x[27]      <=     27           ;
+                                    rdoq_last_y[27]      <=      column_cnt  ;
+                                end
+                            end
+                            else begin
+                                rdoq_last_x[27]      <=      rdoq_last_x_tem[27];
+                                rdoq_last_y[27]      <=      rdoq_last_y_tem[27];
+                            end
+
                             if(i_level_opt_d1[31])begin
                                 rdoq_last_x[31]    <=  31           ;
                                 rdoq_last_y[31]    <=  column_cnt   ;
@@ -1785,8 +2736,16 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                             rdoq_last_y[ 3]    <=  0;
                             rdoq_last_x[ 7]    <=  0;
                             rdoq_last_y[ 7]    <=  0;
+                            rdoq_last_x[11]    <=  0;
+                            rdoq_last_y[11]    <=  0;
                             rdoq_last_x[15]    <=  0;
                             rdoq_last_y[15]    <=  0;
+                            rdoq_last_x[19]    <=  0;
+                            rdoq_last_y[19]    <=  0;
+                            rdoq_last_x[23]    <=  0;
+                            rdoq_last_y[23]    <=  0;
+                            rdoq_last_x[27]    <=  0;
+                            rdoq_last_y[27]    <=  0;
                             rdoq_last_x[31]    <=  0;
                             rdoq_last_y[31]    <=  0;
                         end
@@ -1804,50 +2763,50 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
             end
         end
         else begin
-            for(i = 0 ; i < 3 ; i = i + 1)begin
-                endPosCost_tem[i]     <=   endPosCost[i + 1];   
-            end
-            for(i = 4 ; i < 7 ; i = i + 1)begin
-                endPosCost_tem[i]     <=   endPosCost[i + 1];   
-            end
-            for(i = 8 ; i < 15 ; i = i + 1)begin
-                endPosCost_tem[i]     <=   endPosCost[i + 1];   
-            end
-            for(i = 16; i < 31; i = i + 1)begin
-                endPosCost_tem[i]     <=   endPosCost[i + 1];   
+            for(j = 0; j < 8; j = j + 1)begin
+                for(i = 0 ; i < 3 ; i = i + 1)begin
+                    endPosCost_tem[i + j * 4]     <=   endPosCost[i + 1 + j * 4];   
+                end
             end
 
             case(i_height_log2_d2)
                 3'd2    : begin    
-                        endPosCost_tem[3 ]    <=  endPosCost[3 ];
-                        endPosCost_tem[7 ]    <=  0;//pending, not used
-                        endPosCost_tem[15]    <=  0;//pending, not used
-                        endPosCost_tem[31]    <=  0;//pending, not used
+                        for(i = 0; i < 8; i = i + 1)begin
+                            endPosCost_tem[3 + i * 4]    <=  endPosCost[3 + i * 4];
+                        end
                     end
-                3'd3    : begin
-                        endPosCost_tem[3 ]    <=  endPosCost[4 ];
-                        endPosCost_tem[7 ]    <=  endPosCost[7 ];//pending, not used
-                        endPosCost_tem[15]    <=  0;//pending, not used
-                        endPosCost_tem[31]    <=  0;//pending, not used
-
+                    3'd3    : begin
+                        for(i = 0; i < 4; i = i + 1)begin
+                            endPosCost_tem[3 + i * 8]    <=  endPosCost[4 + i * 8];
+                            endPosCost_tem[7 + i * 8]    <=  endPosCost[7 + i * 8];
+                        end
                     end
                 3'd4    : begin
-                        endPosCost_tem[3 ]    <=  endPosCost[4 ];
-                        endPosCost_tem[7 ]    <=  endPosCost[8 ];
-                        endPosCost_tem[15]    <=  endPosCost[15];
-                        endPosCost_tem[31]    <=  0;//pending, not used
-
+                        for(i = 0; i < 2; i = i + 1)begin
+                            endPosCost_tem[3  + i * 16]    <=  endPosCost[4  + i * 16];
+                            endPosCost_tem[7  + i * 16]    <=  endPosCost[8  + i * 16];
+                            endPosCost_tem[11 + i * 16]    <=  endPosCost[12 + i * 16];
+                            endPosCost_tem[15 + i * 16]    <=  endPosCost[15 + i * 16];
+                        end
                     end
                 3'd5    : begin
                         endPosCost_tem[3 ]    <=  endPosCost[4 ];
                         endPosCost_tem[7 ]    <=  endPosCost[8 ];
+                        endPosCost_tem[11]    <=  endPosCost[12];
                         endPosCost_tem[15]    <=  endPosCost[16];
+                        endPosCost_tem[19]    <=  endPosCost[20];
+                        endPosCost_tem[23]    <=  endPosCost[24];
+                        endPosCost_tem[27]    <=  endPosCost[28];
                         endPosCost_tem[31]    <=  endPosCost[31];
                     end
                 default : begin
                         endPosCost_tem[3 ]    <=  0;
                         endPosCost_tem[7 ]    <=  0;
+                        endPosCost_tem[11]    <=  0;
                         endPosCost_tem[15]    <=  0;
+                        endPosCost_tem[19]    <=  0;
+                        endPosCost_tem[23]    <=  0;
+                        endPosCost_tem[27]    <=  0;
                         endPosCost_tem[31]    <=  0;
                     end
             endcase
@@ -1883,7 +2842,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
             end
 
             //odd rows except the last row of each matrix
-            for(i = 1; i < 3; i = i + 2)begin
+            for(i = 1; i < 3; i = i + 4)begin
                 if(i_level_opt_d1[i])begin
                     if(rdoq_last_y_tem[i] != -1)begin
                         if( (tempCost_tem[i] + i_base_cost_buffer_tmp_d1[i] + i_d64_cost_last_one_d1[i] - i_d64_cost_last_zero_d1[i]) < (endPosCost_tem[i] + rdoqD64LastOne_tem[i] - rdoqD64LastZero_tem[i]) )begin
@@ -1901,7 +2860,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                     endPosCost[i]       <=      endPosCost_tem[i];
                 end
             end
-            for(i = 5; i < 7; i = i + 2)begin
+            for(i = 5; i < 7; i = i + 4)begin
                 if(i_level_opt_d1[i])begin
                     if(rdoq_last_y_tem[i] != -1)begin
                         if( (tempCost_tem[i] + i_base_cost_buffer_tmp_d1[i] + i_d64_cost_last_one_d1[i] - i_d64_cost_last_zero_d1[i]) < (endPosCost_tem[i] + rdoqD64LastOne_tem[i] - rdoqD64LastZero_tem[i]) )begin
@@ -1919,7 +2878,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                     endPosCost[i]       <=      endPosCost_tem[i];
                 end
             end
-            for(i = 9; i < 15; i = i + 2)begin
+            for(i = 9; i < 15; i = i + 4)begin
                 if(i_level_opt_d1[i])begin
                     if(rdoq_last_y_tem[i] != -1)begin
                         if( (tempCost_tem[i] + i_base_cost_buffer_tmp_d1[i] + i_d64_cost_last_one_d1[i] - i_d64_cost_last_zero_d1[i]) < (endPosCost_tem[i] + rdoqD64LastOne_tem[i] - rdoqD64LastZero_tem[i]) )begin
@@ -1937,7 +2896,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                     endPosCost[i]       <=      endPosCost_tem[i];
                 end
             end            
-            for(i = 17; i < 31; i = i + 2)begin
+            for(i = 17; i < 31; i = i + 4)begin
                 if(i_level_opt_d1[i])begin
                     if(rdoq_last_y_tem[i] != -1)begin
                         if( (tempCost_tem[i] + i_base_cost_buffer_tmp_d1[i] + i_d64_cost_last_one_d1[i] - i_d64_cost_last_zero_d1[i]) < (endPosCost_tem[i] + rdoqD64LastOne_tem[i] - rdoqD64LastZero_tem[i]) )begin
@@ -1958,67 +2917,87 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
             //determine the value of the last row 
             case(i_height_log2_d1)
                 3'd2    : begin    
-                        endPosCost[ 3]      <=      i_level_opt_d1[ 3] != 0 ? i_base_cost_buffer_tmp_d1[ 3] : 0;
-                        endPosCost[ 7]      <=      0;//pending, not used
-                        endPosCost[15]      <=      0;//pending, not used
-                        endPosCost[31]      <=      0;//pending, not used
+                        for(i = 0; i < 8; i = i + 1)begin
+                            endPosCost[ 3 + i * 4]      <=      i_level_opt_d1[ 3 + i * 4] != 0 ? i_base_cost_buffer_tmp_d1[ 3 + i * 4] : 0;
+                        end
                     end
                 3'd3    : begin
-                        if(i_level_opt_d1[ 3])begin
-                            if(rdoq_last_y_tem[ 3] != -1)begin
-                                if( (tempCost_tem[ 3] + i_base_cost_buffer_tmp_d1[ 3] + i_d64_cost_last_one_d1[ 3] - i_d64_cost_last_zero_d1[ 3]) < (endPosCost_tem[ 3] + rdoqD64LastOne_tem[ 3] - rdoqD64LastZero_tem[ 3]) )begin
-                                    endPosCost[ 3]       <=      tempCost_tem[ 3] + i_base_cost_buffer_tmp_d1[ 3];
+                        for(i = 0; i < 4; i = i + 1)begin
+                            if(i_level_opt_d1[ 3 + i * 8])begin
+                                if(rdoq_last_y_tem[ 3 + i * 8] != -1)begin
+                                    if( (tempCost_tem[ 3 + i * 8] + i_base_cost_buffer_tmp_d1[ 3 + i * 8] + i_d64_cost_last_one_d1[ 3 + i * 8] - i_d64_cost_last_zero_d1[ 3 + i * 8]) < (endPosCost_tem[ 3 + i * 8] + rdoqD64LastOne_tem[ 3 + i * 8] - rdoqD64LastZero_tem[ 3 + i * 8]) )begin
+                                        endPosCost[ 3 + i * 8]       <=      tempCost_tem[ 3 + i * 8] + i_base_cost_buffer_tmp_d1[ 3 + i * 8];
+                                    end
+                                    else begin
+                                        endPosCost[ 3 + i * 8]       <=      endPosCost_tem[ 3 + i * 8];
+                                    end
                                 end
                                 else begin
-                                    endPosCost[ 3]       <=      endPosCost_tem[ 3];
+                                    endPosCost[ 3 + i * 8]       <=      tempCost_tem[ 3 + i * 8] + i_base_cost_buffer_tmp_d1[ 3 + i * 8];
                                 end
                             end
                             else begin
-                                endPosCost[ 3]       <=      tempCost_tem[ 3] + i_base_cost_buffer_tmp_d1[ 3];
+                                endPosCost[ 3 + i * 8]       <=      endPosCost_tem[ 3 + i * 8];
                             end
+                            endPosCost[ 7 + i * 8]      <=      i_level_opt_d1[ 7 + i * 8] != 0 ? i_base_cost_buffer_tmp_d1[ 7 + i * 8] : 0;
                         end
-                        else begin
-                            endPosCost[ 3]       <=      endPosCost_tem[ 3];
-                        end
-                        endPosCost[ 7]      <=      i_level_opt_d1[ 7] != 0 ? i_base_cost_buffer_tmp_d1[ 7] : 0;
-                        endPosCost[15]      <=      0;//pending, not used
-                        endPosCost[31]      <=      0;//pending, not used
                     end
-                3'd4    : begin
-                        if(i_level_opt_d1[ 3])begin
-                            if(rdoq_last_y_tem[ 3] != -1)begin
-                                if( (tempCost_tem[ 3] + i_base_cost_buffer_tmp_d1[ 3] + i_d64_cost_last_one_d1[ 3] - i_d64_cost_last_zero_d1[ 3]) < (endPosCost_tem[ 3] + rdoqD64LastOne_tem[ 3] - rdoqD64LastZero_tem[ 3]) )begin
-                                    endPosCost[ 3]       <=      tempCost_tem[ 3] + i_base_cost_buffer_tmp_d1[ 3];
+                3'd4    : begin                    
+                        for(i = 0; i < 2; i = i + 1)begin
+                            if(i_level_opt_d1[ 3 + i * 16])begin
+                                if(rdoq_last_y_tem[ 3 + i * 16] != -1)begin
+                                    if( (tempCost_tem[ 3 + i * 16] + i_base_cost_buffer_tmp_d1[ 3 + i * 16] + i_d64_cost_last_one_d1[ 3 + i * 16] - i_d64_cost_last_zero_d1[ 3 + i * 16]) < (endPosCost_tem[ 3 + i * 16] + rdoqD64LastOne_tem[ 3 + i * 16] - rdoqD64LastZero_tem[ 3 + i * 16]) )begin
+                                        endPosCost[ 3 + i * 16]       <=      tempCost_tem[ 3 + i * 16] + i_base_cost_buffer_tmp_d1[ 3 + i * 16];
+                                    end
+                                    else begin
+                                        endPosCost[ 3 + i * 16]       <=      endPosCost_tem[ 3 + i * 16];
+                                    end
                                 end
                                 else begin
-                                    endPosCost[ 3]       <=      endPosCost_tem[ 3];
+                                    endPosCost[ 3 + i * 16]       <=      tempCost_tem[ 3 + i * 16] + i_base_cost_buffer_tmp_d1[ 3 + i * 16];
                                 end
                             end
                             else begin
-                                endPosCost[ 3]       <=      tempCost_tem[ 3] + i_base_cost_buffer_tmp_d1[ 3];
+                                endPosCost[ 3 + i * 16]       <=      endPosCost_tem[ 3 + i * 16];
                             end
-                        end
-                        else begin
-                            endPosCost[ 3]       <=      endPosCost_tem[ 3];
-                        end
-                        if(i_level_opt_d1[ 7])begin
-                            if(rdoq_last_y_tem[ 7] != -1)begin
-                                if( (tempCost_tem[ 7] + i_base_cost_buffer_tmp_d1[ 7] + i_d64_cost_last_one_d1[ 7] - i_d64_cost_last_zero_d1[ 7]) < (endPosCost_tem[ 7] + rdoqD64LastOne_tem[ 7] - rdoqD64LastZero_tem[ 7]) )begin
-                                    endPosCost[ 7]       <=      tempCost_tem[ 7] + i_base_cost_buffer_tmp_d1[ 7];
+
+                            if(i_level_opt_d1[ 7 + i * 16])begin
+                                if(rdoq_last_y_tem[ 7 + i * 16] != -1)begin
+                                    if( (tempCost_tem[ 7 + i * 16] + i_base_cost_buffer_tmp_d1[ 7 + i * 16] + i_d64_cost_last_one_d1[ 7 + i * 16] - i_d64_cost_last_zero_d1[ 7 + i * 16]) < (endPosCost_tem[ 7 + i * 16] + rdoqD64LastOne_tem[ 7 + i * 16] - rdoqD64LastZero_tem[ 7 + i * 16]) )begin
+                                        endPosCost[ 7 + i * 16]       <=      tempCost_tem[ 7 + i * 16] + i_base_cost_buffer_tmp_d1[ 7 + i * 16];
+                                    end
+                                    else begin
+                                        endPosCost[ 7 + i * 16]       <=      endPosCost_tem[ 7 + i * 16];
+                                    end
                                 end
                                 else begin
-                                    endPosCost[ 7]       <=      endPosCost_tem[ 7];
+                                    endPosCost[ 7 + i * 16]       <=      tempCost_tem[ 7 + i * 16] + i_base_cost_buffer_tmp_d1[ 7 + i * 16];
                                 end
                             end
                             else begin
-                                endPosCost[ 7]       <=      tempCost_tem[ 7] + i_base_cost_buffer_tmp_d1[ 7];
+                                endPosCost[ 7 + i * 16]       <=      endPosCost_tem[ 7 + i * 16];
                             end
+                            
+                            if(i_level_opt_d1[11 + i * 16])begin
+                                if(rdoq_last_y_tem[11 + i * 16] != -1)begin
+                                    if( (tempCost_tem[11 + i * 16] + i_base_cost_buffer_tmp_d1[11 + i * 16] + i_d64_cost_last_one_d1[11 + i * 16] - i_d64_cost_last_zero_d1[11 + i * 16]) < (endPosCost_tem[11 + i * 16] + rdoqD64LastOne_tem[11 + i * 16] - rdoqD64LastZero_tem[11 + i * 16]) )begin
+                                        endPosCost[11 + i * 16]       <=      tempCost_tem[11 + i * 16] + i_base_cost_buffer_tmp_d1[11 + i * 16];
+                                    end
+                                    else begin
+                                        endPosCost[11 + i * 16]       <=      endPosCost_tem[11 + i * 16];
+                                    end
+                                end
+                                else begin
+                                    endPosCost[11 + i * 16]       <=      tempCost_tem[11 + i * 16] + i_base_cost_buffer_tmp_d1[11 + i * 16];
+                                end
+                            end
+                            else begin
+                                endPosCost[11 + i * 16]       <=      endPosCost_tem[11 + i * 16];
+                            end
+
+                            
+                            endPosCost[15 + i * 16]      <=      i_level_opt_d1[15 + i * 16] != 0 ? i_base_cost_buffer_tmp_d1[15 + i * 16] : 0;
                         end
-                        else begin
-                            endPosCost[ 7]       <=      endPosCost_tem[ 7];
-                        end
-                        endPosCost[15]      <=      i_level_opt_d1[15] != 0 ? i_base_cost_buffer_tmp_d1[15] : 0;
-                        endPosCost[31]      <=      0;//pending, not used
                     end
                 3'd5    : begin
                         if(i_level_opt_d1[ 3])begin
@@ -2037,6 +3016,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         else begin
                             endPosCost[ 3]       <=      endPosCost_tem[ 3];
                         end
+
                         if(i_level_opt_d1[ 7])begin
                             if(rdoq_last_y_tem[ 7] != -1)begin
                                 if( (tempCost_tem[ 7] + i_base_cost_buffer_tmp_d1[ 7] + i_d64_cost_last_one_d1[ 7] - i_d64_cost_last_zero_d1[ 7]) < (endPosCost_tem[ 7] + rdoqD64LastOne_tem[ 7] - rdoqD64LastZero_tem[ 7]) )begin
@@ -2053,6 +3033,24 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         else begin
                             endPosCost[ 7]       <=      endPosCost_tem[ 7];
                         end
+                        
+                        if(i_level_opt_d1[11])begin
+                            if(rdoq_last_y_tem[11] != -1)begin
+                                if( (tempCost_tem[11] + i_base_cost_buffer_tmp_d1[11] + i_d64_cost_last_one_d1[11] - i_d64_cost_last_zero_d1[11]) < (endPosCost_tem[11] + rdoqD64LastOne_tem[11] - rdoqD64LastZero_tem[11]) )begin
+                                    endPosCost[11]       <=      tempCost_tem[11] + i_base_cost_buffer_tmp_d1[11];
+                                end
+                                else begin
+                                    endPosCost[11]       <=      endPosCost_tem[11];
+                                end
+                            end
+                            else begin
+                                endPosCost[11]       <=      tempCost_tem[11] + i_base_cost_buffer_tmp_d1[11];
+                            end
+                        end
+                        else begin
+                            endPosCost[11]       <=      endPosCost_tem[11];
+                        end
+
                         if(i_level_opt_d1[15])begin
                             if(rdoq_last_y_tem[15] != -1)begin
                                 if( (tempCost_tem[15] + i_base_cost_buffer_tmp_d1[15] + i_d64_cost_last_one_d1[15] - i_d64_cost_last_zero_d1[15]) < (endPosCost_tem[15] + rdoqD64LastOne_tem[15] - rdoqD64LastZero_tem[15]) )begin
@@ -2069,12 +3067,68 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         else begin
                             endPosCost[15]       <=      endPosCost_tem[15];
                         end
+                        
+                        if(i_level_opt_d1[19])begin
+                            if(rdoq_last_y_tem[19] != -1)begin
+                                if( (tempCost_tem[19] + i_base_cost_buffer_tmp_d1[19] + i_d64_cost_last_one_d1[19] - i_d64_cost_last_zero_d1[19]) < (endPosCost_tem[19] + rdoqD64LastOne_tem[19] - rdoqD64LastZero_tem[19]) )begin
+                                    endPosCost[19]       <=      tempCost_tem[19] + i_base_cost_buffer_tmp_d1[19];
+                                end
+                                else begin
+                                    endPosCost[19]       <=      endPosCost_tem[19];
+                                end
+                            end
+                            else begin
+                                endPosCost[19]       <=      tempCost_tem[19] + i_base_cost_buffer_tmp_d1[19];
+                            end
+                        end
+                        else begin
+                            endPosCost[19]       <=      endPosCost_tem[19];
+                        end
+                        
+                        if(i_level_opt_d1[23])begin
+                            if(rdoq_last_y_tem[23] != -1)begin
+                                if( (tempCost_tem[23] + i_base_cost_buffer_tmp_d1[23] + i_d64_cost_last_one_d1[23] - i_d64_cost_last_zero_d1[23]) < (endPosCost_tem[23] + rdoqD64LastOne_tem[23] - rdoqD64LastZero_tem[23]) )begin
+                                    endPosCost[23]       <=      tempCost_tem[23] + i_base_cost_buffer_tmp_d1[23];
+                                end
+                                else begin
+                                    endPosCost[23]       <=      endPosCost_tem[23];
+                                end
+                            end
+                            else begin
+                                endPosCost[23]       <=      tempCost_tem[23] + i_base_cost_buffer_tmp_d1[23];
+                            end
+                        end
+                        else begin
+                            endPosCost[23]       <=      endPosCost_tem[23];
+                        end
+                        
+                        if(i_level_opt_d1[27])begin
+                            if(rdoq_last_y_tem[27] != -1)begin
+                                if( (tempCost_tem[27] + i_base_cost_buffer_tmp_d1[27] + i_d64_cost_last_one_d1[27] - i_d64_cost_last_zero_d1[27]) < (endPosCost_tem[27] + rdoqD64LastOne_tem[27] - rdoqD64LastZero_tem[27]) )begin
+                                    endPosCost[27]       <=      tempCost_tem[27] + i_base_cost_buffer_tmp_d1[27];
+                                end
+                                else begin
+                                    endPosCost[27]       <=      endPosCost_tem[27];
+                                end
+                            end
+                            else begin
+                                endPosCost[27]       <=      tempCost_tem[27] + i_base_cost_buffer_tmp_d1[27];
+                            end
+                        end
+                        else begin
+                            endPosCost[27]       <=      endPosCost_tem[27];
+                        end
+
                         endPosCost[31]      <=      i_level_opt_d1[31] != 0 ? i_base_cost_buffer_tmp_d1[31] : 0;
                     end
                 default : begin
                         endPosCost[ 3]      <=      0;
                         endPosCost[ 7]      <=      0;
+                        endPosCost[11]      <=      0;
                         endPosCost[15]      <=      0;
+                        endPosCost[19]      <=      0;
+                        endPosCost[23]      <=      0;
+                        endPosCost[27]      <=      0;
                         endPosCost[31]      <=      0;
                     end
             endcase
@@ -2111,7 +3165,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                 end
 
                 //odd rows except the last row of each matrix
-                for(i = 1; i < 3; i = i + 2)begin
+                for(i = 1; i < 3; i = i + 4)begin
                     if(i_level_opt_d1[i])begin
                         if(rdoq_last_y_tem[i] != -1)begin
                             if(tempCost_tem[i] - endPosCost_tem[i] + rdoqD64LastOne_tem[i] - i_d64_cost_last_one_d1[i] + i_d64_cost_last_zero_d1[i] - rdoqD64LastZero_tem[i] > 0)begin
@@ -2129,7 +3183,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         endPosCost[i]       <=      endPosCost_tem[i];
                     end
                 end
-                for(i = 5; i < 7; i = i + 2)begin
+                for(i = 5; i < 7; i = i + 4)begin
                     if(i_level_opt_d1[i])begin
                         if(rdoq_last_y_tem[i] != -1)begin
                             if(tempCost_tem[i] - endPosCost_tem[i] + rdoqD64LastOne_tem[i] - i_d64_cost_last_one_d1[i] + i_d64_cost_last_zero_d1[i] - rdoqD64LastZero_tem[i] > 0)begin
@@ -2147,7 +3201,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         endPosCost[i]       <=      endPosCost_tem[i];
                     end
                 end
-                for(i = 9; i < 15; i = i + 2)begin
+                for(i = 9; i < 15; i = i + 4)begin
                     if(i_level_opt_d1[i])begin
                         if(rdoq_last_y_tem[i] != -1)begin
                             if(tempCost_tem[i] - endPosCost_tem[i] + rdoqD64LastOne_tem[i] - i_d64_cost_last_one_d1[i] + i_d64_cost_last_zero_d1[i] - rdoqD64LastZero_tem[i] > 0)begin
@@ -2165,7 +3219,7 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                         endPosCost[i]       <=      endPosCost_tem[i];
                     end
                 end            
-                for(i = 17; i < 31; i = i + 2)begin
+                for(i = 17; i < 31; i = i + 4)begin
                     if(i_level_opt_d1[i])begin
                         if(rdoq_last_y_tem[i] != -1)begin
                             if(tempCost_tem[i] - endPosCost_tem[i] + rdoqD64LastOne_tem[i] - i_d64_cost_last_one_d1[i] + i_d64_cost_last_zero_d1[i] - rdoqD64LastZero_tem[i] > 0)begin
@@ -2186,70 +3240,87 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                 //determine the value of the last row 
                 case(i_height_log2_d1)
                     3'd2    : begin    
-                            endPosCost[ 3]      <=      i_level_opt_d1[ 3] == 0 ? i_base_cost_buffer_tmp_d1[ 3] : 0;
-                            endPosCost[ 7]      <=      0;//pending, not used
-                            endPosCost[15]      <=      0;//pending, not used
-                            endPosCost[31]      <=      0;//pending, not used
+                            for(i = 0; i < 8; i = i + 1)begin
+                                endPosCost[ 3 + i * 4]      <=      i_level_opt_d1[ 3 + i * 4] == 0 ? i_base_cost_buffer_tmp_d1[ 3 + i * 4] : 0;
+                            end
                         end
                     3'd3    : begin
-                            if(i_level_opt_d1[ 3])begin
-                                if(rdoq_last_y_tem[ 3] != -1)begin
-                                    if(tempCost_tem[ 3] - endPosCost_tem[ 3] + rdoqD64LastOne_tem[ 3] - i_d64_cost_last_one_d1[ 3] + i_d64_cost_last_zero_d1[ 3] - rdoqD64LastZero_tem[ 3] > 0)begin
-                                        endPosCost[ 3]       <=      tempCost_tem[ 3];
+                            for(i = 0; i < 4; i = i + 1)begin
+                                if(i_level_opt_d1[ 3 + i * 8])begin
+                                    if(rdoq_last_y_tem[ 3 + i * 8] != -1)begin
+                                        if(tempCost_tem[ 3 + i * 8] - endPosCost_tem[ 3 + i * 8] + rdoqD64LastOne_tem[ 3 + i * 8] - i_d64_cost_last_one_d1[ 3 + i * 8] + i_d64_cost_last_zero_d1[ 3 + i * 8] - rdoqD64LastZero_tem[ 3 + i * 8] > 0)begin
+                                            endPosCost[ 3 + i * 8]       <=      tempCost_tem[ 3 + i * 8];
+                                        end
+                                        else begin
+                                            endPosCost[ 3 + i * 8]       <=      endPosCost_tem[ 3 + i * 8];
+                                        end
                                     end
                                     else begin
-                                        endPosCost[ 3]       <=      endPosCost_tem[ 3];
+                                        endPosCost[ 3 + i * 8]       <=      tempCost_tem[ 3 + i * 8];
                                     end
                                 end
                                 else begin
-                                    endPosCost[ 3]       <=      tempCost_tem[ 3];
+                                    endPosCost[ 3 + i * 8]       <=      endPosCost_tem[ 3 + i * 8];
                                 end
-                            end
-                            else begin
-                                endPosCost[ 3]       <=      endPosCost_tem[ 3];
-                            end
 
-                            endPosCost[ 7]      <=      i_level_opt_d1[ 7] == 0 ? i_base_cost_buffer_tmp_d1[ 7] : 0;
-                            endPosCost[15]      <=      0;//pending, not used
-                            endPosCost[31]      <=      0;//pending, not used
+                                endPosCost[ 7 + i * 8]      <=      i_level_opt_d1[ 7 + i * 8] == 0 ? i_base_cost_buffer_tmp_d1[ 7 + i * 8] : 0;
+                            end
                         end
-                    3'd4    : begin
-                            if(i_level_opt_d1[ 3])begin
-                                if(rdoq_last_y_tem[ 3] != -1)begin
-                                    if(tempCost_tem[ 3] - endPosCost_tem[ 3] + rdoqD64LastOne_tem[ 3] - i_d64_cost_last_one_d1[ 3] + i_d64_cost_last_zero_d1[ 3] - rdoqD64LastZero_tem[ 3] > 0)begin
-                                        endPosCost[ 3]       <=      tempCost_tem[ 3];
+                    3'd4    : begin                            
+                            for(i = 0; i < 2; i = i + 1)begin
+                                if(i_level_opt_d1[ 3 + i * 16])begin
+                                    if(rdoq_last_y_tem[ 3 + i * 16] != -1)begin
+                                        if(tempCost_tem[ 3 + i * 16] - endPosCost_tem[ 3 + i * 16] + rdoqD64LastOne_tem[ 3 + i * 16] - i_d64_cost_last_one_d1[ 3 + i * 16] + i_d64_cost_last_zero_d1[ 3 + i * 16] - rdoqD64LastZero_tem[ 3 + i * 16] > 0)begin
+                                            endPosCost[ 3 + i * 16]       <=      tempCost_tem[ 3 + i * 16];
+                                        end
+                                        else begin
+                                            endPosCost[ 3 + i * 16]       <=      endPosCost_tem[ 3 + i * 16];
+                                        end
                                     end
                                     else begin
-                                        endPosCost[ 3]       <=      endPosCost_tem[ 3];
+                                        endPosCost[ 3 + i * 16]       <=      tempCost_tem[ 3 + i * 16];
                                     end
                                 end
                                 else begin
-                                    endPosCost[ 3]       <=      tempCost_tem[ 3];
+                                    endPosCost[ 3 + i * 16]       <=      endPosCost_tem[ 3 + i * 16];
                                 end
-                            end
-                            else begin
-                                endPosCost[ 3]       <=      endPosCost_tem[ 3];
-                            end
 
-                            if(i_level_opt_d1[ 7])begin
-                                if(rdoq_last_y_tem[ 7] != -1)begin
-                                    if(tempCost_tem[ 7] - endPosCost_tem[ 7] + rdoqD64LastOne_tem[ 7] - i_d64_cost_last_one_d1[ 7] + i_d64_cost_last_zero_d1[ 7] - rdoqD64LastZero_tem[ 7] > 0)begin
-                                        endPosCost[ 7]       <=      tempCost_tem[ 7];
+                                if(i_level_opt_d1[ 7 + i * 16])begin
+                                    if(rdoq_last_y_tem[ 7 + i * 16] != -1)begin
+                                        if(tempCost_tem[ 7 + i * 16] - endPosCost_tem[ 7 + i * 16] + rdoqD64LastOne_tem[ 7 + i * 16] - i_d64_cost_last_one_d1[ 7 + i * 16] + i_d64_cost_last_zero_d1[ 7 + i * 16] - rdoqD64LastZero_tem[ 7 + i * 16] > 0)begin
+                                            endPosCost[ 7 + i * 16]       <=      tempCost_tem[ 7 + i * 16];
+                                        end
+                                        else begin
+                                            endPosCost[ 7 + i * 16]       <=      endPosCost_tem[ 7 + i * 16];
+                                        end
                                     end
                                     else begin
-                                        endPosCost[ 7]       <=      endPosCost_tem[ 7];
+                                        endPosCost[ 7 + i * 16]       <=      tempCost_tem[ 7 + i * 16];
                                     end
                                 end
                                 else begin
-                                    endPosCost[ 7]       <=      tempCost_tem[ 7];
+                                    endPosCost[ 7 + i * 16]       <=      endPosCost_tem[ 7 + i * 16];
                                 end
-                            end
-                            else begin
-                                endPosCost[ 7]       <=      endPosCost_tem[ 7];
-                            end
 
-                            endPosCost[15]      <=      i_level_opt_d1[15] == 0 ? i_base_cost_buffer_tmp_d1[15] : 0;
-                            endPosCost[31]      <=      0;//pending, not used
+                                if(i_level_opt_d1[11+ i * 16])begin
+                                    if(rdoq_last_y_tem[11+ i * 16] != -1)begin
+                                        if(tempCost_tem[11+ i * 16] - endPosCost_tem[11+ i * 16] + rdoqD64LastOne_tem[11+ i * 16] - i_d64_cost_last_one_d1[11+ i * 16] + i_d64_cost_last_zero_d1[11+ i * 16] - rdoqD64LastZero_tem[11+ i * 16] > 0)begin
+                                            endPosCost[11+ i * 16]       <=      tempCost_tem[11+ i * 16];
+                                        end
+                                        else begin
+                                            endPosCost[11+ i * 16]       <=      endPosCost_tem[11+ i * 16];
+                                        end
+                                    end
+                                    else begin
+                                        endPosCost[11+ i * 16]       <=      tempCost_tem[11+ i * 16];
+                                    end
+                                end
+                                else begin
+                                    endPosCost[11+ i * 16]       <=      endPosCost_tem[11+ i * 16];
+                                end
+
+                                endPosCost[15 + i * 16]      <=      i_level_opt_d1[15 + i * 16] == 0 ? i_base_cost_buffer_tmp_d1[15 + i * 16] : 0;
+                            end
                         end
                     3'd5    : begin
                             if(i_level_opt_d1[ 3])begin
@@ -2286,6 +3357,23 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                                 endPosCost[ 7]       <=      endPosCost_tem[ 7];
                             end
 
+                            if(i_level_opt_d1[11])begin
+                                if(rdoq_last_y_tem[11] != -1)begin
+                                    if(tempCost_tem[11] - endPosCost_tem[11] + rdoqD64LastOne_tem[11] - i_d64_cost_last_one_d1[11] + i_d64_cost_last_zero_d1[11] - rdoqD64LastZero_tem[11] > 0)begin
+                                        endPosCost[11]       <=      tempCost_tem[11];
+                                    end
+                                    else begin
+                                        endPosCost[11]       <=      endPosCost_tem[11];
+                                    end
+                                end
+                                else begin
+                                    endPosCost[11]       <=      tempCost_tem[11];
+                                end
+                            end
+                            else begin
+                                endPosCost[11]       <=      endPosCost_tem[11];
+                            end
+
                             if(i_level_opt_d1[15])begin
                                 if(rdoq_last_y_tem[15] != -1)begin
                                     if(tempCost_tem[15] - endPosCost_tem[15] + rdoqD64LastOne_tem[15] - i_d64_cost_last_one_d1[15] + i_d64_cost_last_zero_d1[15] - rdoqD64LastZero_tem[15] > 0)begin
@@ -2303,19 +3391,73 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
                                 endPosCost[15]       <=      endPosCost_tem[15];
                             end
 
+                            if(i_level_opt_d1[19])begin
+                                if(rdoq_last_y_tem[19] != -1)begin
+                                    if(tempCost_tem[19] - endPosCost_tem[19] + rdoqD64LastOne_tem[19] - i_d64_cost_last_one_d1[19] + i_d64_cost_last_zero_d1[19] - rdoqD64LastZero_tem[19] > 0)begin
+                                        endPosCost[19]       <=      tempCost_tem[19];
+                                    end
+                                    else begin
+                                        endPosCost[19]       <=      endPosCost_tem[19];
+                                    end
+                                end
+                                else begin
+                                    endPosCost[19]       <=      tempCost_tem[19];
+                                end
+                            end
+                            else begin
+                                endPosCost[19]       <=      endPosCost_tem[19];
+                            end
+
+                            if(i_level_opt_d1[23])begin
+                                if(rdoq_last_y_tem[23] != -1)begin
+                                    if(tempCost_tem[23] - endPosCost_tem[23] + rdoqD64LastOne_tem[23] - i_d64_cost_last_one_d1[23] + i_d64_cost_last_zero_d1[23] - rdoqD64LastZero_tem[23] > 0)begin
+                                        endPosCost[23]       <=      tempCost_tem[23];
+                                    end
+                                    else begin
+                                        endPosCost[23]       <=      endPosCost_tem[23];
+                                    end
+                                end
+                                else begin
+                                    endPosCost[23]       <=      tempCost_tem[23];
+                                end
+                            end
+                            else begin
+                                endPosCost[23]       <=      endPosCost_tem[23];
+                            end
+
+                            if(i_level_opt_d1[27])begin
+                                if(rdoq_last_y_tem[27] != -1)begin
+                                    if(tempCost_tem[27] - endPosCost_tem[27] + rdoqD64LastOne_tem[27] - i_d64_cost_last_one_d1[27] + i_d64_cost_last_zero_d1[27] - rdoqD64LastZero_tem[27] > 0)begin
+                                        endPosCost[27]       <=      tempCost_tem[27];
+                                    end
+                                    else begin
+                                        endPosCost[27]       <=      endPosCost_tem[27];
+                                    end
+                                end
+                                else begin
+                                    endPosCost[27]       <=      tempCost_tem[27];
+                                end
+                            end
+                            else begin
+                                endPosCost[27]       <=      endPosCost_tem[27];
+                            end
+
                             endPosCost[31]      <=      i_level_opt_d1[31] == 0 ? i_base_cost_buffer_tmp_d1[31] : 0;
                         end
                     default : begin
-                            endPosCost[ 3]      <=      0;
-                            endPosCost[ 7]      <=      0;
+                            endPosCost[3 ]      <=      0;
+                            endPosCost[7 ]      <=      0;
+                            endPosCost[11]      <=      0;
                             endPosCost[15]      <=      0;
+                            endPosCost[19]      <=      0;
+                            endPosCost[23]      <=      0;
+                            endPosCost[27]      <=      0;
                             endPosCost[31]      <=      0;
                         end
                 endcase
             end
         end
     end
-
 
     assign  temp_RdoqCost_top   =   final_rdoq_cost_top + tempCost[0] - endPosCost[0] - rdoqD64LastZero[0];
 
@@ -2527,127 +3669,165 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
 
 //16x16
     initial begin 
-    integer fp_tempCost_w1;
-    integer wr_tempCost_j,wr_tempCost_k;
-    reg     signed  [63: 0]     tempCost_data        [0 : 63]    ;
-        #20;
-        fp_tempCost_w1 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_16x16.txt", "w");
-        for (wr_tempCost_j = 0; wr_tempCost_j < 16; wr_tempCost_j = wr_tempCost_j + 1) begin
-            for (wr_tempCost_k = 0; wr_tempCost_k < 16; wr_tempCost_k = wr_tempCost_k + 1) begin
-                tempCost_data[wr_tempCost_k] = tempCost[wr_tempCost_k];
-            end
-            #2;
-            $fwrite(fp_tempCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-                tempCost_data[0 ], tempCost_data[1 ], tempCost_data[2 ], tempCost_data[3 ], tempCost_data[4 ], tempCost_data[5 ], tempCost_data[6 ], tempCost_data[7 ], 
-                tempCost_data[8 ], tempCost_data[9 ], tempCost_data[10], tempCost_data[11], tempCost_data[12], tempCost_data[13], tempCost_data[14], tempCost_data[15]);
-        end
-        $fclose(fp_tempCost_w1);
-    end
-
-
-    initial begin 
-    integer fp_rdoqD64LastOne_w1;
-    integer wr_rdoqD64LastOne_j,wr_rdoqD64LastOne_k;
-    reg     signed  [63: 0]     rdoqD64LastOne_data        [0 : 63]    ;
-        #20;
-        fp_rdoqD64LastOne_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_16x16.txt", "w");
-        for (wr_rdoqD64LastOne_j = 0; wr_rdoqD64LastOne_j < 16; wr_rdoqD64LastOne_j = wr_rdoqD64LastOne_j + 1) begin
-            for (wr_rdoqD64LastOne_k = 0; wr_rdoqD64LastOne_k < 16; wr_rdoqD64LastOne_k = wr_rdoqD64LastOne_k + 1) begin
-                rdoqD64LastOne_data[wr_rdoqD64LastOne_k] = rdoqD64LastOne[wr_rdoqD64LastOne_k];
-            end
-            #2;
-            $fwrite(fp_rdoqD64LastOne_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-                rdoqD64LastOne_data[0 ], rdoqD64LastOne_data[1 ], rdoqD64LastOne_data[2 ], rdoqD64LastOne_data[3 ], rdoqD64LastOne_data[4 ], rdoqD64LastOne_data[5 ], rdoqD64LastOne_data[6 ], rdoqD64LastOne_data[7 ], 
-                rdoqD64LastOne_data[8 ], rdoqD64LastOne_data[9 ], rdoqD64LastOne_data[10], rdoqD64LastOne_data[11], rdoqD64LastOne_data[12], rdoqD64LastOne_data[13], rdoqD64LastOne_data[14], rdoqD64LastOne_data[15]);
-        end
-        $fclose(fp_rdoqD64LastOne_w1);
-    end
-
-    initial begin 
-    integer fp_rdoqD64LastZero_w1;
-    integer wr_rdoqD64LastZero_j,wr_rdoqD64LastZero_k;
-    reg     signed  [63: 0]     rdoqD64LastZero_data        [0 : 63]    ;
-        #20;
-        fp_rdoqD64LastZero_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_16x16.txt", "w");
-        for (wr_rdoqD64LastZero_j = 0; wr_rdoqD64LastZero_j < 16; wr_rdoqD64LastZero_j = wr_rdoqD64LastZero_j + 1) begin
-            for (wr_rdoqD64LastZero_k = 0; wr_rdoqD64LastZero_k < 16; wr_rdoqD64LastZero_k = wr_rdoqD64LastZero_k + 1) begin
-                rdoqD64LastZero_data[wr_rdoqD64LastZero_k] = rdoqD64LastZero[wr_rdoqD64LastZero_k];
-            end
-            #2;
-            $fwrite(fp_rdoqD64LastZero_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-                rdoqD64LastZero_data[0 ], rdoqD64LastZero_data[1 ], rdoqD64LastZero_data[2 ], rdoqD64LastZero_data[3 ], rdoqD64LastZero_data[4 ], rdoqD64LastZero_data[5 ], rdoqD64LastZero_data[6 ], rdoqD64LastZero_data[7 ], 
-                rdoqD64LastZero_data[8 ], rdoqD64LastZero_data[9 ], rdoqD64LastZero_data[10], rdoqD64LastZero_data[11], rdoqD64LastZero_data[12], rdoqD64LastZero_data[13], rdoqD64LastZero_data[14], rdoqD64LastZero_data[15]);
-        end
-        $fclose(fp_rdoqD64LastZero_w1);
-    end
-
-
-    initial begin 
-    integer fp_endPosCost_w1;
+    integer fp_endPosCost_w0,fp_endPosCost_w1;
     integer wr_endPosCost_j,wr_endPosCost_k;
     reg     signed  [63: 0]     endPosCost_data        [0 : 63]    ;
+    integer fp_tempCost_w0,fp_tempCost_w1;
+    integer wr_tempCost_j,wr_tempCost_k;
+    reg     signed  [63: 0]     tempCost_data        [0 : 63]    ;
+    reg     column_count;
         #20;
-        fp_endPosCost_w1 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_16x16.txt", "w");
-        for (wr_endPosCost_j = 0; wr_endPosCost_j < 16; wr_endPosCost_j = wr_endPosCost_j + 1) begin
-            for (wr_endPosCost_k = 0; wr_endPosCost_k < 16; wr_endPosCost_k = wr_endPosCost_k + 1) begin
-                endPosCost_data[wr_endPosCost_k] = endPosCost[wr_endPosCost_k];
+        fp_tempCost_w0 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_16x16_0.txt", "w");
+        fp_tempCost_w1 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_16x16_1.txt", "w");
+        fp_endPosCost_w0 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_16x16_0.txt", "w");
+        fp_endPosCost_w1 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_16x16_1.txt", "w");
+        column_count  <=  0;
+        for (wr_tempCost_j = 0; wr_tempCost_j < 16; wr_tempCost_j = wr_tempCost_j + 1) begin
+            for (wr_tempCost_k = 0; wr_tempCost_k < 32; wr_tempCost_k = wr_tempCost_k + 1) begin
+                tempCost_data[wr_tempCost_k]    = tempCost[wr_tempCost_k];
+                endPosCost_data[wr_tempCost_k]  = endPosCost[wr_tempCost_k];
             end
             #2;
-            $fwrite(fp_endPosCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-                endPosCost_data[0 ], endPosCost_data[1 ], endPosCost_data[2 ], endPosCost_data[3 ], endPosCost_data[4 ], endPosCost_data[5 ], endPosCost_data[6 ], endPosCost_data[7 ], 
-                endPosCost_data[8 ], endPosCost_data[9 ], endPosCost_data[10], endPosCost_data[11], endPosCost_data[12], endPosCost_data[13], endPosCost_data[14], endPosCost_data[15]);
+            $fwrite(fp_tempCost_w0, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                tempCost_data[0 ], tempCost_data[1 ], tempCost_data[2 ], tempCost_data[3 ], tempCost_data[4 ], tempCost_data[5 ], tempCost_data[6 ], tempCost_data[7 ], 
+                tempCost_data[8 ], tempCost_data[9 ], tempCost_data[10], tempCost_data[11], tempCost_data[12], tempCost_data[13], tempCost_data[14], tempCost_data[15]);
+            $fwrite(fp_tempCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                tempCost_data[16], tempCost_data[17], tempCost_data[18], tempCost_data[19], tempCost_data[20], tempCost_data[21], tempCost_data[22], tempCost_data[23], 
+                tempCost_data[24], tempCost_data[25], tempCost_data[26], tempCost_data[27], tempCost_data[28], tempCost_data[29], tempCost_data[30], tempCost_data[31]);
+            if(column_count % 2)begin
+                $fwrite(fp_endPosCost_w0, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                    tempCost_data[0 ] - endPosCost_data[0 ], endPosCost_data[1 ], endPosCost_data[2 ], endPosCost_data[3 ], endPosCost_data[4 ], endPosCost_data[5 ], endPosCost_data[6 ], endPosCost_data[7 ], 
+                    endPosCost_data[8 ], endPosCost_data[9 ], endPosCost_data[10], endPosCost_data[11], endPosCost_data[12], endPosCost_data[13], endPosCost_data[14], endPosCost_data[15]);
+                $fwrite(fp_endPosCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                    tempCost_data[16] - endPosCost_data[16], endPosCost_data[17], endPosCost_data[18], endPosCost_data[19], endPosCost_data[20], endPosCost_data[21], endPosCost_data[22], endPosCost_data[23], 
+                    endPosCost_data[24], endPosCost_data[25], endPosCost_data[26], endPosCost_data[27], endPosCost_data[28], endPosCost_data[29], endPosCost_data[30], endPosCost_data[31]);
+            end
+            else begin
+                $fwrite(fp_endPosCost_w0, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                    endPosCost_data[0 ], endPosCost_data[1 ], endPosCost_data[2 ], endPosCost_data[3 ], endPosCost_data[4 ], endPosCost_data[5 ], endPosCost_data[6 ], endPosCost_data[7 ], 
+                    endPosCost_data[8 ], endPosCost_data[9 ], endPosCost_data[10], endPosCost_data[11], endPosCost_data[12], endPosCost_data[13], endPosCost_data[14], endPosCost_data[15]);
+                $fwrite(fp_endPosCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                    endPosCost_data[16], endPosCost_data[17], endPosCost_data[18], endPosCost_data[19], endPosCost_data[20], endPosCost_data[21], endPosCost_data[22], endPosCost_data[23], 
+                    endPosCost_data[24], endPosCost_data[25], endPosCost_data[26], endPosCost_data[27], endPosCost_data[28], endPosCost_data[29], endPosCost_data[30], endPosCost_data[31]);
+            end
+            column_count  <=  column_count + 1;
         end
+        $fclose(fp_tempCost_w0);
+        $fclose(fp_tempCost_w1);
+        $fclose(fp_endPosCost_w0);
         $fclose(fp_endPosCost_w1);
     end
 
     initial begin 
-    integer fp_rdoq_last_x_w1;
-    integer wr_rdoq_last_x_j,wr_rdoq_last_x_k;
-    reg     signed  [63: 0]     rdoq_last_x_data        [0 : 63]    ;
+    integer fp_rdoqD64LastOne_w0,fp_rdoqD64LastOne_w1;
+    integer wr_rdoqD64LastOne_j,wr_rdoqD64LastOne_k;
+    reg     signed  [63: 0]     rdoqD64LastOne_data        [0 : 63]    ;
         #20;
-        fp_rdoq_last_x_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_16x16.txt", "w");
-        for (wr_rdoq_last_x_j = 0; wr_rdoq_last_x_j < 16; wr_rdoq_last_x_j = wr_rdoq_last_x_j + 1) begin
-            for (wr_rdoq_last_x_k = 0; wr_rdoq_last_x_k < 16; wr_rdoq_last_x_k = wr_rdoq_last_x_k + 1) begin
-                rdoq_last_x_data[wr_rdoq_last_x_k] = rdoq_last_x[wr_rdoq_last_x_k];
+        fp_rdoqD64LastOne_w0 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_16x16_0.txt", "w");
+        fp_rdoqD64LastOne_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_16x16_1.txt", "w");
+        for (wr_rdoqD64LastOne_j = 0; wr_rdoqD64LastOne_j < 16; wr_rdoqD64LastOne_j = wr_rdoqD64LastOne_j + 1) begin
+            for (wr_rdoqD64LastOne_k = 0; wr_rdoqD64LastOne_k < 32; wr_rdoqD64LastOne_k = wr_rdoqD64LastOne_k + 1) begin
+                rdoqD64LastOne_data[wr_rdoqD64LastOne_k] = rdoqD64LastOne[wr_rdoqD64LastOne_k];
             end
             #2;
-            $fwrite(fp_rdoq_last_x_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-                rdoq_last_x_data[0 ], rdoq_last_x_data[1 ], rdoq_last_x_data[2 ], rdoq_last_x_data[3 ], rdoq_last_x_data[4 ], rdoq_last_x_data[5 ], rdoq_last_x_data[6 ], rdoq_last_x_data[7 ], 
-                rdoq_last_x_data[8 ], rdoq_last_x_data[9 ], rdoq_last_x_data[10], rdoq_last_x_data[11], rdoq_last_x_data[12], rdoq_last_x_data[13], rdoq_last_x_data[14], rdoq_last_x_data[15]);
+            $fwrite(fp_rdoqD64LastOne_w0, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoqD64LastOne_data[0 ], rdoqD64LastOne_data[1 ], rdoqD64LastOne_data[2 ], rdoqD64LastOne_data[3 ], rdoqD64LastOne_data[4 ], rdoqD64LastOne_data[5 ], rdoqD64LastOne_data[6 ], rdoqD64LastOne_data[7 ], 
+                rdoqD64LastOne_data[8 ], rdoqD64LastOne_data[9 ], rdoqD64LastOne_data[10], rdoqD64LastOne_data[11], rdoqD64LastOne_data[12], rdoqD64LastOne_data[13], rdoqD64LastOne_data[14], rdoqD64LastOne_data[15]);
+            $fwrite(fp_rdoqD64LastOne_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoqD64LastOne_data[16], rdoqD64LastOne_data[17], rdoqD64LastOne_data[18], rdoqD64LastOne_data[19], rdoqD64LastOne_data[20], rdoqD64LastOne_data[21], rdoqD64LastOne_data[22], rdoqD64LastOne_data[23], 
+                rdoqD64LastOne_data[24], rdoqD64LastOne_data[25], rdoqD64LastOne_data[26], rdoqD64LastOne_data[27], rdoqD64LastOne_data[28], rdoqD64LastOne_data[29], rdoqD64LastOne_data[30], rdoqD64LastOne_data[31]);
         end
-        $fclose(fp_rdoq_last_x_w1);
+        $fclose(fp_rdoqD64LastOne_w0);
+        $fclose(fp_rdoqD64LastOne_w1);
     end
 
     initial begin 
-    integer fp_rdoq_last_y_w1;
-    integer wr_rdoq_last_y_j,wr_rdoq_last_y_k;
-    reg     signed  [63: 0]     rdoq_last_y_data        [0 : 63]    ;
+    integer fp_rdoqD64LastZero_w0,fp_rdoqD64LastZero_w1;
+    integer wr_rdoqD64LastZero_j,wr_rdoqD64LastZero_k;
+    reg     signed  [63: 0]     rdoqD64LastZero_data        [0 : 63]    ;
         #20;
-        fp_rdoq_last_y_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_16x16.txt", "w");
-        for (wr_rdoq_last_y_j = 0; wr_rdoq_last_y_j < 16; wr_rdoq_last_y_j = wr_rdoq_last_y_j + 1) begin
-            for (wr_rdoq_last_y_k = 0; wr_rdoq_last_y_k < 16; wr_rdoq_last_y_k = wr_rdoq_last_y_k + 1) begin
-                rdoq_last_y_data[wr_rdoq_last_y_k] = rdoq_last_y[wr_rdoq_last_y_k];
+        fp_rdoqD64LastZero_w0 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_16x16_0.txt", "w");
+        fp_rdoqD64LastZero_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_16x16_1.txt", "w");
+        for (wr_rdoqD64LastZero_j = 0; wr_rdoqD64LastZero_j < 16; wr_rdoqD64LastZero_j = wr_rdoqD64LastZero_j + 1) begin
+            for (wr_rdoqD64LastZero_k = 0; wr_rdoqD64LastZero_k < 32; wr_rdoqD64LastZero_k = wr_rdoqD64LastZero_k + 1) begin
+                rdoqD64LastZero_data[wr_rdoqD64LastZero_k] = rdoqD64LastZero[wr_rdoqD64LastZero_k];
             end
             #2;
-            $fwrite(fp_rdoq_last_y_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-                rdoq_last_y_data[0 ], rdoq_last_y_data[1 ], rdoq_last_y_data[2 ], rdoq_last_y_data[3 ], rdoq_last_y_data[4 ], rdoq_last_y_data[5 ], rdoq_last_y_data[6 ], rdoq_last_y_data[7 ], 
-                rdoq_last_y_data[8 ], rdoq_last_y_data[9 ], rdoq_last_y_data[10], rdoq_last_y_data[11], rdoq_last_y_data[12], rdoq_last_y_data[13], rdoq_last_y_data[14], rdoq_last_y_data[15]);
+            $fwrite(fp_rdoqD64LastZero_w0, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoqD64LastZero_data[0 ], rdoqD64LastZero_data[1 ], rdoqD64LastZero_data[2 ], rdoqD64LastZero_data[3 ], rdoqD64LastZero_data[4 ], rdoqD64LastZero_data[5 ], rdoqD64LastZero_data[6 ], rdoqD64LastZero_data[7 ], 
+                rdoqD64LastZero_data[8 ], rdoqD64LastZero_data[9 ], rdoqD64LastZero_data[10], rdoqD64LastZero_data[11], rdoqD64LastZero_data[12], rdoqD64LastZero_data[13], rdoqD64LastZero_data[14], rdoqD64LastZero_data[15]);
+            $fwrite(fp_rdoqD64LastZero_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoqD64LastZero_data[16], rdoqD64LastZero_data[17], rdoqD64LastZero_data[18], rdoqD64LastZero_data[19], rdoqD64LastZero_data[20], rdoqD64LastZero_data[21], rdoqD64LastZero_data[22], rdoqD64LastZero_data[23], 
+                rdoqD64LastZero_data[24], rdoqD64LastZero_data[25], rdoqD64LastZero_data[26], rdoqD64LastZero_data[27], rdoqD64LastZero_data[28], rdoqD64LastZero_data[29], rdoqD64LastZero_data[30], rdoqD64LastZero_data[31]);
         end
-        $fclose(fp_rdoq_last_y_w1);
+        $fclose(fp_rdoqD64LastZero_w0);
+        $fclose(fp_rdoqD64LastZero_w1);
+    end
+
+    initial begin 
+    integer fp_rdoq_last_x_w0,fp_rdoq_last_x_w1;
+    integer wr_rdoq_last_x_j,wr_rdoq_last_x_k;
+    reg     signed  [63: 0]     rdoq_last_x_data        [0 : 63]    ;
+        #20;
+        fp_rdoq_last_x_w0 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_16x16_0.txt", "w");
+        fp_rdoq_last_x_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_16x16_1.txt", "w");
+        for (wr_rdoq_last_x_j = 0; wr_rdoq_last_x_j < 16; wr_rdoq_last_x_j = wr_rdoq_last_x_j + 1) begin
+            for (wr_rdoq_last_x_k = 0; wr_rdoq_last_x_k < 32; wr_rdoq_last_x_k = wr_rdoq_last_x_k + 1) begin
+                rdoq_last_x_data[wr_rdoq_last_x_k] = rdoq_last_x[wr_rdoq_last_x_k];
+            end
+            #2;
+            $fwrite(fp_rdoq_last_x_w0, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoq_last_x_data[0 ], rdoq_last_x_data[1 ], rdoq_last_x_data[2 ], rdoq_last_x_data[3 ], rdoq_last_x_data[4 ], rdoq_last_x_data[5 ], rdoq_last_x_data[6 ], rdoq_last_x_data[7 ], 
+                rdoq_last_x_data[8 ], rdoq_last_x_data[9 ], rdoq_last_x_data[10], rdoq_last_x_data[11], rdoq_last_x_data[12], rdoq_last_x_data[13], rdoq_last_x_data[14], rdoq_last_x_data[15]);
+            $fwrite(fp_rdoq_last_x_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoq_last_x_data[16], rdoq_last_x_data[17], rdoq_last_x_data[18], rdoq_last_x_data[19], rdoq_last_x_data[20], rdoq_last_x_data[21], rdoq_last_x_data[22], rdoq_last_x_data[23], 
+                rdoq_last_x_data[24], rdoq_last_x_data[25], rdoq_last_x_data[26], rdoq_last_x_data[27], rdoq_last_x_data[28], rdoq_last_x_data[29], rdoq_last_x_data[30], rdoq_last_x_data[31]);
+        end
+        $fclose(fp_rdoq_last_x_w0);
+        $fclose(fp_rdoq_last_x_w1);
     end
 
 
+    initial begin 
+    integer fp_rdoq_last_y_w0,fp_rdoq_last_y_w1;
+    integer wr_rdoq_last_y_j,wr_rdoq_last_y_k;
+    reg     signed  [63: 0]     rdoq_last_y_data        [0 : 63]    ;
+        #20;
+        fp_rdoq_last_y_w0 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_16x16_0.txt", "w");
+        fp_rdoq_last_y_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_16x16_1.txt", "w");
+        for (wr_rdoq_last_y_j = 0; wr_rdoq_last_y_j < 16; wr_rdoq_last_y_j = wr_rdoq_last_y_j + 1) begin
+            for (wr_rdoq_last_y_k = 0; wr_rdoq_last_y_k < 32; wr_rdoq_last_y_k = wr_rdoq_last_y_k + 1) begin
+                rdoq_last_y_data[wr_rdoq_last_y_k] = rdoq_last_y[wr_rdoq_last_y_k];
+            end
+            #2;
+            $fwrite(fp_rdoq_last_y_w0, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoq_last_y_data[0 ], rdoq_last_y_data[1 ], rdoq_last_y_data[2 ], rdoq_last_y_data[3 ], rdoq_last_y_data[4 ], rdoq_last_y_data[5 ], rdoq_last_y_data[6 ], rdoq_last_y_data[7 ], 
+                rdoq_last_y_data[8 ], rdoq_last_y_data[9 ], rdoq_last_y_data[10], rdoq_last_y_data[11], rdoq_last_y_data[12], rdoq_last_y_data[13], rdoq_last_y_data[14], rdoq_last_y_data[15]);
+            $fwrite(fp_rdoq_last_y_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoq_last_y_data[16], rdoq_last_y_data[17], rdoq_last_y_data[18], rdoq_last_y_data[19], rdoq_last_y_data[20], rdoq_last_y_data[21], rdoq_last_y_data[22], rdoq_last_y_data[23], 
+                rdoq_last_y_data[24], rdoq_last_y_data[25], rdoq_last_y_data[26], rdoq_last_y_data[27], rdoq_last_y_data[28], rdoq_last_y_data[29], rdoq_last_y_data[30], rdoq_last_y_data[31]);
+        end
+        $fclose(fp_rdoq_last_y_w0);
+        $fclose(fp_rdoq_last_y_w1);
+    end
 
 //32x32
     initial begin 
     integer fp_tempCost_w1;
     integer wr_tempCost_j,wr_tempCost_k;
-    reg     signed  [63: 0]     tempCost_data        [0 : 63]    ;
+    integer fp_endPosCost_w1;
+    integer wr_endPosCost_j,wr_endPosCost_k;
+    reg     signed  [63: 0]     tempCost_data       [0 : 63]    ;
+    reg     signed  [63: 0]     endPosCost_data     [0 : 63]    ;
+    reg             [5 : 0]     column_count                    ;
         #52;
-        fp_tempCost_w1 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_32x32.txt", "w");
+        fp_tempCost_w1      = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_32x32.txt", "w");
+        fp_endPosCost_w1    = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_32x32.txt", "w");
+        column_count        <=  0;
         for (wr_tempCost_j = 0; wr_tempCost_j < 32; wr_tempCost_j = wr_tempCost_j + 1) begin
             for (wr_tempCost_k = 0; wr_tempCost_k < 32; wr_tempCost_k = wr_tempCost_k + 1) begin
                 tempCost_data[wr_tempCost_k] = tempCost[wr_tempCost_k];
+                endPosCost_data[wr_tempCost_k] = endPosCost[wr_tempCost_k];
             end
             #2;
             $fwrite(fp_tempCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
@@ -2655,8 +3835,24 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
             tempCost_data[8 ], tempCost_data[9 ], tempCost_data[10], tempCost_data[11], tempCost_data[12], tempCost_data[13], tempCost_data[14], tempCost_data[15], 
             tempCost_data[16], tempCost_data[17], tempCost_data[18], tempCost_data[19], tempCost_data[20], tempCost_data[21], tempCost_data[22], tempCost_data[23], 
             tempCost_data[24], tempCost_data[25], tempCost_data[26], tempCost_data[27], tempCost_data[28], tempCost_data[29], tempCost_data[30], tempCost_data[31]);
+            if(column_count % 2)begin
+                $fwrite(fp_endPosCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                tempCost_data[0 ] - endPosCost_data[0 ], endPosCost_data[1 ], endPosCost_data[2 ], endPosCost_data[3 ], endPosCost_data[4 ], endPosCost_data[5 ], endPosCost_data[6 ], endPosCost_data[7 ],
+                endPosCost_data[8 ], endPosCost_data[9 ], endPosCost_data[10], endPosCost_data[11], endPosCost_data[12], endPosCost_data[13], endPosCost_data[14], endPosCost_data[15], 
+                endPosCost_data[16], endPosCost_data[17], endPosCost_data[18], endPosCost_data[19], endPosCost_data[20], endPosCost_data[21], endPosCost_data[22], endPosCost_data[23], 
+                endPosCost_data[24], endPosCost_data[25], endPosCost_data[26], endPosCost_data[27], endPosCost_data[28], endPosCost_data[29], endPosCost_data[30], endPosCost_data[31]);
+            end
+            else begin
+                $fwrite(fp_endPosCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                endPosCost_data[0 ], endPosCost_data[1 ], endPosCost_data[2 ], endPosCost_data[3 ], endPosCost_data[4 ], endPosCost_data[5 ], endPosCost_data[6 ], endPosCost_data[7 ],
+                endPosCost_data[8 ], endPosCost_data[9 ], endPosCost_data[10], endPosCost_data[11], endPosCost_data[12], endPosCost_data[13], endPosCost_data[14], endPosCost_data[15], 
+                endPosCost_data[16], endPosCost_data[17], endPosCost_data[18], endPosCost_data[19], endPosCost_data[20], endPosCost_data[21], endPosCost_data[22], endPosCost_data[23], 
+                endPosCost_data[24], endPosCost_data[25], endPosCost_data[26], endPosCost_data[27], endPosCost_data[28], endPosCost_data[29], endPosCost_data[30], endPosCost_data[31]);
+            end
+            column_count        <=  column_count + 1;
         end
         $fclose(fp_tempCost_w1);
+        $fclose(fp_endPosCost_w1);
     end
 
 
@@ -2702,26 +3898,6 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
 
 
     initial begin 
-    integer fp_endPosCost_w1;
-    integer wr_endPosCost_j,wr_endPosCost_k;
-    reg     signed  [63: 0]     endPosCost_data        [0 : 63]    ;
-        #52;
-        fp_endPosCost_w1 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_32x32.txt", "w");
-        for (wr_endPosCost_j = 0; wr_endPosCost_j < 32; wr_endPosCost_j = wr_endPosCost_j + 1) begin
-            for (wr_endPosCost_k = 0; wr_endPosCost_k < 32; wr_endPosCost_k = wr_endPosCost_k + 1) begin
-                endPosCost_data[wr_endPosCost_k] = endPosCost[wr_endPosCost_k];
-            end
-            #2;
-            $fwrite(fp_endPosCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d %6d \n", 
-            endPosCost_data[0 ], endPosCost_data[1 ], endPosCost_data[2 ], endPosCost_data[3 ], endPosCost_data[4 ], endPosCost_data[5 ], endPosCost_data[6 ], endPosCost_data[7 ],
-            endPosCost_data[8 ], endPosCost_data[9 ], endPosCost_data[10], endPosCost_data[11], endPosCost_data[12], endPosCost_data[13], endPosCost_data[14], endPosCost_data[15], 
-            endPosCost_data[16], endPosCost_data[17], endPosCost_data[18], endPosCost_data[19], endPosCost_data[20], endPosCost_data[21], endPosCost_data[22], endPosCost_data[23], 
-            endPosCost_data[24], endPosCost_data[25], endPosCost_data[26], endPosCost_data[27], endPosCost_data[28], endPosCost_data[29], endPosCost_data[30], endPosCost_data[31]);
-        end
-        $fclose(fp_endPosCost_w1);
-    end
-
-    initial begin 
     integer fp_rdoq_last_x_w1;
     integer wr_rdoq_last_x_j,wr_rdoq_last_x_k;
     reg     signed  [63: 0]     rdoq_last_x_data        [0 : 63]    ;
@@ -2761,224 +3937,475 @@ assign  o_d64_best_cost_tmp     =       d64_best_cost_tmp_left_d[31];
         $fclose(fp_rdoq_last_y_w1);
     end
 
-
-
 //8x8
     initial begin 
-    integer fp_tempCost_w1;
+    integer fp_endPosCost_w0,fp_endPosCost_w1,fp_endPosCost_w2,fp_endPosCost_w3;
+    integer wr_endPosCost_j,wr_endPosCost_k;
+    reg     signed  [63: 0]     endPosCost_data        [0 : 63]    ;
+    integer fp_tempCost_w0,fp_tempCost_w1,fp_tempCost_w2,fp_tempCost_w3;
     integer wr_tempCost_j,wr_tempCost_k;
     reg     signed  [63: 0]     tempCost_data        [0 : 63]    ;
+    reg     column_count;
         #116;
-        fp_tempCost_w1 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_8x8.txt", "w");
+        fp_tempCost_w0 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_8x8_0.txt", "w");
+        fp_tempCost_w1 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_8x8_1.txt", "w");
+        fp_tempCost_w2 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_8x8_2.txt", "w");
+        fp_tempCost_w3 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_8x8_3.txt", "w");
+        fp_endPosCost_w0 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_8x8_0.txt", "w");
+        fp_endPosCost_w1 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_8x8_1.txt", "w");
+        fp_endPosCost_w2 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_8x8_2.txt", "w");
+        fp_endPosCost_w3 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_8x8_3.txt", "w");
+        column_count    <=  0;
         for (wr_tempCost_j = 0; wr_tempCost_j < 8; wr_tempCost_j = wr_tempCost_j + 1) begin
-            for (wr_tempCost_k = 0; wr_tempCost_k < 8; wr_tempCost_k = wr_tempCost_k + 1) begin
+            for (wr_tempCost_k = 0; wr_tempCost_k < 32; wr_tempCost_k = wr_tempCost_k + 1) begin
                 tempCost_data[wr_tempCost_k] = tempCost[wr_tempCost_k];
+                endPosCost_data[wr_tempCost_k] = endPosCost[wr_tempCost_k];
             end
             #2;
-            $fwrite(fp_tempCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            $fwrite(fp_tempCost_w0, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
                 tempCost_data[0 ], tempCost_data[1 ], tempCost_data[2 ], tempCost_data[3 ], tempCost_data[4 ], tempCost_data[5 ], tempCost_data[6 ], tempCost_data[7 ]);
+            $fwrite(fp_tempCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                tempCost_data[8 ], tempCost_data[9 ], tempCost_data[10], tempCost_data[11], tempCost_data[12], tempCost_data[13], tempCost_data[14], tempCost_data[15]);
+            $fwrite(fp_tempCost_w2, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                tempCost_data[16], tempCost_data[17], tempCost_data[18], tempCost_data[19], tempCost_data[20], tempCost_data[21], tempCost_data[22], tempCost_data[23]); 
+            $fwrite(fp_tempCost_w3, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                tempCost_data[24], tempCost_data[25], tempCost_data[26], tempCost_data[27], tempCost_data[28], tempCost_data[29], tempCost_data[30], tempCost_data[31]);
+
+            if(column_count % 2)begin                
+                $fwrite(fp_endPosCost_w0, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                    tempCost_data[0 ] - endPosCost_data[0 ], endPosCost_data[1 ], endPosCost_data[2 ], endPosCost_data[3 ], endPosCost_data[4 ], endPosCost_data[5 ], endPosCost_data[6 ], endPosCost_data[7 ]);
+                $fwrite(fp_endPosCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                    tempCost_data[8 ] - endPosCost_data[8 ], endPosCost_data[9 ], endPosCost_data[10], endPosCost_data[11], endPosCost_data[12], endPosCost_data[13], endPosCost_data[14], endPosCost_data[15]);
+                $fwrite(fp_endPosCost_w2, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                    tempCost_data[16] - endPosCost_data[16], endPosCost_data[17], endPosCost_data[18], endPosCost_data[19], endPosCost_data[20], endPosCost_data[21], endPosCost_data[22], endPosCost_data[23]); 
+                $fwrite(fp_endPosCost_w3, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                    tempCost_data[24] - endPosCost_data[24], endPosCost_data[25], endPosCost_data[26], endPosCost_data[27], endPosCost_data[28], endPosCost_data[29], endPosCost_data[30], endPosCost_data[31]);
+            end
+            else begin
+                $fwrite(fp_endPosCost_w0, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                    endPosCost_data[0 ], endPosCost_data[1 ], endPosCost_data[2 ], endPosCost_data[3 ], endPosCost_data[4 ], endPosCost_data[5 ], endPosCost_data[6 ], endPosCost_data[7 ]);
+                $fwrite(fp_endPosCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                    endPosCost_data[8 ], endPosCost_data[9 ], endPosCost_data[10], endPosCost_data[11], endPosCost_data[12], endPosCost_data[13], endPosCost_data[14], endPosCost_data[15]);
+                $fwrite(fp_endPosCost_w2, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                    endPosCost_data[16], endPosCost_data[17], endPosCost_data[18], endPosCost_data[19], endPosCost_data[20], endPosCost_data[21], endPosCost_data[22], endPosCost_data[23]); 
+                $fwrite(fp_endPosCost_w3, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                    endPosCost_data[24], endPosCost_data[25], endPosCost_data[26], endPosCost_data[27], endPosCost_data[28], endPosCost_data[29], endPosCost_data[30], endPosCost_data[31]);
+            end
+            column_count    <=  column_count + 1;
         end
+        $fclose(fp_tempCost_w0);
         $fclose(fp_tempCost_w1);
+        $fclose(fp_tempCost_w2);
+        $fclose(fp_tempCost_w3);
+        $fclose(fp_endPosCost_w0);
+        $fclose(fp_endPosCost_w1);
+        $fclose(fp_endPosCost_w2);
+        $fclose(fp_endPosCost_w3);
     end
 
 
     initial begin 
-    integer fp_rdoqD64LastOne_w1;
+    integer fp_rdoqD64LastOne_w0,fp_rdoqD64LastOne_w1,fp_rdoqD64LastOne_w2,fp_rdoqD64LastOne_w3;
     integer wr_rdoqD64LastOne_j,wr_rdoqD64LastOne_k;
     reg     signed  [63: 0]     rdoqD64LastOne_data        [0 : 63]    ;
         #116;
-        fp_rdoqD64LastOne_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_8x8.txt", "w");
+        fp_rdoqD64LastOne_w0 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_8x8_0.txt", "w");
+        fp_rdoqD64LastOne_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_8x8_1.txt", "w");
+        fp_rdoqD64LastOne_w2 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_8x8_2.txt", "w");
+        fp_rdoqD64LastOne_w3 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_8x8_3.txt", "w");
         for (wr_rdoqD64LastOne_j = 0; wr_rdoqD64LastOne_j < 8; wr_rdoqD64LastOne_j = wr_rdoqD64LastOne_j + 1) begin
-            for (wr_rdoqD64LastOne_k = 0; wr_rdoqD64LastOne_k < 8; wr_rdoqD64LastOne_k = wr_rdoqD64LastOne_k + 1) begin
+            for (wr_rdoqD64LastOne_k = 0; wr_rdoqD64LastOne_k < 32; wr_rdoqD64LastOne_k = wr_rdoqD64LastOne_k + 1) begin
                 rdoqD64LastOne_data[wr_rdoqD64LastOne_k] = rdoqD64LastOne[wr_rdoqD64LastOne_k];
             end
             #2;
-            $fwrite(fp_rdoqD64LastOne_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            $fwrite(fp_rdoqD64LastOne_w0, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
                 rdoqD64LastOne_data[0 ], rdoqD64LastOne_data[1 ], rdoqD64LastOne_data[2 ], rdoqD64LastOne_data[3 ], rdoqD64LastOne_data[4 ], rdoqD64LastOne_data[5 ], rdoqD64LastOne_data[6 ], rdoqD64LastOne_data[7 ]);
+            $fwrite(fp_rdoqD64LastOne_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoqD64LastOne_data[8 ], rdoqD64LastOne_data[9 ], rdoqD64LastOne_data[10], rdoqD64LastOne_data[11], rdoqD64LastOne_data[12], rdoqD64LastOne_data[13], rdoqD64LastOne_data[14], rdoqD64LastOne_data[15]);
+            $fwrite(fp_rdoqD64LastOne_w2, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoqD64LastOne_data[16], rdoqD64LastOne_data[17], rdoqD64LastOne_data[18], rdoqD64LastOne_data[19], rdoqD64LastOne_data[20], rdoqD64LastOne_data[21], rdoqD64LastOne_data[22], rdoqD64LastOne_data[23]); 
+            $fwrite(fp_rdoqD64LastOne_w3, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoqD64LastOne_data[24], rdoqD64LastOne_data[25], rdoqD64LastOne_data[26], rdoqD64LastOne_data[27], rdoqD64LastOne_data[28], rdoqD64LastOne_data[29], rdoqD64LastOne_data[30], rdoqD64LastOne_data[31]);
         end
+        $fclose(fp_rdoqD64LastOne_w0);
         $fclose(fp_rdoqD64LastOne_w1);
+        $fclose(fp_rdoqD64LastOne_w2);
+        $fclose(fp_rdoqD64LastOne_w3);
     end
 
+
     initial begin 
-    integer fp_rdoqD64LastZero_w1;
+    integer fp_rdoqD64LastZero_w0,fp_rdoqD64LastZero_w1,fp_rdoqD64LastZero_w2,fp_rdoqD64LastZero_w3;
     integer wr_rdoqD64LastZero_j,wr_rdoqD64LastZero_k;
     reg     signed  [63: 0]     rdoqD64LastZero_data        [0 : 63]    ;
         #116;
-        fp_rdoqD64LastZero_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_8x8.txt", "w");
+        fp_rdoqD64LastZero_w0 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_8x8_0.txt", "w");
+        fp_rdoqD64LastZero_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_8x8_1.txt", "w");
+        fp_rdoqD64LastZero_w2 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_8x8_2.txt", "w");
+        fp_rdoqD64LastZero_w3 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_8x8_3.txt", "w");
         for (wr_rdoqD64LastZero_j = 0; wr_rdoqD64LastZero_j < 8; wr_rdoqD64LastZero_j = wr_rdoqD64LastZero_j + 1) begin
-            for (wr_rdoqD64LastZero_k = 0; wr_rdoqD64LastZero_k < 8; wr_rdoqD64LastZero_k = wr_rdoqD64LastZero_k + 1) begin
+            for (wr_rdoqD64LastZero_k = 0; wr_rdoqD64LastZero_k < 32; wr_rdoqD64LastZero_k = wr_rdoqD64LastZero_k + 1) begin
                 rdoqD64LastZero_data[wr_rdoqD64LastZero_k] = rdoqD64LastZero[wr_rdoqD64LastZero_k];
             end
             #2;
-            $fwrite(fp_rdoqD64LastZero_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            $fwrite(fp_rdoqD64LastZero_w0, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
                 rdoqD64LastZero_data[0 ], rdoqD64LastZero_data[1 ], rdoqD64LastZero_data[2 ], rdoqD64LastZero_data[3 ], rdoqD64LastZero_data[4 ], rdoqD64LastZero_data[5 ], rdoqD64LastZero_data[6 ], rdoqD64LastZero_data[7 ]);
+            $fwrite(fp_rdoqD64LastZero_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoqD64LastZero_data[8 ], rdoqD64LastZero_data[9 ], rdoqD64LastZero_data[10], rdoqD64LastZero_data[11], rdoqD64LastZero_data[12], rdoqD64LastZero_data[13], rdoqD64LastZero_data[14], rdoqD64LastZero_data[15]);
+            $fwrite(fp_rdoqD64LastZero_w2, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoqD64LastZero_data[16], rdoqD64LastZero_data[17], rdoqD64LastZero_data[18], rdoqD64LastZero_data[19], rdoqD64LastZero_data[20], rdoqD64LastZero_data[21], rdoqD64LastZero_data[22], rdoqD64LastZero_data[23]); 
+            $fwrite(fp_rdoqD64LastZero_w3, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoqD64LastZero_data[24], rdoqD64LastZero_data[25], rdoqD64LastZero_data[26], rdoqD64LastZero_data[27], rdoqD64LastZero_data[28], rdoqD64LastZero_data[29], rdoqD64LastZero_data[30], rdoqD64LastZero_data[31]);
         end
+        $fclose(fp_rdoqD64LastZero_w0);
         $fclose(fp_rdoqD64LastZero_w1);
-    end
-
-
-    initial begin 
-    integer fp_endPosCost_w1;
-    integer wr_endPosCost_j,wr_endPosCost_k;
-    reg     signed  [63: 0]     endPosCost_data        [0 : 63]    ;
-        #116;
-        fp_endPosCost_w1 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_8x8.txt", "w");
-        for (wr_endPosCost_j = 0; wr_endPosCost_j < 8; wr_endPosCost_j = wr_endPosCost_j + 1) begin
-            for (wr_endPosCost_k = 0; wr_endPosCost_k < 8; wr_endPosCost_k = wr_endPosCost_k + 1) begin
-                endPosCost_data[wr_endPosCost_k] = endPosCost[wr_endPosCost_k];
-            end
-            #2;
-            $fwrite(fp_endPosCost_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
-                endPosCost_data[0 ], endPosCost_data[1 ], endPosCost_data[2 ], endPosCost_data[3 ], endPosCost_data[4 ], endPosCost_data[5 ], endPosCost_data[6 ], endPosCost_data[7 ]);
-        end
-        $fclose(fp_endPosCost_w1);
+        $fclose(fp_rdoqD64LastZero_w2);
+        $fclose(fp_rdoqD64LastZero_w3);
     end
 
     initial begin 
-    integer fp_rdoq_last_x_w1;
+    integer fp_rdoq_last_x_w0,fp_rdoq_last_x_w1,fp_rdoq_last_x_w2,fp_rdoq_last_x_w3;
     integer wr_rdoq_last_x_j,wr_rdoq_last_x_k;
     reg     signed  [63: 0]     rdoq_last_x_data        [0 : 63]    ;
         #116;
-        fp_rdoq_last_x_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_8x8.txt", "w");
+        fp_rdoq_last_x_w0 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_8x8_0.txt", "w");
+        fp_rdoq_last_x_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_8x8_1.txt", "w");
+        fp_rdoq_last_x_w2 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_8x8_2.txt", "w");
+        fp_rdoq_last_x_w3 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_8x8_3.txt", "w");
         for (wr_rdoq_last_x_j = 0; wr_rdoq_last_x_j < 8; wr_rdoq_last_x_j = wr_rdoq_last_x_j + 1) begin
-            for (wr_rdoq_last_x_k = 0; wr_rdoq_last_x_k < 8; wr_rdoq_last_x_k = wr_rdoq_last_x_k + 1) begin
+            for (wr_rdoq_last_x_k = 0; wr_rdoq_last_x_k < 32; wr_rdoq_last_x_k = wr_rdoq_last_x_k + 1) begin
                 rdoq_last_x_data[wr_rdoq_last_x_k] = rdoq_last_x[wr_rdoq_last_x_k];
             end
             #2;
-            $fwrite(fp_rdoq_last_x_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            $fwrite(fp_rdoq_last_x_w0, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
                 rdoq_last_x_data[0 ], rdoq_last_x_data[1 ], rdoq_last_x_data[2 ], rdoq_last_x_data[3 ], rdoq_last_x_data[4 ], rdoq_last_x_data[5 ], rdoq_last_x_data[6 ], rdoq_last_x_data[7 ]);
+            $fwrite(fp_rdoq_last_x_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoq_last_x_data[8 ], rdoq_last_x_data[9 ], rdoq_last_x_data[10], rdoq_last_x_data[11], rdoq_last_x_data[12], rdoq_last_x_data[13], rdoq_last_x_data[14], rdoq_last_x_data[15]);
+            $fwrite(fp_rdoq_last_x_w2, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoq_last_x_data[16], rdoq_last_x_data[17], rdoq_last_x_data[18], rdoq_last_x_data[19], rdoq_last_x_data[20], rdoq_last_x_data[21], rdoq_last_x_data[22], rdoq_last_x_data[23]); 
+            $fwrite(fp_rdoq_last_x_w3, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoq_last_x_data[24], rdoq_last_x_data[25], rdoq_last_x_data[26], rdoq_last_x_data[27], rdoq_last_x_data[28], rdoq_last_x_data[29], rdoq_last_x_data[30], rdoq_last_x_data[31]);
         end
+        $fclose(fp_rdoq_last_x_w0);
         $fclose(fp_rdoq_last_x_w1);
+        $fclose(fp_rdoq_last_x_w2);
+        $fclose(fp_rdoq_last_x_w3);
     end
 
     initial begin 
-    integer fp_rdoq_last_y_w1;
+    integer fp_rdoq_last_y_w0,fp_rdoq_last_y_w1,fp_rdoq_last_y_w2,fp_rdoq_last_y_w3;
     integer wr_rdoq_last_y_j,wr_rdoq_last_y_k;
     reg     signed  [63: 0]     rdoq_last_y_data        [0 : 63]    ;
         #116;
-        fp_rdoq_last_y_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_8x8.txt", "w");
+        fp_rdoq_last_y_w0 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_8x8_0.txt", "w");
+        fp_rdoq_last_y_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_8x8_1.txt", "w");
+        fp_rdoq_last_y_w2 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_8x8_2.txt", "w");
+        fp_rdoq_last_y_w3 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_8x8_3.txt", "w");
         for (wr_rdoq_last_y_j = 0; wr_rdoq_last_y_j < 8; wr_rdoq_last_y_j = wr_rdoq_last_y_j + 1) begin
-            for (wr_rdoq_last_y_k = 0; wr_rdoq_last_y_k < 8; wr_rdoq_last_y_k = wr_rdoq_last_y_k + 1) begin
+            for (wr_rdoq_last_y_k = 0; wr_rdoq_last_y_k < 32; wr_rdoq_last_y_k = wr_rdoq_last_y_k + 1) begin
                 rdoq_last_y_data[wr_rdoq_last_y_k] = rdoq_last_y[wr_rdoq_last_y_k];
             end
             #2;
-            $fwrite(fp_rdoq_last_y_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+            $fwrite(fp_rdoq_last_y_w0, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
                 rdoq_last_y_data[0 ], rdoq_last_y_data[1 ], rdoq_last_y_data[2 ], rdoq_last_y_data[3 ], rdoq_last_y_data[4 ], rdoq_last_y_data[5 ], rdoq_last_y_data[6 ], rdoq_last_y_data[7 ]);
+            $fwrite(fp_rdoq_last_y_w1, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoq_last_y_data[8 ], rdoq_last_y_data[9 ], rdoq_last_y_data[10], rdoq_last_y_data[11], rdoq_last_y_data[12], rdoq_last_y_data[13], rdoq_last_y_data[14], rdoq_last_y_data[15]);
+            $fwrite(fp_rdoq_last_y_w2, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoq_last_y_data[16], rdoq_last_y_data[17], rdoq_last_y_data[18], rdoq_last_y_data[19], rdoq_last_y_data[20], rdoq_last_y_data[21], rdoq_last_y_data[22], rdoq_last_y_data[23]); 
+            $fwrite(fp_rdoq_last_y_w3, "%6d %6d %6d %6d %6d %6d %6d %6d \n", 
+                rdoq_last_y_data[24], rdoq_last_y_data[25], rdoq_last_y_data[26], rdoq_last_y_data[27], rdoq_last_y_data[28], rdoq_last_y_data[29], rdoq_last_y_data[30], rdoq_last_y_data[31]);
         end
+        $fclose(fp_rdoq_last_y_w0);
         $fclose(fp_rdoq_last_y_w1);
+        $fclose(fp_rdoq_last_y_w2);
+        $fclose(fp_rdoq_last_y_w3);
     end
-
-
 
 //4x4
     initial begin 
-    integer fp_tempCost_w1;
+    integer fp_tempCost_w0,fp_tempCost_w1,fp_tempCost_w2,fp_tempCost_w3,fp_tempCost_w4,fp_tempCost_w5,fp_tempCost_w6,fp_tempCost_w7;
     integer wr_tempCost_j,wr_tempCost_k;
     reg     signed  [63: 0]     tempCost_data        [0 : 63]    ;
+    integer fp_endPosCost_w0,fp_endPosCost_w1,fp_endPosCost_w2,fp_endPosCost_w3,fp_endPosCost_w4,fp_endPosCost_w5,fp_endPosCost_w6,fp_endPosCost_w7;
+    integer wr_endPosCost_j,wr_endPosCost_k;
+    reg     signed  [63: 0]     endPosCost_data        [0 : 63]    ;
+    reg     column_count   ;
         #132;
-        fp_tempCost_w1 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_4x4.txt", "w");
+        fp_tempCost_w0 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_4x4_0.txt", "w");
+        fp_tempCost_w1 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_4x4_1.txt", "w");
+        fp_tempCost_w2 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_4x4_2.txt", "w");
+        fp_tempCost_w3 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_4x4_3.txt", "w");
+        fp_tempCost_w4 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_4x4_4.txt", "w");
+        fp_tempCost_w5 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_4x4_5.txt", "w");
+        fp_tempCost_w6 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_4x4_6.txt", "w");
+        fp_tempCost_w7 = $fopen("../../../../../result/lnpd/fpga_tempCost/fpga_tempCost_4x4_7.txt", "w");
+        fp_endPosCost_w0 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_4x4_0.txt", "w");
+        fp_endPosCost_w1 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_4x4_1.txt", "w");
+        fp_endPosCost_w2 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_4x4_2.txt", "w");
+        fp_endPosCost_w3 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_4x4_3.txt", "w");
+        fp_endPosCost_w4 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_4x4_4.txt", "w");
+        fp_endPosCost_w5 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_4x4_5.txt", "w");
+        fp_endPosCost_w6 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_4x4_6.txt", "w");
+        fp_endPosCost_w7 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_4x4_7.txt", "w");
+        column_count    <=  0;
         for (wr_tempCost_j = 0; wr_tempCost_j < 4; wr_tempCost_j = wr_tempCost_j + 1) begin
-            for (wr_tempCost_k = 0; wr_tempCost_k < 4; wr_tempCost_k = wr_tempCost_k + 1) begin
+            for (wr_tempCost_k = 0; wr_tempCost_k < 32; wr_tempCost_k = wr_tempCost_k + 1) begin
                 tempCost_data[wr_tempCost_k] = tempCost[wr_tempCost_k];
+                endPosCost_data[wr_tempCost_k] = endPosCost[wr_tempCost_k];
             end
             #2;
-            $fwrite(fp_tempCost_w1, "%6d %6d %6d %6d \n", 
+            $fwrite(fp_tempCost_w0, "%6d %6d %6d %6d \n", 
                 tempCost_data[0 ], tempCost_data[1 ], tempCost_data[2 ], tempCost_data[3 ]);
+            $fwrite(fp_tempCost_w1, "%6d %6d %6d %6d \n", 
+                tempCost_data[4 ], tempCost_data[5 ], tempCost_data[6 ], tempCost_data[7 ]);
+            $fwrite(fp_tempCost_w2, "%6d %6d %6d %6d \n", 
+                tempCost_data[8 ], tempCost_data[9 ], tempCost_data[10], tempCost_data[11]);
+            $fwrite(fp_tempCost_w3, "%6d %6d %6d %6d \n", 
+                tempCost_data[12], tempCost_data[13], tempCost_data[14], tempCost_data[15]);
+            $fwrite(fp_tempCost_w4, "%6d %6d %6d %6d \n", 
+                tempCost_data[16], tempCost_data[17], tempCost_data[18], tempCost_data[19]);
+            $fwrite(fp_tempCost_w5, "%6d %6d %6d %6d \n", 
+                tempCost_data[20], tempCost_data[21], tempCost_data[22], tempCost_data[23]); 
+            $fwrite(fp_tempCost_w6, "%6d %6d %6d %6d \n", 
+                tempCost_data[24], tempCost_data[25], tempCost_data[26], tempCost_data[27]);
+            $fwrite(fp_tempCost_w7, "%6d %6d %6d %6d \n", 
+                tempCost_data[28], tempCost_data[29], tempCost_data[30], tempCost_data[31]);
+
+            if(column_count % 2)begin
+                $fwrite(fp_endPosCost_w0, "%6d %6d %6d %6d \n", 
+                    tempCost_data[0 ] - endPosCost_data[0 ], endPosCost_data[1 ], endPosCost_data[2 ], endPosCost_data[3 ]);
+                $fwrite(fp_endPosCost_w1, "%6d %6d %6d %6d \n", 
+                    tempCost_data[4 ] - endPosCost_data[4 ], endPosCost_data[5 ], endPosCost_data[6 ], endPosCost_data[7 ]);
+                $fwrite(fp_endPosCost_w2, "%6d %6d %6d %6d \n", 
+                    tempCost_data[8 ] - endPosCost_data[8 ], endPosCost_data[9 ], endPosCost_data[10], endPosCost_data[11]);
+                $fwrite(fp_endPosCost_w3, "%6d %6d %6d %6d \n", 
+                    tempCost_data[12] - endPosCost_data[12], endPosCost_data[13], endPosCost_data[14], endPosCost_data[15]);
+                $fwrite(fp_endPosCost_w4, "%6d %6d %6d %6d \n", 
+                    tempCost_data[16] - endPosCost_data[16], endPosCost_data[17], endPosCost_data[18], endPosCost_data[19]);
+                $fwrite(fp_endPosCost_w5, "%6d %6d %6d %6d \n", 
+                    tempCost_data[20] - endPosCost_data[20], endPosCost_data[21], endPosCost_data[22], endPosCost_data[23]); 
+                $fwrite(fp_endPosCost_w6, "%6d %6d %6d %6d \n", 
+                    tempCost_data[24] - endPosCost_data[24], endPosCost_data[25], endPosCost_data[26], endPosCost_data[27]);
+                $fwrite(fp_endPosCost_w7, "%6d %6d %6d %6d \n", 
+                    tempCost_data[28] - endPosCost_data[28], endPosCost_data[29], endPosCost_data[30], endPosCost_data[31]);
+            end
+            else begin
+                $fwrite(fp_endPosCost_w0, "%6d %6d %6d %6d \n", 
+                    endPosCost_data[0 ], endPosCost_data[1 ], endPosCost_data[2 ], endPosCost_data[3 ]);
+                $fwrite(fp_endPosCost_w1, "%6d %6d %6d %6d \n", 
+                    endPosCost_data[4 ], endPosCost_data[5 ], endPosCost_data[6 ], endPosCost_data[7 ]);
+                $fwrite(fp_endPosCost_w2, "%6d %6d %6d %6d \n", 
+                    endPosCost_data[8 ], endPosCost_data[9 ], endPosCost_data[10], endPosCost_data[11]);
+                $fwrite(fp_endPosCost_w3, "%6d %6d %6d %6d \n", 
+                    endPosCost_data[12], endPosCost_data[13], endPosCost_data[14], endPosCost_data[15]);
+                $fwrite(fp_endPosCost_w4, "%6d %6d %6d %6d \n", 
+                    endPosCost_data[16], endPosCost_data[17], endPosCost_data[18], endPosCost_data[19]);
+                $fwrite(fp_endPosCost_w5, "%6d %6d %6d %6d \n", 
+                    endPosCost_data[20], endPosCost_data[21], endPosCost_data[22], endPosCost_data[23]); 
+                $fwrite(fp_endPosCost_w6, "%6d %6d %6d %6d \n", 
+                    endPosCost_data[24], endPosCost_data[25], endPosCost_data[26], endPosCost_data[27]);
+                $fwrite(fp_endPosCost_w7, "%6d %6d %6d %6d \n", 
+                    endPosCost_data[28], endPosCost_data[29], endPosCost_data[30], endPosCost_data[31]);
+            end
+            column_count    <=  column_count + 1;
         end
+        $fclose(fp_tempCost_w0);
         $fclose(fp_tempCost_w1);
+        $fclose(fp_tempCost_w2);
+        $fclose(fp_tempCost_w3);
+        $fclose(fp_tempCost_w4);
+        $fclose(fp_tempCost_w5);
+        $fclose(fp_tempCost_w6);
+        $fclose(fp_tempCost_w7);
+        $fclose(fp_endPosCost_w0);
+        $fclose(fp_endPosCost_w1);
+        $fclose(fp_endPosCost_w2);
+        $fclose(fp_endPosCost_w3);
+        $fclose(fp_endPosCost_w4);
+        $fclose(fp_endPosCost_w5);
+        $fclose(fp_endPosCost_w6);
+        $fclose(fp_endPosCost_w7);
     end
 
-
     initial begin 
-    integer fp_rdoqD64LastOne_w1;
+    integer fp_rdoqD64LastOne_w0,fp_rdoqD64LastOne_w1,fp_rdoqD64LastOne_w2,fp_rdoqD64LastOne_w3,fp_rdoqD64LastOne_w4,fp_rdoqD64LastOne_w5,fp_rdoqD64LastOne_w6,fp_rdoqD64LastOne_w7;
     integer wr_rdoqD64LastOne_j,wr_rdoqD64LastOne_k;
     reg     signed  [63: 0]     rdoqD64LastOne_data        [0 : 63]    ;
         #132;
-        fp_rdoqD64LastOne_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_4x4.txt", "w");
+        fp_rdoqD64LastOne_w0 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_4x4_0.txt", "w");
+        fp_rdoqD64LastOne_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_4x4_1.txt", "w");
+        fp_rdoqD64LastOne_w2 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_4x4_2.txt", "w");
+        fp_rdoqD64LastOne_w3 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_4x4_3.txt", "w");
+        fp_rdoqD64LastOne_w4 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_4x4_4.txt", "w");
+        fp_rdoqD64LastOne_w5 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_4x4_5.txt", "w");
+        fp_rdoqD64LastOne_w6 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_4x4_6.txt", "w");
+        fp_rdoqD64LastOne_w7 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastOne/fpga_rdoqD64LastOne_4x4_7.txt", "w");
         for (wr_rdoqD64LastOne_j = 0; wr_rdoqD64LastOne_j < 4; wr_rdoqD64LastOne_j = wr_rdoqD64LastOne_j + 1) begin
-            for (wr_rdoqD64LastOne_k = 0; wr_rdoqD64LastOne_k < 4; wr_rdoqD64LastOne_k = wr_rdoqD64LastOne_k + 1) begin
+            for (wr_rdoqD64LastOne_k = 0; wr_rdoqD64LastOne_k < 32; wr_rdoqD64LastOne_k = wr_rdoqD64LastOne_k + 1) begin
                 rdoqD64LastOne_data[wr_rdoqD64LastOne_k] = rdoqD64LastOne[wr_rdoqD64LastOne_k];
             end
             #2;
-            $fwrite(fp_rdoqD64LastOne_w1, "%6d %6d %6d %6d \n", 
+            $fwrite(fp_rdoqD64LastOne_w0, "%6d %6d %6d %6d \n", 
                 rdoqD64LastOne_data[0 ], rdoqD64LastOne_data[1 ], rdoqD64LastOne_data[2 ], rdoqD64LastOne_data[3 ]);
+            $fwrite(fp_rdoqD64LastOne_w1, "%6d %6d %6d %6d \n", 
+                rdoqD64LastOne_data[4 ], rdoqD64LastOne_data[5 ], rdoqD64LastOne_data[6 ], rdoqD64LastOne_data[7 ]);
+            $fwrite(fp_rdoqD64LastOne_w2, "%6d %6d %6d %6d \n", 
+                rdoqD64LastOne_data[8 ], rdoqD64LastOne_data[9 ], rdoqD64LastOne_data[10], rdoqD64LastOne_data[11]);
+            $fwrite(fp_rdoqD64LastOne_w3, "%6d %6d %6d %6d \n", 
+                rdoqD64LastOne_data[12], rdoqD64LastOne_data[13], rdoqD64LastOne_data[14], rdoqD64LastOne_data[15]);
+            $fwrite(fp_rdoqD64LastOne_w4, "%6d %6d %6d %6d \n", 
+                rdoqD64LastOne_data[16], rdoqD64LastOne_data[17], rdoqD64LastOne_data[18], rdoqD64LastOne_data[19]);
+            $fwrite(fp_rdoqD64LastOne_w5, "%6d %6d %6d %6d \n", 
+                rdoqD64LastOne_data[20], rdoqD64LastOne_data[21], rdoqD64LastOne_data[22], rdoqD64LastOne_data[23]); 
+            $fwrite(fp_rdoqD64LastOne_w6, "%6d %6d %6d %6d \n", 
+                rdoqD64LastOne_data[24], rdoqD64LastOne_data[25], rdoqD64LastOne_data[26], rdoqD64LastOne_data[27]);
+            $fwrite(fp_rdoqD64LastOne_w7, "%6d %6d %6d %6d \n", 
+                rdoqD64LastOne_data[28], rdoqD64LastOne_data[29], rdoqD64LastOne_data[30], rdoqD64LastOne_data[31]);
         end
+        $fclose(fp_rdoqD64LastOne_w0);
         $fclose(fp_rdoqD64LastOne_w1);
+        $fclose(fp_rdoqD64LastOne_w2);
+        $fclose(fp_rdoqD64LastOne_w3);
+        $fclose(fp_rdoqD64LastOne_w4);
+        $fclose(fp_rdoqD64LastOne_w5);
+        $fclose(fp_rdoqD64LastOne_w6);
+        $fclose(fp_rdoqD64LastOne_w7);
     end
 
     initial begin 
-    integer fp_rdoqD64LastZero_w1;
+    integer fp_rdoqD64LastZero_w0,fp_rdoqD64LastZero_w1,fp_rdoqD64LastZero_w2,fp_rdoqD64LastZero_w3,fp_rdoqD64LastZero_w4,fp_rdoqD64LastZero_w5,fp_rdoqD64LastZero_w6,fp_rdoqD64LastZero_w7;
     integer wr_rdoqD64LastZero_j,wr_rdoqD64LastZero_k;
     reg     signed  [63: 0]     rdoqD64LastZero_data        [0 : 63]    ;
         #132;
-        fp_rdoqD64LastZero_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_4x4.txt", "w");
+        fp_rdoqD64LastZero_w0 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_4x4_0.txt", "w");
+        fp_rdoqD64LastZero_w1 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_4x4_1.txt", "w");
+        fp_rdoqD64LastZero_w2 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_4x4_2.txt", "w");
+        fp_rdoqD64LastZero_w3 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_4x4_3.txt", "w");
+        fp_rdoqD64LastZero_w4 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_4x4_4.txt", "w");
+        fp_rdoqD64LastZero_w5 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_4x4_5.txt", "w");
+        fp_rdoqD64LastZero_w6 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_4x4_6.txt", "w");
+        fp_rdoqD64LastZero_w7 = $fopen("../../../../../result/lnpd/fpga_rdoqD64LastZero/fpga_rdoqD64LastZero_4x4_7.txt", "w");
         for (wr_rdoqD64LastZero_j = 0; wr_rdoqD64LastZero_j < 4; wr_rdoqD64LastZero_j = wr_rdoqD64LastZero_j + 1) begin
-            for (wr_rdoqD64LastZero_k = 0; wr_rdoqD64LastZero_k < 4; wr_rdoqD64LastZero_k = wr_rdoqD64LastZero_k + 1) begin
+            for (wr_rdoqD64LastZero_k = 0; wr_rdoqD64LastZero_k < 32; wr_rdoqD64LastZero_k = wr_rdoqD64LastZero_k + 1) begin
                 rdoqD64LastZero_data[wr_rdoqD64LastZero_k] = rdoqD64LastZero[wr_rdoqD64LastZero_k];
             end
             #2;
-            $fwrite(fp_rdoqD64LastZero_w1, "%6d %6d %6d %6d \n", 
+            $fwrite(fp_rdoqD64LastZero_w0, "%6d %6d %6d %6d \n", 
                 rdoqD64LastZero_data[0 ], rdoqD64LastZero_data[1 ], rdoqD64LastZero_data[2 ], rdoqD64LastZero_data[3 ]);
+            $fwrite(fp_rdoqD64LastZero_w1, "%6d %6d %6d %6d \n", 
+                rdoqD64LastZero_data[4 ], rdoqD64LastZero_data[5 ], rdoqD64LastZero_data[6 ], rdoqD64LastZero_data[7 ]);
+            $fwrite(fp_rdoqD64LastZero_w2, "%6d %6d %6d %6d \n", 
+                rdoqD64LastZero_data[8 ], rdoqD64LastZero_data[9 ], rdoqD64LastZero_data[10], rdoqD64LastZero_data[11]);
+            $fwrite(fp_rdoqD64LastZero_w3, "%6d %6d %6d %6d \n", 
+                rdoqD64LastZero_data[12], rdoqD64LastZero_data[13], rdoqD64LastZero_data[14], rdoqD64LastZero_data[15]);
+            $fwrite(fp_rdoqD64LastZero_w4, "%6d %6d %6d %6d \n", 
+                rdoqD64LastZero_data[16], rdoqD64LastZero_data[17], rdoqD64LastZero_data[18], rdoqD64LastZero_data[19]);
+            $fwrite(fp_rdoqD64LastZero_w5, "%6d %6d %6d %6d \n", 
+                rdoqD64LastZero_data[20], rdoqD64LastZero_data[21], rdoqD64LastZero_data[22], rdoqD64LastZero_data[23]); 
+            $fwrite(fp_rdoqD64LastZero_w6, "%6d %6d %6d %6d \n", 
+                rdoqD64LastZero_data[24], rdoqD64LastZero_data[25], rdoqD64LastZero_data[26], rdoqD64LastZero_data[27]);
+            $fwrite(fp_rdoqD64LastZero_w7, "%6d %6d %6d %6d \n", 
+                rdoqD64LastZero_data[28], rdoqD64LastZero_data[29], rdoqD64LastZero_data[30], rdoqD64LastZero_data[31]);
         end
+        $fclose(fp_rdoqD64LastZero_w0);
         $fclose(fp_rdoqD64LastZero_w1);
-    end
-
-
-    initial begin 
-    integer fp_endPosCost_w1;
-    integer wr_endPosCost_j,wr_endPosCost_k;
-    reg     signed  [63: 0]     endPosCost_data        [0 : 63]    ;
-        #132;
-        fp_endPosCost_w1 = $fopen("../../../../../result/lnpd/fpga_endPosCost/fpga_endPosCost_4x4.txt", "w");
-        for (wr_endPosCost_j = 0; wr_endPosCost_j < 4; wr_endPosCost_j = wr_endPosCost_j + 1) begin
-            for (wr_endPosCost_k = 0; wr_endPosCost_k < 4; wr_endPosCost_k = wr_endPosCost_k + 1) begin
-                endPosCost_data[wr_endPosCost_k] = endPosCost[wr_endPosCost_k];
-            end
-            #2;
-            $fwrite(fp_endPosCost_w1, "%6d %6d %6d %6d \n", 
-                endPosCost_data[0 ], endPosCost_data[1 ], endPosCost_data[2 ], endPosCost_data[3 ]);
-        end
-        $fclose(fp_endPosCost_w1);
+        $fclose(fp_rdoqD64LastZero_w2);
+        $fclose(fp_rdoqD64LastZero_w3);
+        $fclose(fp_rdoqD64LastZero_w4);
+        $fclose(fp_rdoqD64LastZero_w5);
+        $fclose(fp_rdoqD64LastZero_w6);
+        $fclose(fp_rdoqD64LastZero_w7);
     end
 
     initial begin 
-    integer fp_rdoq_last_x_w1;
+    integer fp_rdoq_last_x_w0,fp_rdoq_last_x_w1,fp_rdoq_last_x_w2,fp_rdoq_last_x_w3,fp_rdoq_last_x_w4,fp_rdoq_last_x_w5,fp_rdoq_last_x_w6,fp_rdoq_last_x_w7;
     integer wr_rdoq_last_x_j,wr_rdoq_last_x_k;
     reg     signed  [63: 0]     rdoq_last_x_data        [0 : 63]    ;
         #132;
-        fp_rdoq_last_x_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_4x4.txt", "w");
+        fp_rdoq_last_x_w0 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_4x4_0.txt", "w");
+        fp_rdoq_last_x_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_4x4_1.txt", "w");
+        fp_rdoq_last_x_w2 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_4x4_2.txt", "w");
+        fp_rdoq_last_x_w3 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_4x4_3.txt", "w");
+        fp_rdoq_last_x_w4 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_4x4_4.txt", "w");
+        fp_rdoq_last_x_w5 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_4x4_5.txt", "w");
+        fp_rdoq_last_x_w6 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_4x4_6.txt", "w");
+        fp_rdoq_last_x_w7 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_x/fpga_rdoq_last_x_4x4_7.txt", "w");
         for (wr_rdoq_last_x_j = 0; wr_rdoq_last_x_j < 4; wr_rdoq_last_x_j = wr_rdoq_last_x_j + 1) begin
-            for (wr_rdoq_last_x_k = 0; wr_rdoq_last_x_k < 4; wr_rdoq_last_x_k = wr_rdoq_last_x_k + 1) begin
+            for (wr_rdoq_last_x_k = 0; wr_rdoq_last_x_k < 32; wr_rdoq_last_x_k = wr_rdoq_last_x_k + 1) begin
                 rdoq_last_x_data[wr_rdoq_last_x_k] = rdoq_last_x[wr_rdoq_last_x_k];
             end
             #2;
-            $fwrite(fp_rdoq_last_x_w1, "%6d %6d %6d %6d \n", 
+            $fwrite(fp_rdoq_last_x_w0, "%6d %6d %6d %6d \n", 
                 rdoq_last_x_data[0 ], rdoq_last_x_data[1 ], rdoq_last_x_data[2 ], rdoq_last_x_data[3 ]);
+            $fwrite(fp_rdoq_last_x_w1, "%6d %6d %6d %6d \n", 
+                rdoq_last_x_data[4 ], rdoq_last_x_data[5 ], rdoq_last_x_data[6 ], rdoq_last_x_data[7 ]);
+            $fwrite(fp_rdoq_last_x_w2, "%6d %6d %6d %6d \n", 
+                rdoq_last_x_data[8 ], rdoq_last_x_data[9 ], rdoq_last_x_data[10], rdoq_last_x_data[11]);
+            $fwrite(fp_rdoq_last_x_w3, "%6d %6d %6d %6d \n", 
+                rdoq_last_x_data[12], rdoq_last_x_data[13], rdoq_last_x_data[14], rdoq_last_x_data[15]);
+            $fwrite(fp_rdoq_last_x_w4, "%6d %6d %6d %6d \n", 
+                rdoq_last_x_data[16], rdoq_last_x_data[17], rdoq_last_x_data[18], rdoq_last_x_data[19]);
+            $fwrite(fp_rdoq_last_x_w5, "%6d %6d %6d %6d \n", 
+                rdoq_last_x_data[20], rdoq_last_x_data[21], rdoq_last_x_data[22], rdoq_last_x_data[23]); 
+            $fwrite(fp_rdoq_last_x_w6, "%6d %6d %6d %6d \n", 
+                rdoq_last_x_data[24], rdoq_last_x_data[25], rdoq_last_x_data[26], rdoq_last_x_data[27]);
+            $fwrite(fp_rdoq_last_x_w7, "%6d %6d %6d %6d \n", 
+                rdoq_last_x_data[28], rdoq_last_x_data[29], rdoq_last_x_data[30], rdoq_last_x_data[31]);
         end
+        $fclose(fp_rdoq_last_x_w0);
         $fclose(fp_rdoq_last_x_w1);
+        $fclose(fp_rdoq_last_x_w2);
+        $fclose(fp_rdoq_last_x_w3);
+        $fclose(fp_rdoq_last_x_w4);
+        $fclose(fp_rdoq_last_x_w5);
+        $fclose(fp_rdoq_last_x_w6);
+        $fclose(fp_rdoq_last_x_w7);
     end
 
     initial begin 
-    integer fp_rdoq_last_y_w1;
+    integer fp_rdoq_last_y_w0,fp_rdoq_last_y_w1,fp_rdoq_last_y_w2,fp_rdoq_last_y_w3,fp_rdoq_last_y_w4,fp_rdoq_last_y_w5,fp_rdoq_last_y_w6,fp_rdoq_last_y_w7;
     integer wr_rdoq_last_y_j,wr_rdoq_last_y_k;
     reg     signed  [63: 0]     rdoq_last_y_data        [0 : 63]    ;
         #132;
-        fp_rdoq_last_y_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_4x4.txt", "w");
+        fp_rdoq_last_y_w0 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_4x4_0.txt", "w");
+        fp_rdoq_last_y_w1 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_4x4_1.txt", "w");
+        fp_rdoq_last_y_w2 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_4x4_2.txt", "w");
+        fp_rdoq_last_y_w3 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_4x4_3.txt", "w");
+        fp_rdoq_last_y_w4 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_4x4_4.txt", "w");
+        fp_rdoq_last_y_w5 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_4x4_5.txt", "w");
+        fp_rdoq_last_y_w6 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_4x4_6.txt", "w");
+        fp_rdoq_last_y_w7 = $fopen("../../../../../result/lnpd/fpga_rdoq_last_y/fpga_rdoq_last_y_4x4_7.txt", "w");
         for (wr_rdoq_last_y_j = 0; wr_rdoq_last_y_j < 4; wr_rdoq_last_y_j = wr_rdoq_last_y_j + 1) begin
-            for (wr_rdoq_last_y_k = 0; wr_rdoq_last_y_k < 4; wr_rdoq_last_y_k = wr_rdoq_last_y_k + 1) begin
+            for (wr_rdoq_last_y_k = 0; wr_rdoq_last_y_k < 32; wr_rdoq_last_y_k = wr_rdoq_last_y_k + 1) begin
                 rdoq_last_y_data[wr_rdoq_last_y_k] = rdoq_last_y[wr_rdoq_last_y_k];
             end
             #2;
-            $fwrite(fp_rdoq_last_y_w1, "%6d %6d %6d %6d \n", 
+            $fwrite(fp_rdoq_last_y_w0, "%6d %6d %6d %6d \n", 
                 rdoq_last_y_data[0 ], rdoq_last_y_data[1 ], rdoq_last_y_data[2 ], rdoq_last_y_data[3 ]);
+            $fwrite(fp_rdoq_last_y_w1, "%6d %6d %6d %6d \n", 
+                rdoq_last_y_data[4 ], rdoq_last_y_data[5 ], rdoq_last_y_data[6 ], rdoq_last_y_data[7 ]);
+            $fwrite(fp_rdoq_last_y_w2, "%6d %6d %6d %6d \n", 
+                rdoq_last_y_data[8 ], rdoq_last_y_data[9 ], rdoq_last_y_data[10], rdoq_last_y_data[11]);
+            $fwrite(fp_rdoq_last_y_w3, "%6d %6d %6d %6d \n", 
+                rdoq_last_y_data[12], rdoq_last_y_data[13], rdoq_last_y_data[14], rdoq_last_y_data[15]);
+            $fwrite(fp_rdoq_last_y_w4, "%6d %6d %6d %6d \n", 
+                rdoq_last_y_data[16], rdoq_last_y_data[17], rdoq_last_y_data[18], rdoq_last_y_data[19]);
+            $fwrite(fp_rdoq_last_y_w5, "%6d %6d %6d %6d \n", 
+                rdoq_last_y_data[20], rdoq_last_y_data[21], rdoq_last_y_data[22], rdoq_last_y_data[23]); 
+            $fwrite(fp_rdoq_last_y_w6, "%6d %6d %6d %6d \n", 
+                rdoq_last_y_data[24], rdoq_last_y_data[25], rdoq_last_y_data[26], rdoq_last_y_data[27]);
+            $fwrite(fp_rdoq_last_y_w7, "%6d %6d %6d %6d \n", 
+                rdoq_last_y_data[28], rdoq_last_y_data[29], rdoq_last_y_data[30], rdoq_last_y_data[31]);
         end
+        $fclose(fp_rdoq_last_y_w0);
         $fclose(fp_rdoq_last_y_w1);
+        $fclose(fp_rdoq_last_y_w2);
+        $fclose(fp_rdoq_last_y_w3);
+        $fclose(fp_rdoq_last_y_w4);
+        $fclose(fp_rdoq_last_y_w5);
+        $fclose(fp_rdoq_last_y_w6);
+        $fclose(fp_rdoq_last_y_w7);
     end
-
-
-
-
-
 
 
 
