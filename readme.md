@@ -63,3 +63,26 @@
 |           | pre_quant          | 6374  | 9879  | 0         | 32   | 350.2（v）  |
 |           | ocd                | 69714 | 14757 | 0         | 192  |             |
 |           | lnpd               | 2985  | 2427  | 0         | 0    | 189.25（v） |
+
+v1.0 ，多并行流水
+
+| 时间      | 备注               | LUT   | FF    | RAM(bits) | DSP  | Fmax(MHz) |
+| --------- | ------------------ | ----- | ----- | --------- | ---- | --------- |
+| 2023.4.16 | 多并行RDOQ流水结构 | 78330 | 21965 | 0         | 224  | 113.57(s) |
+|           | pre_quant          | 6523  | 7349  | 0         | 32   | 335.6(s)  |
+|           | ocd                | 76350 | 15857 | 0         | 192  | 113.6(s)  |
+|           | lnpd               | 2854  | 2538  | 0         | 0    | 394.1(s)  |
+
+|      |
+| ---- |
+
+v1.1，多并行流水
+
+delete some unnecesssary delay operation in the **PQ** module cause there's so much unused signal through this module(the deleted siganl was given by the testbench file to the next stage **OCD** )
+
+| 时间      | 备注               | LUT   | FF    | RAM(bits) | DSP  | Fmax(MHz) |
+| --------- | ------------------ | ----- | ----- | --------- | ---- | --------- |
+| 2023.4.21 | 多并行RDOQ流水结构 | 72017 | 23440 | 0         | 224  | 116.27(s) |
+|           | pre_quant          | 6115  | 3289  | 0         | 32   | 335.6(s)  |
+|           | ocd                | 63559 | 16644 | 0         | 192  | 113.6(s)  |
+|           | lnpd               | 2338  | 3476  | 0         | 0    | 394.1(s)  |

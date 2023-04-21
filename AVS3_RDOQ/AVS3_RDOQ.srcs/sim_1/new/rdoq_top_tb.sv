@@ -12,11 +12,14 @@ localparam  SIZE4       = 3'd2  ,
             SIZE32      = 3'd5  ,
             SIZE64      = 3'd6  ;
 
+//integer definition
+integer i,j,k,l,m   ;
+genvar  o,p,q,r     ;
 integer fp_r, fp_w, rd_i, rd_j, rd_k, rd_l, wr_i, wr_j, wr_k, rd_z, rd_y;
 
 //system input
     reg                                             clk             ;
-    reg                                             reset           ;
+    reg                                             rst_n           ;
 //input parameter       
     reg             [`w_q_value     - 1 : 0]        q_value         ;
     reg             [`w_q_bits      - 1 : 0]        q_bits          ;
@@ -54,45 +57,205 @@ integer fp_r, fp_w, rd_i, rd_j, rd_k, rd_l, wr_i, wr_j, wr_k, rd_z, rd_y;
 
     reg             [31: 0]     rdoq_data           ;
 
+
+    reg             [`w_size            - 1 : 0]    in_width_log2                               ;
+    reg             [`w_size            - 1 : 0]    in_height_log2                              ;
+    reg     signed  [`w_err_scale       - 1 : 0]    in_err_scale                                ;
+    reg     signed  [`w_lambda          - 1 : 0]    in_lambda                                   ;
+    reg     signed  [`w_diff_scale      - 1 : 0]    in_diff_scale                               ;
+    reg             [`w_rdoq_est_last   - 1 : 0]    in_rdoq_est_last    [0 :  5][0 : 11][0 : 1] ;
+    reg             [`w_rdoq_est_level  - 1 : 0]    in_rdoq_est_level   [0 : 23][0 :  1]        ;
+    reg             [`w_rdoq_est_run    - 1 : 0]    in_rdoq_est_run     [0 : 23][0 :  1]        ;
+    reg             [`w_pos             - 1 : 0]    in_left_pos         [0 : 31]                ;
+    reg             [`w_pos             - 1 : 0]    in_bottom_pos       [0 : 31]                ;
+
+    reg             [`w_size            - 1 : 0]    i_width_log2_d      [0 :  3]                        ;
+    reg             [`w_size            - 1 : 0]    i_height_log2_d     [0 :  3]                        ;
+    reg     signed  [`w_err_scale       - 1 : 0]    i_err_scale_d       [0 :  3]                        ;
+    reg     signed  [`w_lambda          - 1 : 0]    i_lambda_d          [0 :  3]                        ;
+    reg     signed  [`w_diff_scale      - 1 : 0]    i_diff_scale_d      [0 :  3]                        ;
+    reg             [`w_rdoq_est_last   - 1 : 0]    i_rdoq_est_last_d   [0 :  3][0 :  5][0 : 11][0 : 1] ;
+    reg             [`w_rdoq_est_level  - 1 : 0]    i_rdoq_est_level_d  [0 :  3][0 : 23][0 :  1]        ;
+    reg             [`w_rdoq_est_run    - 1 : 0]    i_rdoq_est_run_d    [0 :  3][0 : 23][0 :  1]        ;
+    reg             [`w_pos             - 1 : 0]    i_left_pos_d        [0 :  3][0 : 31]                ;
+    reg             [`w_pos             - 1 : 0]    i_bottom_pos_d      [0 :  3][0 : 31]                ;
+
+
 rdoq_top u_rdoq_top(
     //system clk and rest
-    .clk                    (clk            ),
-    .rst_n                  (reset          ),
+    .clk                    (clk                ),
+    .rst_n                  (rst_n              ),
 
-    //input block information
-    .q_value                (q_value        ),
-    .q_bits                 (q_bits         ),
+    //input block information   
+    .q_value                (q_value            ),
+    .q_bits                 (q_bits             ),
 
-    .cu_width_log2          (cu_width_log2  ),//the value is between 2 and 4
-    .cu_height_log2         (cu_height_log2 ),//the value is between 2 and 4
-    .err_scale              (err_scale      ),
-    .lambda                 (lambda         ),
-    .diff_scale             (diff_scale     ),
+    .cu_width_log2          (in_width_log2      ),
+    .cu_height_log2         (in_height_log2     ),
+    .err_scale              (in_err_scale       ),
+    .lambda                 (in_lambda          ),
+    .diff_scale             (in_diff_scale      ),
 
-    .rdoq_est_last          (rdoq_est_last  ),
-    .rdoq_est_level         (rdoq_est_level ),
-    .rdoq_est_run           (rdoq_est_run   ),
-    .left_pos               (left_pos       ),
-    .bottom_pos             (bottom_pos     ),
+    .rdoq_est_last          (in_rdoq_est_last   ),
+    .rdoq_est_level         (in_rdoq_est_level  ),
+    .rdoq_est_run           (in_rdoq_est_run    ),
+    .left_pos               (in_left_pos        ),
+    .bottom_pos             (in_bottom_pos      ),
 
     //input block data
-    .i_valid                (i_valid        ),
-    .src_coef               (i_data         ),
+    .i_valid                (i_valid            ),
+    .src_coef               (i_data             ),
 
-    //output block data
-    .o_valid                (o_valid        )
+    //output block data 
+    .o_valid                (o_valid            )
 );
 
 
 always #1 begin
     clk <= ~clk;
 end
-  
+
+//delay operation
+    assign  in_width_log2    =   i_width_log2_d[3]; 
+    assign  in_height_log2   =   i_height_log2_d[3];
+    assign  in_err_scale     =   i_err_scale_d[3];
+    assign  in_lambda        =   i_lambda_d[3];
+    assign  in_diff_scale    =   i_diff_scale_d[3];
+    assign  in_left_pos      =   i_left_pos_d[3]; 
+    assign  in_bottom_pos    =   i_bottom_pos_d[3];
+
+    generate
+        for(p = 0; p < 6; p = p + 1)begin
+            for(q = 0; q < 12; q = q + 1)begin
+                for(r = 0; r < 2; r = r + 1)begin
+                    assign in_rdoq_est_last[p][q][r] = i_rdoq_est_last_d[3][p][q][r];
+                end
+            end
+        end
+        for (o = 0; o < 24; o = o + 1) begin
+            for(p = 0; p < 2; p = p + 1)begin
+                assign in_rdoq_est_level[o][p] = i_rdoq_est_level_d[3][o][p];
+            end
+        end
+        for (o = 0; o < 24; o = o + 1) begin
+            for(p = 0; p < 2; p = p + 1)begin
+                assign in_rdoq_est_run[o][p] = i_rdoq_est_run_d[3][o][p];
+            end
+        end
+    endgenerate
+
+    always@(posedge clk or negedge rst_n)begin
+        if(!rst_n)begin
+            for(i = 0; i < 4; i = i + 1)begin
+                i_width_log2_d[i]       <=  0;
+                i_height_log2_d[i]      <=  0;
+                i_err_scale_d[i]        <=  0;
+                i_lambda_d[i]           <=  0;
+                i_diff_scale_d[i]       <=  0;
+            end
+            for(i = 0; i < 4; i = i + 1)begin
+                for(j = 0; j < 32; j = j + 1)begin
+                    i_left_pos_d[i][j]      <=  0;
+                    i_bottom_pos_d[i][j]    <=  0;
+                end
+            end
+            for(m = 0; m < 4; m = m + 1)begin
+                for(j = 0; j < 6; j = j + 1)begin
+                    for(k = 0; k < 12; k = k + 1)begin
+                        for(l = 0; l < 2; l = l + 1)begin
+                            i_rdoq_est_last_d[m][j][k][l] <= 0;
+                        end
+                    end
+                end
+                for (i = 0; i < 24; i = i + 1) begin
+                    for(j = 0; j < 2; j = j + 1)begin
+                        i_rdoq_est_level_d[m][i][j] <= 0;
+                    end
+                end
+                for (i = 0; i < 24; i = i + 1) begin
+                    for(j = 0; j < 2; j = j + 1)begin
+                        i_rdoq_est_run_d[m][i][j] <= 0;
+                    end
+                end
+            end
+        end
+        else begin
+            i_width_log2_d[0]       <=      cu_width_log2   ;
+            i_height_log2_d[0]      <=      cu_height_log2  ;
+            i_err_scale_d[0]        <=      err_scale       ;
+            i_lambda_d[0]           <=      lambda          ;
+            i_diff_scale_d[0]       <=      diff_scale      ;
+            
+            
+            for(j = 0; j < 32; j = j + 1)begin
+                i_left_pos_d[0][j]      <=  left_pos[j];
+                i_bottom_pos_d[0][j]    <=  bottom_pos[j];
+            end
+            for(j = 0; j < 6; j = j + 1)begin
+                for(k = 0; k < 12; k = k + 1)begin
+                    for(l = 0; l < 2; l = l + 1)begin
+                        i_rdoq_est_last_d[0][j][k][l] <= rdoq_est_last[j][k][l];
+                    end
+                end
+            end
+            for (i = 0; i < 24; i = i + 1) begin
+                for(j = 0; j < 2; j = j + 1)begin
+                    i_rdoq_est_level_d[0][i][j] <= rdoq_est_level[i][j];
+                end
+            end
+            for (i = 0; i < 24; i = i + 1) begin
+                for(j = 0; j < 2; j = j + 1)begin
+                    i_rdoq_est_run_d[0][i][j] <= rdoq_est_run[i][j];
+                end
+            end
+            for(i = 1; i < 4; i = i + 1)begin
+                i_width_log2_d[i]       <=  i_width_log2_d[i-1];
+                i_height_log2_d[i]      <=  i_height_log2_d[i-1];
+                i_err_scale_d[i]        <=  i_err_scale_d[i-1];
+                i_lambda_d[i]           <=  i_lambda_d[i-1];
+                i_diff_scale_d[i]       <=  i_diff_scale_d[i-1];
+            end
+            
+            
+            for(i = 1; i < 4; i = i + 1)begin
+                for(j = 0; j < 32; j = j + 1)begin
+                    i_left_pos_d[i][j]      <=  i_left_pos_d[i-1][j];
+                    i_bottom_pos_d[i][j]    <=  i_bottom_pos_d[i-1][j];
+                end
+            end
+
+            for(m = 1; m < 4; m = m + 1)begin
+                for(j = 0; j < 6; j = j + 1)begin
+                    for(k = 0; k < 12; k = k + 1)begin
+                        for(l = 0; l < 2; l = l + 1)begin
+                            i_rdoq_est_last_d[m][j][k][l] <= i_rdoq_est_last_d[m-1][j][k][l];
+                        end
+                    end
+                end
+                for (i = 0; i < 24; i = i + 1) begin
+                    for(j = 0; j < 2; j = j + 1)begin
+                        i_rdoq_est_level_d[m][i][j] <= i_rdoq_est_level_d[m-1][i][j];
+                    end
+                end
+                for (i = 0; i < 24; i = i + 1) begin
+                    for(j = 0; j < 2; j = j + 1)begin
+                        i_rdoq_est_run_d[m][i][j] <= i_rdoq_est_run_d[m-1][i][j];
+                    end
+                end
+            end
+
+        end
+    end
+
+
+
+
+
 
 //read
 initial begin
     clk             =       0;
-    reset           =       0;
+    rst_n           =       0;
 
     q_value         =       `w_q_value'd0;
     q_bits          =       `w_q_bits'd0;
@@ -139,10 +302,10 @@ initial begin
         end
     end
     #2;
-    reset = 1;
+    rst_n = 1;
     //Start
 
-//16x16
+    //16x16
     i_valid         =   1                           ;
 
     fp_r = $fopen("../../../../../result/origin_data/q_value/q_value_16x16.txt", "r");
@@ -248,7 +411,7 @@ initial begin
     end
 
 
-//32x32
+    //32x32
     i_valid         =   1                           ;
 
     fp_r = $fopen("../../../../../result/origin_data/q_value/q_value_32x32.txt", "r");
@@ -360,7 +523,7 @@ initial begin
 
 
 
-//8x8
+    //8x8
     i_valid         =   1                           ;
 
     fp_r = $fopen("../../../../../result/origin_data/q_value/q_value_8x8.txt", "r");
@@ -464,7 +627,7 @@ initial begin
         i_data[rd_i] = 0;
     end
 
-//4x4
+    //4x4
     i_valid         =   1                           ;
 
     fp_r = $fopen("../../../../../result/origin_data/q_value/q_value_4x4.txt", "r");
@@ -571,10 +734,6 @@ initial begin
     for (rd_i = 0; rd_i < 32; rd_i = rd_i + 1) begin
         i_data[rd_i] = 0;
     end
-
-
-
-
 end
 
 

@@ -44,17 +44,7 @@ genvar  o,p,q,r     ;
 wire    signed  [`w_preq_o_data     - 1 : 0]    pre_quant_coef              [31: 0]                 ;
 wire                                            pre_quant_valid                                     ;
 wire    signed  [`w_level_double    - 1 : 0]    pre_quant_level_double      [31: 0]                 ;
-wire            [`w_size            - 1 : 0]    pre_quant_width_log2                                ;
-wire            [`w_size            - 1 : 0]    pre_quant_height_log2                               ;
 wire            [`w_q_bits          - 1 : 0]    pre_quant_q_bits                                    ;
-wire    signed  [`w_err_scale       - 1 : 0]    pre_quant_err_scale                                 ;
-wire    signed  [`w_lambda          - 1 : 0]    pre_quant_lambda                                    ;
-wire    signed  [`w_diff_scale      - 1 : 0]    pre_quant_diff_scale                                ;
-wire            [`w_rdoq_est_last   - 1 : 0]    pre_quant_rdoq_est_last     [0 :  5][0 : 11][0 : 1] ;
-wire            [`w_rdoq_est_level  - 1 : 0]    pre_quant_rdoq_est_level    [0 : 23][0 :  1]        ;
-wire            [`w_rdoq_est_run    - 1 : 0]    pre_quant_rdoq_est_run      [0 : 23][0 :  1]        ;
-wire            [`w_pos             - 1 : 0]    pre_quant_left_pos          [0 : 31]                ;
-wire            [`w_pos             - 1 : 0]    pre_quant_bottom_pos        [0 : 31]                ;
 
 
 wire            [`w_size            - 1 : 0]    ocd_width_log2                                      ;
@@ -96,37 +86,14 @@ assign  o_d64_best_cost_tmp     =   lnpd_d64_best_cost_tmp      ;
 
         //input parameter   
         .q_value                (q_value                    ),
-
-        .i_width_log2           (cu_width_log2              ),      
-        .i_height_log2          (cu_height_log2             ),
         .i_q_bits               (q_bits                     ),
-        .i_err_scale            (err_scale                  ),
-        .i_lambda               (lambda                     ),
-        .i_diff_scale           (diff_scale                 ),
-
-        .i_rdoq_est_last        (rdoq_est_last              ),
-        .i_rdoq_est_level       (rdoq_est_level             ),
-        .i_rdoq_est_run         (rdoq_est_run               ),
-        .i_left_pos             (left_pos                   ),
-        .i_bottom_pos           (bottom_pos                 ),
 
         //input data    
         .i_valid                (i_valid                    ),
         .i_data                 (src_coef                   ),
 
         //output parameter
-        .o_width_log2           (pre_quant_width_log2       ),
-        .o_height_log2          (pre_quant_height_log2      ),
         .o_q_bits               (pre_quant_q_bits           ),
-        .o_err_scale            (pre_quant_err_scale        ),
-        .o_lambda               (pre_quant_lambda           ),
-        .o_diff_scale           (pre_quant_diff_scale       ),
-
-        .o_rdoq_est_last        (pre_quant_rdoq_est_last    ),
-        .o_rdoq_est_level       (pre_quant_rdoq_est_level   ),
-        .o_rdoq_est_run         (pre_quant_rdoq_est_run     ),
-        .o_left_pos             (pre_quant_left_pos         ),
-        .o_bottom_pos           (pre_quant_bottom_pos       ),
 
         //output data
         .o_valid                (pre_quant_valid            ),
@@ -141,18 +108,18 @@ assign  o_d64_best_cost_tmp     =   lnpd_d64_best_cost_tmp      ;
         .rst_n                  (rst_n                      ),
 
     //input parameter       
-        .i_width_log2           (pre_quant_width_log2       ),      
-        .i_height_log2          (pre_quant_height_log2      ),   
+        .i_width_log2           (cu_width_log2              ),      
+        .i_height_log2          (cu_height_log2             ),   
         .i_q_bits               (pre_quant_q_bits           ),
-        .i_err_scale            (pre_quant_err_scale        ),
-        .i_lambda               (pre_quant_lambda           ),
-        .i_diff_scale           (pre_quant_diff_scale       ),
+        .i_err_scale            (err_scale                  ),
+        .i_lambda               (lambda                     ),
+        .i_diff_scale           (diff_scale                 ),
     
-        .i_rdoq_est_last        (pre_quant_rdoq_est_last    ),
-        .i_rdoq_est_level       (pre_quant_rdoq_est_level   ),
-        .i_rdoq_est_run         (pre_quant_rdoq_est_run     ),
-        .i_left_pos             (pre_quant_left_pos         ),
-        .i_bottom_pos           (pre_quant_bottom_pos       ),
+        .i_rdoq_est_last        (rdoq_est_last              ),
+        .i_rdoq_est_level       (rdoq_est_level             ),
+        .i_rdoq_est_run         (rdoq_est_run               ),
+        .i_left_pos             (left_pos                   ),
+        .i_bottom_pos           (bottom_pos                 ),
 
 
     //input data                
