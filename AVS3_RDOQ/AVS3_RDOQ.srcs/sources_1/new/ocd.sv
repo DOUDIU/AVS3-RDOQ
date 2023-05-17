@@ -1058,14 +1058,14 @@ wire    signed  [31                     : 0]    i64Delta_tem            [0 :  1]
             end    
             for(o = 0; o < 32; o = o + 1)begin
                 assign  dCurrCost_tem[1][1][o]   =  err_x_err[1][o] +
-                                                    i_rdoq_est_run_d[1][ctx_level[o]    ][0] + 
-                                                    i_rdoq_est_run_d[1][ctx_level[o] + 1][0] << 3 - i_rdoq_est_run_d[1][ctx_level[o] + 1][0] + 
+                                                    i_rdoq_est_level_d[1][ctx_level[o]    ][0] + 
+                                                    i_rdoq_est_level_d[1][ctx_level[o] + 1][0] << 3 - i_rdoq_est_level_d[1][ctx_level[o] + 1][0] + 
                                                     ((funclog2(temp_coef_abs_d2[o] - 1 - 7) < 12 ? (funclog2(temp_coef_abs_d2[o] - 1 - 7) << 1 ) + 1 : 25) << 16);
             end    
             for(o = 0; o < 32; o = o + 1)begin
                 assign  dCurrCost_tem[2][1][o]   =  err_x_err[1][o] +
-                                                    i_rdoq_est_run_d[1][ctx_level[o]    ][0] + 
-                                                    i_rdoq_est_run_d[1][ctx_level[o] + 1][1];
+                                                    i_rdoq_est_level_d[1][ctx_level[o]    ][0] + 
+                                                    i_rdoq_est_level_d[1][ctx_level[o] + 1][1];
             end
         endgenerate
 
@@ -1082,22 +1082,22 @@ wire    signed  [31                     : 0]    i64Delta_tem            [0 :  1]
                         dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i];
                     end
                     4 : begin
-                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + i_rdoq_est_run_d[1][ctx_level[i] + 1][0];
+                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + i_rdoq_est_level_d[1][ctx_level[i] + 1][0];
                     end
                     5 : begin
-                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + (i_rdoq_est_run_d[1][ctx_level[i] + 1][0] << 1);
+                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + (i_rdoq_est_level_d[1][ctx_level[i] + 1][0] << 1);
                     end
                     6 : begin
-                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + (i_rdoq_est_run_d[1][ctx_level[i] + 1][0] << 1) + i_rdoq_est_run_d[1][ctx_level[i] + 1][0];
+                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + (i_rdoq_est_level_d[1][ctx_level[i] + 1][0] << 1) + i_rdoq_est_level_d[1][ctx_level[i] + 1][0];
                     end
                     7 : begin
-                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + (i_rdoq_est_run_d[1][ctx_level[i] + 1][0] << 2);
+                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + (i_rdoq_est_level_d[1][ctx_level[i] + 1][0] << 2);
                     end
                     8 : begin
-                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + (i_rdoq_est_run_d[1][ctx_level[i] + 1][0] << 2) + i_rdoq_est_run_d[1][ctx_level[i] + 1][0];
+                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + (i_rdoq_est_level_d[1][ctx_level[i] + 1][0] << 2) + i_rdoq_est_level_d[1][ctx_level[i] + 1][0];
                     end
                     9 : begin
-                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + (i_rdoq_est_run_d[1][ctx_level[i] + 1][0] << 2) + (i_rdoq_est_run_d[1][ctx_level[i] + 1][0] << 1);
+                        dCurrCost[1][i]     <=  dCurrCost_tem[2][1][i] + (i_rdoq_est_level_d[1][ctx_level[i] + 1][0] << 2) + (i_rdoq_est_level_d[1][ctx_level[i] + 1][0] << 1);
                     end
                     default: begin 
                         dCurrCost[1][i]     <=  dCurrCost_tem[1][1][i];
