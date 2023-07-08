@@ -983,7 +983,7 @@ wire    signed  [31                     : 0]    i64Delta_tem            [0 :  1]
 
         generate            
             for(o = 0; o < 32; o = o + 1)begin
-                assign  dCurrCost_extra[o]      =   GET_IEP_RATE + (run[o] == 0 ? i_rdoq_est_run_d[1][ctx_run[o]][1] : i_rdoq_est_run_d[1][ctx_run[o] + 1][1]);
+                assign  dCurrCost_extra[o]      =   GET_IEP_RATE + (run[o] == 0 ? i_rdoq_est_run_d[1][ctx_run[o]][1] : i_rdoq_est_run_d[1][ctx_run[o] + 1][1]);//may have some trouble with the last value 1, may 0
             end
         endgenerate
 
