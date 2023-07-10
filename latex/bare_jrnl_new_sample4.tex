@@ -14,7 +14,7 @@
 
 \usepackage{multirow}
 \usepackage{booktabs}
-\usepackage{makecell}                 % 三线�?-竖线
+\usepackage{makecell}                 % 三线�??-竖线
 
 \usepackage[backref]{hyperref} 
 \hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore}
@@ -316,9 +316,9 @@ As described previously, we propose a parallel RDOQ scheme that consists of two 
   \renewcommand{\algorithmicensure}{\textbf{Output:}}
   \caption{The proposed parallelized RDOQ algorithm}
   \label{the proposed LNPD algorithm}
-	\begin{algorithmic}[1] % 控制�?否有序号
-	\REQUIRE  $c_{0,..,W \times H-1}$, \ $W$, \ $H$, \ $\lambda$.      % input 的内�?
-	\ENSURE $l_{0,..,W \times H-1}^{*}$, \ $i_{}^{*}$. \\      % output 的内�?	
+	\begin{algorithmic}[1] 
+	\REQUIRE  $c_{0,..,W \times H-1}$, \ $W$, \ $H$, \ $\lambda$.      
+	\ENSURE $l_{0,..,W \times H-1}^{*}$, \ $i_{}^{*}$. \\      
 	\STATE $\textsc{Temp \ buffer:} \ S_{best}[H], \ E_{best}[H], \ S_{all}[H], \ i_{best}^{*}[H]$;
 	% for loop1
 	\FORALL {$u = 0,1,\cdots,W-1$}
@@ -364,19 +364,20 @@ As described previously, we propose a parallel RDOQ scheme that consists of two 
 	\end{algorithmic}
 \end{algorithm}
 
-
-\subsection{SIMD-based fast RDOQ} 
-Although the algorithm proposed in subsection \ref{subsec:paraRDOQ} can be run in parallel for all coefficients within the same column, it may take longer execution time on the Intel X86 platform as each coefficient is processed without skipping. A SIMD-based approach is adopted to address this issue, and the implementation and design are explained below. 
-
-During the pre-quantization step, each transform coefficient is processed independently. In the SIMD optimization, we execute four coefficients simultaneously by utilizing intrinsics. Similarly, the parallelism is four coefficients per instruction in the OCL decision step, consistent with the parallelism of the pre-quantization step. For the decision of $l_{i}^{*}$, there may have different numbers of candidate level $L_{i}$ for each of the four parallelized coefficients, which will impact the parallelization by intrinsic due to its irregularity. To address this issue, all coefficients will calculate the RD cost for three candidate levels as shown in Fig.~\ref{selection}. It should be noted that the candidate levels for the gray color block will not participate into the optimal level $l_{i}^{*}$ comparison. For the intrinsic of minimum cost comparison, the PCMPGTD instruction is used and the result is bit-inverted by the VPANDN instruction.
-\par
-\begin{figure}[!h]
+%\par
+\begin{figure}[h]
 	\centering
 	\centerline{\includegraphics[width=0.38\textwidth]{figure/SIMDSEL.png}} 
 	% figure caption is below the figure
 	\caption{An example of OCL decision process using SIMD.}
 	\label{selection} % Give a unique label
 \end{figure} 
+
+\subsection{SIMD-based fast RDOQ} 
+Although the algorithm proposed in subsection \ref{subsec:paraRDOQ} can be run in parallel for all coefficients within the same column, it may take longer execution time on the Intel X86 platform as each coefficient is processed without skipping. A SIMD-based approach is adopted to address this issue, and the implementation and design are explained below. 
+
+
+During the pre-quantization step, each transform coefficient is processed independently. In the SIMD optimization, we execute four coefficients simultaneously by utilizing intrinsics. Similarly, the parallelism is four coefficients per instruction in the OCL decision step, consistent with the parallelism of the pre-quantization step. For the decision of $l_{i}^{*}$, there may have different numbers of candidate level $L_{i}$ for each of the four parallelized coefficients, which will impact the parallelization by intrinsic due to its irregularity. To address this issue, all coefficients will calculate the RD cost for three candidate levels as shown in Fig.~\ref{selection}. It should be noted that the candidate levels for the gray color block will not participate into the optimal level $l_{i}^{*}$ comparison. For the intrinsic of minimum cost comparison, the PCMPGTD instruction is used and the result is bit-inverted by the VPANDN instruction.
 
 In the LSC position decision step, the pixel parallelism is four coefficients similar to the previous steps. The shift buffer is adopted to save the buffer as illustrated in subsection \ref{subsecgreedy}. Rotation instruction is needed to implement this behavior. We use the VPSRLDQ, Extract, and Insert operations to rotate the data. VPSRLDQ instruction shifts the data in the 128-bit channel by a specified byte, the extract operation extracts the data in the channel, and the insert operation inserts the data into a specified location, respectively. 
 
@@ -403,18 +404,42 @@ The timing diagram xxx. plot different TUs, Wx4 Wx8 Wx16 Wx32 cases. ...
 In the pre-quantization step, all the transformed coefficients $c_{i}$ undergo the absolute, multiplication, and round operations according to Eq.~\eqref{round}. The division operation in Eq.~\eqref{round} is transformed to multiplication and shift operations in HPM-4.0.1. The absolute value of $c_{i}$ is multiplied by $q\_value$, which $q\_value$ is derived according to $QP$ and TU size. The output of this product is then right shifted by $q\_bits$ to obtain the final pre-quantization coefficients. It is obvious that there is no data dependency in this step, all coefficients output from different TUs can be processed in parallel. The hardware architecture is shown as $S1$ and $S2$ in Fig.~\ref{timing diagram}. 
 
 \subsection{OCL decision}
-The strong run-level context dependency between neighboring coefficients poses a challenge for the parallelized hardware implementation and can hinder the real-time processing. This data dependency problem is partially resolved by the parallelized OCL algorithm in subsection \ref{subsecOCL:B}. The proposed algorithm segregates the context dependency from TU-level to zig-zag scanline line level, which limits the data dependency within one scanline. This allows for parallelism between scanlines, but the coefficients within each scanline must be processed in serial. The scanline-level dependency exists for the derivation of the variables $pre\_level_i$ and $run_i$, and their derivation process is shown in Eq.~\eqref{prevlevel} and Eq.~\eqref{run}. From these two formulas, it indicates that the $pre\_level_i$ and $run_i$ depend on the optimal coefficient level $l _{i-1}^{*}$ or $l _{i+1}^{*}$ for the up-right and down-left scanline, respectively. However, determining the optimal coefficient level involves complex RD cost calculations, and the rate cost, in turn, depends on $pre\_level_i$ and $run_i$. As a result, this dependency increases the complexity of the hardware design. 
+The strong run-level context dependency between neighboring coefficients poses a challenge for the parallelized hardware implementation and can hinder the real-time processing. This data dependency problem is partially resolved by the parallelized OCL algorithm in subsection \ref{subsecOCL:B}. The proposed algorithm segregates the context dependency from TU-level to zig-zag scanline line level, which limits the data dependency within one scanline. This allows for parallelism between scanlines, but the coefficients within each scanline must be processed in serial. 
+The scanline-level dependency exists for the derivation of the variables $pre\_level_i$ and $run_i$, and their derivation process is shown in Eq.~\eqref{prevlevel} and Eq.~\eqref{run}. From these two formulas, it indicates that the $pre\_level_i$ and $run_i$ depend on the optimal coefficient level $l _{i-1}^{*}$ or $l _{i+1}^{*}$ for the up-right and down-left scanline, respectively. However, determining the optimal coefficient level involves complex RD cost calculations, and the rate cost, in turn, depends on $pre\_level_i$ and $run_i$. As a result, this dependency increases the complexity of the hardware design. 
 
-To resolve above problem, the RD cost calculation is split into different pipeline stages, ranging from $S2$ to $S4$ as illustrated in Fig.~\ref{timing diagram}. The pipeline stage of the distortion calculation is allocated before the rate calculation. This is because that the distortion is calculated without context dependency for all candidate levels. The distortion calculation is distributed from stage $S2$ to $S3$, where each stage features a multiplication operation. The rate calculation and RD cost comparison is scheduled at stage $S4$. This scheduling will make the OCL decision implement in pipeline. The $pre\_level_i$ and $run_i$ derivation and optimal coefficient level decision are implemented in one cycle, and then utilizing data-forwarding method to resolve this dependency \emph{TODO: cite architecture.}. Furthermore, due to that the RD cost is optimized to a more efficient form in subsection \ref{subsecOCL:B}, there is no multiplication operation in this pipeline stage. This optimization has the potential to improve the timing of the RTL design, enabling our RTL design to operate at a higher frequency.  
+To resolve above problem, the RD cost calculation is split into different pipeline stages, ranging from $S2$ to $S4$ as illustrated in Fig.~\ref{timing diagram}. 
+The pipeline stage of the distortion calculation is allocated before the rate calculation. This is because that the distortion is calculated without context dependency for all candidate levels. The distortion calculation is distributed from stage $S2$ to $S3$, where each stage features a multiplication operation. 
+The rate calculation and RD cost comparison is scheduled at stage $S4$. This scheduling will make the OCL decision implement in pipeline. The $pre\_level_i$ and $run_i$ derivation and optimal coefficient level decision are implemented in one cycle, and then utilizing data-forwarding method to resolve this dependency \cite{harris2010digital}. Furthermore, due to that the RD cost is optimized to a more efficient form in subsection \ref{subsecOCL:B}, there is no multiplication operation in this pipeline stage. This optimization has the potential to improve the timing of the RTL design, enabling our RTL design to operate at a higher frequency.  
 
-\begin{figure*}[htbp]
-	\centering
-	\centerline{\includegraphics[width=0.90\textwidth]{pic_pan/rdcost_calculation.png}} 
-	% figure caption is below the figure
-	\caption{The calculation timing diagram of the RD-cost.}
-	\label{RD-cost} % Give a unique label
-\end{figure*}
+\begin{equation}\label{err}
+\left\{
+\begin{aligned}
+	&Err_{0} 	=  Q_{p} \times err_{scale} << 20,  \\
+	&Err_{l-1} 	= \left ( Q_{p} - \left ( \lvert l-1 \rvert << q_{bits} \right ) \right ) \times err_{scale} << 20,  \\
+	&Err_{l} 	= \left ( Q_{p} - \left ( \lvert l \rvert << q_{bits} \right ) \right ) \times err_{scale} << 20,  \\ 
+\end{aligned}
+\right.
+\end{equation}
 
+\begin{equation}\label{level_{double}}
+	\begin{aligned}
+		Q_{p} = \lvert C_{u,v} \rvert \times q_{value},
+	\end{aligned}
+\end{equation}
+
+\begin{equation}\label{distortion}
+	\begin{aligned}
+		Dist_{i} = Err_{i}^{2}, i = 0, l-1, l,
+	\end{aligned}
+\end{equation}
+
+% \begin{figure*}[htbp]
+% 	\centering
+% 	\centerline{\includegraphics[width=0.90\textwidth]{pic_pan/rdcost_calculation.png}} 
+% 	% figure caption is below the figure
+% 	\caption{The calculation timing diagram of the RD-cost.}
+% 	\label{RD-cost} % Give a unique label
+% \end{figure*}
 \begin{figure}[!h]
 	\centering
 	\centerline{\includegraphics[width=0.49\textwidth]{pic_pan/rate_calculation.png}} 
@@ -424,7 +449,11 @@ To resolve above problem, the RD cost calculation is split into different pipeli
 \end{figure}
 
 \emph{TODO: draw a better architecture, then illustrates it.}. 
-The overall timing diagram for OCL processing is presented in Fig.~\ref{RD-cost}. Upon obtaining the product from $S1$, as shown in Fig.~\ref{timing diagram}, the next stage involves calculating the distortion cost. The maximum number of candidates, as listed in Tab.~\ref{tab:candidate list}, does not exceed three, and the rate cost of these candidates are computed in parallel. Additionally, the double multiplication operation used in the distortion cost calculation is divided into two stages to improve timing performance.
+
+%The overall timing diagram for OCL processing is presented in Fig.~\ref{RD-cost}. Upon obtaining the product from $S1$, as shown in Fig.~\ref{timing diagram}, the next stage involves calculating the distortion cost. The maximum number of candidates, as listed in Tab.~\ref{tab:candidate list}, does not exceed three, and the rate cost of these candidates are computed in parallel. Additionally, the double multiplication operation used in the distortion cost calculation is divided into two stages to improve timing performance.
+In the phase of OCL, we should calculate the RD-cost of all candidates as list in Tab.~\ref{tab:candidate list} and select the minimum one as the optimal choice. The overall timing diagram for OCL processing is presented in Fig.~\ref{RD-cost}. As mentioned in \ref{pRDcost}. 
+
+Upon obtaining the product from $S1$, the next stage involves calculating the distortion cost. Considering that the maximum number of the RD-cost candidates would not exceed three as listed in Tab.~\ref{tab:candidate list}, and we should calculate the rate cost of these candidates in parallel. Additionally, the double multiplication operation used in the distortion cost calculation is divided into two stages to improve timing performance.
 
 As mentioned earlier, the calculation of rate cost and the comparison of RD-cost should be performed within a single cycle due to their data dependency. In fact, there are three distinct situations that need to be considered for calculating the rate cost of each candidate, as depicted in HPM-4.0.1. Consequently, the hardware design should accommodate these three rate cost strategies as separate and independent entities. The detail hardware architecture for the rate cost calculation is illustrated in Fig.~\ref{rate cost}. When the candidate value is equal to one, the rate cost is solely determined by the $est_level$ parameter, which is passed into the RDOQ process, as pepicted in HPM-4.0.1. However, for candidate values greater than eight, the rate cost calculation becomes more complex. In addition to $est_level$, it also takes into account the Golomb code of the candidate. For the remaining candidates, the rate cost is dependent on the input value $est_level$. Furthermore, one component of the rate cost requires multiplication with the candidate. All multiplication operations involving $est_level$ and the limited range of candidates (between one and eight) are implemented using separate add and shift operations, thus reduce the area consumption and benefit the timing greatly. 
 
@@ -435,7 +464,7 @@ The values of $R_{l}$ and $R_{l-1}$ in the rate cost calculations are determined
 The parallelized LSC position decision proposed in subsection \ref{subsecgreedy} resolves the zig-zag scan problem and enhances the parallelism. According to the algorithm, the hardware architecture of the LSC position decision involves two components. One is the on-the-fly sub-optimal scanline LSC position decision, which calculates the sub-optimal LSC position for $W$ scanlines. The other is the optimal LSC decision for the remaining $H-1$ scanline. In Fig.~\ref{timing diagram}, the on-the-fly component is scheduled at the pipeline stage $S5$, and the remaining component distributes from stage $S6$ to $S9$. The remaining component start process when all $W$ scanlines finished the on-the-fly processing, which the timing diagram is shown in xxx. 
 
 % The proposed greedy strategy based parallelized LSC position decision in section III-B resolved the problem that the original zigzag scan order would lead to a low parallelism. And according to the proposed algorithm, a fully pipelined LSC hardware architecture is proposed, the wholly hardware architecture of LSC position decision is separated into two parts. The first one is to determine the sub-optimal position of each scanlines, recording the sub-best RD cost in the meanwhile, the remaining part is to determine the final optimal position from all sub-optimal position in a multiple iteration hardware architecture.
-Actually, as mentioned in subsection III-B, the calculation of the sub-optimal position are independently of each scanlines. Considering that the RD-cost are outputted from OCL module in the column by column order, in order to align each scanlines, the temporal output are the input of the sub-optimal position calculation architecture, thus a shift architecture with combinatorial logic are added to each temporal output. As the on-the-fly algorithm depicted in subsection III-B, each cycles would get a final sub-optimal position of one scanline, the resullt would send to an extra architecture do comparison and register the optimal position of the former $W$ scanlines. After the last column of one transform unit entered, all sub-optimal position of each scanlines would got, and the remaining iterative calculation part start. All the transform units would go through into a $H_{max} - 1$ pipelines architecture, a buffer is used to store the sub-optimal position of the last $H - 1$ scanlines in void of the collision with other transform units, and the comparison would start one by one, after H cycles, the optimal-position of a single transform unit is calculated, then the value would not change in the next $32 - W$ pipelines. Thus, we could got a optimal LSC position after $3 + W + H - 1$ cycles in the LSC stage. 
+Actually, as mentioned in subsection \ref{subsecgreedy}, the calculation of the sub-optimal position are independently of each scanlines. Considering that the RD-cost are outputted from OCL module in the column by column order, in order to align each scanlines, the temporal output are the input of the sub-optimal position calculation architecture, thus a shift architecture with combinatorial logic are added to each temporal output. As the on-the-fly algorithm depicted in subsection \ref{subsecgreedy}, each cycles would get a final sub-optimal position of one scanline, the resullt would send to an extra architecture do comparison and register the optimal position of the former $W$ scanlines. After the last column of one transform unit entered, all sub-optimal position of each scanlines would got, and the remaining iterative calculation part start. All the transform units would go through into a $H_{max} - 1$ pipelines architecture, a buffer is used to store the sub-optimal position of the last $H - 1$ scanlines in void of the collision with other transform units, and the comparison would start one by one, after H cycles, the optimal-position of a single transform unit is calculated, then the value would not change in the next $32 - W$ pipelines. Thus, we could got a optimal LSC position after $3 + W + H - 1$ cycles in the LSC stage. 
 
 \emph{TODO: different TU parallelized implemented? shift register?}
 
@@ -586,6 +615,30 @@ The proposed hardware architecture has been implemented in Verilog and synthesiz
 		\cmidrule[0.75pt]{1-4}
 		\makecell[c]{Pre-quantization + OCL decision \\ + LSC position decision} & 31.35\% & 28.63\% & 28.56\%  \\            
 		\midrule[0.75pt] \specialrule{0em}{0.35pt}{0.35pt} \midrule[0.75pt] % \bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{table}[!ht]
+	%\usepackage{hhline}
+	\caption{Comparasion of hardware resource consumption.}
+	\label{hardware resource consumption}
+	\centering
+	\tabcolsep 7pt  % 
+	\arrayrulewidth 0.75pt
+	\begin{tabular}{c | c  c } 
+		\midrule[0.75pt] \specialrule{0em}{0.35pt}{0.35pt} \midrule[0.75pt] 
+		Design 		& \cite{zhao2023scanline}     & RA     \\   
+		\cmidrule[0.75pt]{1-3}  
+		LUTs   		& 109759 	& 20.35\% \\ 
+		\cmidrule[0.75pt]{1-3}
+		FFs   		& 29576 	& 27.36\% \\      
+		\cmidrule[0.75pt]{1-3}
+		DSPs  		& 481 		& 27.36\% \\     
+		\cmidrule[0.75pt]{1-3}
+		Cycles  	& 538 		& 27.36\% \\     
+		\cmidrule[0.75pt]{1-3}
+		Frequency  	& 200MHz	& 27.36\% \\            
+		\midrule[0.75pt] \specialrule{0em}{0.35pt}{0.35pt} \midrule[0.75pt] 
 	\end{tabular}
 \end{table}
 
