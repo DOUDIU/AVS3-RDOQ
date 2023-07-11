@@ -364,14 +364,6 @@ As described previously, we propose a parallel RDOQ scheme that consists of two 
 	\end{algorithmic}
 \end{algorithm}
 
-%\par
-\begin{figure}[h]
-	\centering
-	\centerline{\includegraphics[width=0.38\textwidth]{figure/SIMDSEL.png}} 
-	% figure caption is below the figure
-	\caption{An example of OCL decision process using SIMD.}
-	\label{selection} % Give a unique label
-\end{figure} 
 
 \subsection{SIMD-based fast RDOQ} 
 Although the algorithm proposed in subsection \ref{subsec:paraRDOQ} can be run in parallel for all coefficients within the same column, it may take longer execution time on the Intel X86 platform as each coefficient is processed without skipping. A SIMD-based approach is adopted to address this issue, and the implementation and design are explained below. 
@@ -379,8 +371,16 @@ Although the algorithm proposed in subsection \ref{subsec:paraRDOQ} can be run i
 
 During the pre-quantization step, each transform coefficient is processed independently. In the SIMD optimization, we execute four coefficients simultaneously by utilizing intrinsics. Similarly, the parallelism is four coefficients per instruction in the OCL decision step, consistent with the parallelism of the pre-quantization step. For the decision of $l_{i}^{*}$, there may have different numbers of candidate level $L_{i}$ for each of the four parallelized coefficients, which will impact the parallelization by intrinsic due to its irregularity. To address this issue, all coefficients will calculate the RD cost for three candidate levels as shown in Fig.~\ref{selection}. It should be noted that the candidate levels for the gray color block will not participate into the optimal level $l_{i}^{*}$ comparison. For the intrinsic of minimum cost comparison, the PCMPGTD instruction is used and the result is bit-inverted by the VPANDN instruction.
 
-In the LSC position decision step, the pixel parallelism is four coefficients similar to the previous steps. The shift buffer is adopted to save the buffer as illustrated in subsection \ref{subsecgreedy}. Rotation instruction is needed to implement this behavior. We use the VPSRLDQ, Extract, and Insert operations to rotate the data. VPSRLDQ instruction shifts the data in the 128-bit channel by a specified byte, the extract operation extracts the data in the channel, and the insert operation inserts the data into a specified location, respectively. 
+%\par
+\begin{figure}[!h]
+	\centering
+	\centerline{\includegraphics[width=0.38\textwidth]{figure/SIMDSEL.png}} 
+	% figure caption is below the figure
+	\caption{An example of OCL decision process using SIMD.}
+	\label{selection} % Give a unique label
+\end{figure} 
 
+In the LSC position decision step, the pixel parallelism is four coefficients similar to the previous steps. The shift buffer is adopted to save the buffer as illustrated in subsection \ref{subsecgreedy}. Rotation instruction is needed to implement this behavior. We use the VPSRLDQ, Extract, and Insert operations to rotate the data. VPSRLDQ instruction shifts the data in the 128-bit channel by a specified byte, the extract operation extracts the data in the channel, and the insert operation inserts the data into a specified location, respectively. 
 
 \section{Fully pipelined Hardware Architecture Design}
 It is a fact that the RDOQ algorithm shows high computational complexity and strong data dependency, which poses significant challenges for real-time video coding. In the previous section \ref{sec:3}, a parallelized RDOQ algorithm is proposed to resolve these problems. In this section, a fully pipelined and high-throughput hardware architecture is designed for the parallelized algorithm. 
@@ -394,7 +394,7 @@ It is a fact that the RDOQ algorithm shows high computational complexity and str
 \end{figure*}
 
 \subsection{Overall Architecture}
-The TU size in AVS3 standard can range from $4\times4$ to $64\times64$. However, to reduce the coefficient coding for large TU size, only the first 32 rows/columns coefficients are kept and the high-frequency coefficients are zeroed out. As a result, the width $W$ and height $H$ of the TU for RDOQ must not exceed 32. To facilitate this constraint, the RDOQ hardware architecture is designed with a pixel parallelism of 32, which means that a maximum of 32 coefficients within the same column can be processed simultaneously. To improve parallelism for TUs with height $H$ smaller than 32, multiple TUs are combined and processed in parallel by reusing hardware resources. Specifically, the architecture can simultaneously process eight $W\times4$ TUs, four $W\times8$ TUs, and two $W\times16$ TUs, respectively. The width $W$ should be uniform across the parallelized TUs. \emph{TODO: HW related description? architecture?}
+The TU size in AVS3 standard can range from $4\times4$ to $64\times64$. However, to reduce the coefficient coding for large TU size, only the first 32 rows/columns coefficients are kept and the high-frequency coefficients are zeroed out. As a result, the width $W$ and height $H$ of the TU for RDOQ must not exceed 32. To facilitate this constraint, the RDOQ hardware architecture is designed with a pixel parallelism of 32, which means that a maximum of 32 coefficients within the same column can be processed simultaneously. To improve parallelism for TUs with height $H$ smaller than 32, multiple TUs are combined and processed in parallel by reusing hardware resources. Specifically, the architecture can simultaneously process eight $W\times4$ TUs, four $W\times8$ TUs, and two $W\times16$ TUs, respectively. The width $W$ should be uniform across the parallelized TUs.
 
 The designed hardware architecture is shown in Fig.~\ref{timing diagram}. The architecture consists nine pipeline stages, where pre-quantization step occupies $S1$ and $S2$, OCL decision step occupies $S2$, $S3$, and $S4$, and LSC decision step occupies the last five pipeline stages. From $S1$ to $S6$, it will be on-the-fly processing for each column, which implements the for loop from line 2 to 31 in Algorithm \ref{the proposed LNPD algorithm}. From $S7$ to $S9$, it decides the final optimal $i_{}^{*}$, which implements the for loop from line 32 to 34 in Algorithm \ref{the proposed LNPD algorithm}. The four-input sequential comparator are adopted to get the optimal $i_{}^{*}$. As the maximum $H$ is 32, $S7$ utilized eight comparators, $S8$ utilized two comparators, and $S9$ utilized one comparator, respectively. 
 
@@ -467,12 +467,21 @@ As mentioned earlier, the calculation of rate cost and the comparison of RD-cost
 \end{figure}
 
 \subsection{LSC position decision}
-The parallelized LSC position decision proposed in subsection \ref{subsecgreedy} resolves the zig-zag scan problem and enhances the parallelism. According to the algorithm, the hardware architecture of the LSC position decision involves two components. One is the on-the-fly sub-optimal scanline LSC position decision, which calculates the sub-optimal LSC position for $W$ scanlines. The other is the optimal LSC decision for the remaining $H-1$ scanline. In Fig.~\ref{timing diagram}, the on-the-fly component is scheduled at the pipeline stage $S5$, and the remaining component distributes from stage $S6$ to $S9$. The remaining component start process when all $W$ scanlines finished the on-the-fly processing, which the timing diagram is shown in xxx. 
 
-% The proposed greedy strategy based parallelized LSC position decision in section III-B resolved the problem that the original zigzag scan order would lead to a low parallelism. And according to the proposed algorithm, a fully pipelined LSC hardware architecture is proposed, the wholly hardware architecture of LSC position decision is separated into two parts. The first one is to determine the sub-optimal position of each scanlines, recording the sub-best RD cost in the meanwhile, the remaining part is to determine the final optimal position from all sub-optimal position in a multiple iteration hardware architecture.
-Actually, as mentioned in subsection \ref{subsecgreedy}, the calculation of the sub-optimal position are independently of each scanlines. Considering that the RD-cost are outputted from OCL module in the column by column order, in order to align each scanlines, the temporal output are the input of the sub-optimal position calculation architecture, thus a shift architecture with combinatorial logic are added to each temporal output. As the on-the-fly algorithm depicted in subsection \ref{subsecgreedy}, each cycles would get a final sub-optimal position of one scanline, the resullt would send to an extra architecture do comparison and register the optimal position of the former $W$ scanlines. After the last column of one transform unit entered, all sub-optimal position of each scanlines would got, and the remaining iterative calculation part start. All the transform units would go through into a $H_{max} - 1$ pipelines architecture, a buffer is used to store the sub-optimal position of the last $H - 1$ scanlines in void of the collision with other transform units, and the comparison would start one by one, after H cycles, the optimal-position of a single transform unit is calculated, then the value would not change in the next $32 - W$ pipelines. Thus, we could got a optimal LSC position after $3 + W + H - 1$ cycles in the LSC stage. 
+The proposed greedy strategy based parallelized LSC position decision as outlined in subsection \ref{subsecgreedy}, effectively addresses the context dependency inherent in the zig-zag scan order. Consequently, the hardware architecture for the LSC position decision can be designed to incorporate high parallelism.
 
-\emph{TODO: different TU parallelized implemented? shift register?}
+The proposed hardware architecture of the LSC position decision is scheduled from stage $S5$ to $S9$ as shown in Fig.~\ref{timing diagram}. This architecture can be further divided into three key components, each serving a distinct purpose.
+
+The first component is following the determination of the minimum RD-cost as the optimal choice. The calculation of $\Delta J_{j}$, $E_{non_lsc}$, and $E_{lsc}$, as listed in Eq.~\eqref{A_i,last}, is scheduled at stage $S5$, preparing for the subsequent calculation of the optimal LSC position.
+
+The second component is dedicated to making on-the-fly sub-optimal scanline LSC position decisions, where its used to calculate the optimal LSC position for the previous $W$ scanlines. This calculation is scheduled at the pipeline stage $S6$. 
+Considering that the input to stage $S6$ is in a column-by-column manner, and each scanline in a single TU is in the up-right or down-left order. Thus, a shift hardware architecture is incorporated to align the temporal calculate results of each scanline, which corresponds to the for loop from line 28 to 30 in Algorithm \ref{the proposed LNPD algorithm}. 
+Besides, the on-the-fly algorithm as described in subsection \ref{subsecgreedy} results in a sub-optimal position of an entire scanline being obtained in each cycle. Subsequently, a comparison is carried out between the obtained results and the previous scanlines, enabling the determination of the optimal position and its subsequent registration.
+
+The remaining component focuses on calculating the optimal LSC decision for the remaining $H-1$ scanlines. This process is distributed across pipeline stages $S7$ to $S9$, facilitating the determination of the final optimal LSC positions.
+Upon the final column of a given TU reaching the stage $S7$, all sub-optimal positions for each scanline are obtained. At this point, the computation process for determining the optimal LSC decision of the remaining $H-1$ scanlines commences.
+Considering that the maximum height of the TU is 32, the process of comparing sub-optimal positions using a one-by-one sequence requires a total of 32 cycles. To minimize latency and enhance efficiency, the comparison of sub-optimal positions is executed in parallel, resulting in a reduction to just three cycles.
+Take the TU with block size of 8$\times$8 for example. Once the last column of the TU enters stage S7, the two sub-optimal positions for each set of 4 scanlines are determined. These sub-optimal positions are then passed on to stage S8, where the final optimal position is obtained. Besides, the delay operation is adopted in $S9$ to align the output. Hence, the optimal LSC position is pipelined and outputted after a total of 40 ($6 + W_{max} - 1 + 3$) cycles.
 
 \begin{figure*}[htbp]
 	\centering
@@ -637,9 +646,10 @@ The proposed hardware architecture has been implemented in Verilog and synthesiz
 		\cmidrule[0.75pt]{1-3}  
 		LUTs   		& 109759 	& 72017 	\\ 
 		\cmidrule[0.75pt]{1-3}
-		FFs   		& 29576 	& 1723440 	\\      
+		FFs   		& 29576 	& 23440 	\\      
 		\cmidrule[0.75pt]{1-3}
 		DSPs  		& 481 		& 224 		\\     
+		\cmidrule[0.75pt]{1-3} 
 		Parallelism	& 32		& 32		\\
 		\cmidrule[0.75pt]{1-3}
 		Cycles  	& 538 		& 40		\\     
