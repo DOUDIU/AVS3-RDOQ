@@ -14,7 +14,7 @@
 
 \usepackage{multirow}
 \usepackage{booktabs}
-\usepackage{makecell}                 % 三线�??-竖线
+\usepackage{makecell}                 % 三线�???-竖线
 
 \usepackage[backref]{hyperref} 
 \hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore}
@@ -389,19 +389,19 @@ It is a fact that the RDOQ algorithm shows high computational complexity and str
 	\centering
 	\centerline{\includegraphics[width=0.90\textwidth]{pic_pan/overall_architecture.png}} 
 	% figure caption is below the figure
-	\caption{The timing diagram of the overall RDOQ architecture.}
+	\caption{The hardware architecture design of the parallelized RDOQ algorithm.}
 	\label{timing diagram} % Give a unique label
 \end{figure*}
 
 \subsection{Overall Architecture}
-The TU size in AVS3 standard can range from $4\times4$ to $64\times64$. However, to reduce the coefficient coding for large TU size, only the first 32 rows/columns coefficients are kept and the high-frequency coefficients are zeroed out. As a result, the width $W$ and height $H$ of the TU for RDOQ must not exceed 32. To facilitate this constraint, the RDOQ hardware architecture is designed with a pixel parallelism of 32, which means that a maximum of 32 coefficients within the same column can be processed simultaneously. To improve parallelism for TUs with height $H$ smaller than 32, multiple TUs are combined and processed in parallel by reusing hardware resources. Specifically, the architecture can simultaneously process eight $W\times4$ TUs, four $W\times8$ TUs, and two $W\times16$ TUs, respectively. The width $W$ should be uniform across the parallelized TUs.
+The TU size in AVS3 standard can range from $4\times4$ to $64\times64$. However, to reduce the coefficient coding for large TU size, only the first 32 rows/columns coefficients are kept and the high-frequency coefficients are zeroed out. As a result, the width $W$ and height $H$ of the TU for RDOQ must not exceed 32. To facilitate this constraint, the RDOQ hardware architecture is designed with a pixel parallelism of 32, which means that a maximum of 32 coefficients within the same column can be processed simultaneously. To improve parallelism for TUs with height $H$ smaller than 32, multiple TUs are combined and processed in parallel by reusing hardware resources. Specifically, the architecture can simultaneously process eight $W\times4$ TUs, four $W\times8$ TUs, and two $W\times16$ TUs, respectively. The width $W$ should be uniform across the parallelized TUs. 
 
-The designed hardware architecture is shown in Fig.~\ref{timing diagram}. The architecture consists nine pipeline stages, where pre-quantization step occupies $S1$ and $S2$, OCL decision step occupies $S2$, $S3$, and $S4$, and LSC decision step occupies the last five pipeline stages. From $S1$ to $S6$, it will be on-the-fly processing for each column, which implements the for loop from line 2 to 31 in Algorithm \ref{the proposed LNPD algorithm}. From $S7$ to $S9$, it decides the final optimal $i_{}^{*}$, which implements the for loop from line 32 to 34 in Algorithm \ref{the proposed LNPD algorithm}. The four-input sequential comparator are adopted to get the optimal $i_{}^{*}$. As the maximum $H$ is 32, $S7$ utilized eight comparators, $S8$ utilized two comparators, and $S9$ utilized one comparator, respectively. 
+The designed hardware architecture is shown in Fig.~\ref{timing diagram}. The architecture consists of nine pipeline stages, where the pre-quantization step occupies $S1$ and $S2$, the OCL decision step occupies $S2$, $S3$, and $S4$, and the LSC decision step occupies the last five pipeline stages. From $S1$ to $S6$, it will be on-the-fly processing for each column, which implements the for loop from line 2 to 31 in Algorithm \ref{the proposed LNPD algorithm}. From $S7$ to $S9$, it decides the final optimal $i_{}^{*}$, which implements the for loop from line 32 to 34 in Algorithm \ref{the proposed LNPD algorithm}. The four-input sequential comparator is adopted to get the optimal $i_{}^{*}$. As the maximum $H$ is 32, $S7$ utilized eight comparators, $S8$ utilized two comparators, and $S9$ utilized one comparator, respectively. 
 
 The timing diagram xxx. plot different TUs, Wx4 Wx8 Wx16 Wx32 cases. ... 
 
 \subsection{Pre-quantization}
-In the pre-quantization step, all the transformed coefficients $c_{i}$ undergo the absolute, multiplication, and round operations according to Eq.~\eqref{round}. The division operation in Eq.~\eqref{round} is transformed to multiplication and shift operations in HPM-4.0.1. The calculation equation is shown as follow,
+In the pre-quantization step, all the transform coefficients $c_{i}$ undergo the absolute, multiplication, and round operations according to Eq.~\eqref{round}. The division operation in Eq.~\eqref{round} is transformed to multiplication and shift operations in HPM-4.0.1. The equation is shown as follow,
 
 \begin{equation}\label{Qp}
 	\begin{aligned}
@@ -414,16 +414,16 @@ In the pre-quantization step, all the transformed coefficients $c_{i}$ undergo t
 		l = round \left ( Q_{p} \right ) >> q_{bits},
 	\end{aligned}
 \end{equation}
-where $q\_value$ is derived according to $QP$ and TU size, $q_{bits}$ is the shift precision derived from HPM-4.0.1, $c_{i}$ are transformed coefficients, $Q_{p}$ is the multiplication result at stage $S1$, $l$ is the initial scalar quantization level.
+where $q_{value}$ is derived according to $QP$ and TU size, $c_{i}$ is the transform coefficient, $q_{bits}$ is the shift precision, $Q_{p}$ is the multiplication result at stage $S1$, $l$ is the initial scalar quantization level.
 
 It is obvious that there is no data dependency in this step, all coefficients output from different TUs can be processed in parallel. The hardware architecture is shown as $S1$ and $S2$ in Fig.~\ref{timing diagram}. 
 
 \subsection{OCL decision}
-The strong run-level context dependency between neighboring coefficients poses a challenge for the parallelized hardware implementation and can hinder the real-time processing. This data dependency problem is partially resolved by the parallelized OCL algorithm in subsection \ref{subsecOCL:B}. 
-The proposed algorithm segregates the context dependency from TU-level to zig-zag scanline line level, which limits the data dependency within one scanline. This allows for parallelism between scanlines, but the coefficients within each scanline must be processed in serial. 
-The scanline-level dependency exists for the derivation of the variables $pre\_level_i$ and $run_i$, and their derivation process is shown in Eq.~\eqref{prevlevel} and Eq.~\eqref{run}. From these two formulas, it indicates that the $pre\_level_i$ and $run_i$ depend on the optimal coefficient level $l _{i-1}^{*}$ or $l _{i+1}^{*}$ for the up-right and down-left scanline, respectively. However, determining the optimal coefficient level involves complex RD cost calculations, and the rate cost, in turn, depends on $pre\_level_i$ and $run_i$. As a result, this dependency increases the complexity of the hardware design. To resolve above problem, the RD cost calculation is split into different pipeline stages, ranging from $S2$ to $S4$ as illustrated in Fig.~\ref{timing diagram}.
+The strong run-level context dependency between neighboring coefficients poses a challenge for parallelized hardware implementation and hinders real-time processing. This data dependency problem is partially resolved by the parallelized OCL algorithm in subsection \ref{subsecOCL:B}. 
+The proposed algorithm segregates the context dependency from TU-level to zig-zag scanline line level, which makes the data dependency exist within one scanline. This allows for parallelism between scanlines, but the coefficients within each scanline must be processed in serial. 
+The scanline-level dependency exists for the derivation of the variables $pre\_level_i$ and $run_i$, and their derivation process is shown in Eq.~\eqref{prevlevel} and Eq.~\eqref{run}. From these two formulas, it indicates that the $pre\_level_i$ and $run_i$ depend on the optimal coefficient level $l _{i-1}^{*}$ or $l _{i+1}^{*}$ for the up-right and down-left scanline, respectively. However, determining the optimal coefficient level involves complex RD cost calculations, in which the rate cost, in turn, depends on $pre\_level_i$ and $run_i$. As a result, this dependency increases the complexity of the hardware design. To resolve the above problem, the RD cost calculation is split into three pipeline stages, ranging from $S2$ to $S4$ as illustrated in Fig.~\ref{timing diagram}. 
 
-The pipeline stage of the distortion calculation is allocated before the rate calculation. This is because that the distortion is calculated without context dependency for all candidate levels. After optimization of the calculation of RD cost as mentioned in equation \ref{pRDcost}, the calculation of distortion is given by the following formula,
+The pipeline stage of the distortion calculation is allocated before the rate calculation. This is because the distortion is calculated without context dependency for all candidate levels. After optimization of the calculation of RD cost as mentioned in equation \ref{pRDcost}, the calculation of distortion is given by the following formula,
 
 \begin{equation}\label{err}
 	\left\{
@@ -440,13 +440,13 @@ The pipeline stage of the distortion calculation is allocated before the rate ca
 		Dist_{i} = Err_{i}^{2}, i = 0, l-1, l,
 	\end{aligned}
 \end{equation}
-where $q_{bits}$ is the shift precision derived from HPM-4.0.1, $Q_{p}$ is the multiplication result at stage $S1$, $l$ is the initial scalar quantization level, $i$ is the value of the candidates of the optimal quantization level, $err\_scale$ is the scaling factor for the distortion $Dist_{i}$.
+where $q_{bits}$ is the shift precision, $Q_{p}$ is the multiplication result at stage $S1$, $l$ is the initial scalar quantization level, $i$ is the value of the candidates of the optimal quantization level, $err\_scale$ is the scaling factor with the $lambda$ optimization in subsection xxx. \emph{TODO: refine this.}
 
-Considering that the maximum number of the optimal quantization level candidates would not surpass three as listed in Tab.~\ref{tab:candidate list}, three distinct distortion calcuation architectures should instantiated in parallel. To improve timing performance, the distortion calculation is distributed from stage $S2$ to $S3$, where each stage features a multiplication operation. 
+Considering that the maximum number of candidate levels would not surpass three as listed in Tab.~\ref{tab:candidate list}, three distinct distortion calculation architectures should be instantiated in parallel. To improve timing performance, the distortion calculation is distributed from stage $S2$ to $S3$, where each stage has a multiplication operation. \emph{TODO: move to paragrah 1?}
 
-The rate calculation and RD cost comparison is scheduled at stage $S4$, where $R_{0}$, $R_{l-1}$ and $R_{l}$ represent the rate cost of different candidates. This scheduling will make the OCL decision implement in pipeline. The $pre\_level_i$ and $run_i$ derivation and optimal coefficient level decision are implemented in one cycle, and then utilizing data-forwarding method to resolve this dependency \cite{harris2010digital}. Furthermore, due to that the RD cost is optimized to a more efficient form in subsection \ref{subsecOCL:B}, there is no multiplication operation in this pipeline stage. This optimization has the potential to improve the timing of the RTL design, enabling our RTL design to operate at a higher frequency.  
+The rate calculation and RD cost comparison is scheduled at stage $S4$, where $R_{0}$, $R_{l-1}$ and $R_{l}$ represent the rate cost of different candidates. This scheduling will make the OCL decision implement in pipeline. The $pre\_level_i$ and $run_i$ derivation and optimal coefficient level decision are implemented in one cycle, and then utilizing data-forwarding method to resolve this dependency \cite{harris2010digital}. Furthermore, due to that the RD cost is optimized to a more efficient form in subsection \ref{subsecOCL:B}, there is no multiplication operation in this pipeline stage. This optimization has the potential to improve the timing of the RTL design, enabling our RTL design to operate at a higher frequency. 
 
-The rate calculation architectures are instantiated in parallel for three distinct candidates. The calculation of $R_{0}$ is relatively simple, enabling direct access. Additionally, the rate calculation architecture for $R_{l}$ and $R_{l-1}$ is divided into three datapaths, as shown in Fig.~\ref{rate cost}. In the figure, table $est\_level$ is derived from entropy coding, $ctx\_level$ represents the minimum value between $pre\_level_i$ and 5, $L$ is the value of the candidate. 
+The rate calculation architectures are instantiated in parallel for three distinct candidates. The calculation of $R_{0}$ is relatively simple, enabling direct access. Additionally, the rate calculation architecture for $R_{l}$ and $R_{l-1}$ is divided into three datapaths, as shown in Fig.~\ref{rate cost}. In the figure, table $est\_level$ is derived from entropy coding, $ctx\_level$ represents the minimum value between $pre\_level_i$ and 5, $L$ is the value of the candidate. \emph{TODO: move to paragrah 1?}
 
 When $L$ is equal to one, the rate cost is derived from table $est\_level$ indexed by $ctx\_level$. 
 For values of $L$ greater than eight, the rate cost calculation becomes more intricate. 
