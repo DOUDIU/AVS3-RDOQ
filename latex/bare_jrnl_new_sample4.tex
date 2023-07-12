@@ -14,7 +14,7 @@
 
 \usepackage{multirow}
 \usepackage{booktabs}
-\usepackage{makecell}                 % 三线�???-竖线
+\usepackage{makecell}
 
 \usepackage[backref]{hyperref} 
 \hyphenation{op-tical net-works semi-conduc-tor IEEE-Xplore}
@@ -405,55 +405,56 @@ In the pre-quantization step, all the transform coefficients $c_{i}$ undergo the
 
 \begin{equation}\label{Qp}
 	\begin{aligned}
-		Q_{p} = \lvert c_{i} \rvert \times q_{value},
+		P_{i} = \lvert c_{i} \rvert \times q_{value},
 	\end{aligned}
 \end{equation}
 
 \begin{equation}\label{l}
 	\begin{aligned}
-		l = round \left ( Q_{p} \right ) >> q_{bits},
+		l = round \left ( P_{i} \right ) >> q_{bits},
 	\end{aligned}
 \end{equation}
-where $q_{value}$ is derived according to $QP$ and TU size, $c_{i}$ is the transform coefficient, $q_{bits}$ is the shift precision, $Q_{p}$ is the multiplication result at stage $S1$, $l$ is the initial scalar quantization level.
+where $q_{value}$ is derived according to $QP$ and TU size, $c_{i}$ is the transform coefficient, $q_{bits}$ is the shift precision, $P_{i}$ is the multiplication result at stage $S1$, $l$ is the initial scalar quantization level.
 
 It is obvious that there is no data dependency in this step, all coefficients output from different TUs can be processed in parallel. The hardware architecture is shown as $S1$ and $S2$ in Fig.~\ref{timing diagram}. 
 
 \subsection{OCL decision}
-The strong run-level context dependency between neighboring coefficients poses a challenge for parallelized hardware implementation and hinders real-time processing. This data dependency problem is partially resolved by the parallelized OCL algorithm in subsection \ref{subsecOCL:B}. 
-The proposed algorithm segregates the context dependency from TU-level to zig-zag scanline line level, which makes the data dependency exist within one scanline. This allows for parallelism between scanlines, but the coefficients within each scanline must be processed in serial. 
-The scanline-level dependency exists for the derivation of the variables $pre\_level_i$ and $run_i$, and their derivation process is shown in Eq.~\eqref{prevlevel} and Eq.~\eqref{run}. From these two formulas, it indicates that the $pre\_level_i$ and $run_i$ depend on the optimal coefficient level $l _{i-1}^{*}$ or $l _{i+1}^{*}$ for the up-right and down-left scanline, respectively. However, determining the optimal coefficient level involves complex RD cost calculations, in which the rate cost, in turn, depends on $pre\_level_i$ and $run_i$. As a result, this dependency increases the complexity of the hardware design. To resolve the above problem, the RD cost calculation is split into three pipeline stages, ranging from $S2$ to $S4$ as illustrated in Fig.~\ref{timing diagram}. 
 
-The pipeline stage of the distortion calculation is allocated before the rate calculation. This is because the distortion is calculated without context dependency for all candidate levels. After optimization of the calculation of RD cost as mentioned in equation \ref{pRDcost}, the calculation of distortion is given by the following formula,
+The strong run-level context dependency between neighboring coefficients poses a challenge for parallelized OCL hardware implementation and hinders real-time processing. However, this data dependency problem is partially resolved by the parallelized OCL algorithm in subsection \ref{subsecOCL:B}. 
+The proposed algorithm segregates the context dependency from TU-level to zig-zag scanline line level, which makes the data dependency exist within one scanline. The scanline-level dependency exists for the derivation of the variables $pre\_level_i$ and $run_i$, and their derivation process is shown in Eq.~\eqref{prevlevel} and Eq.~\eqref{run}. From these two formulas, it indicates that the $pre\_level_i$ and $run_i$ depend on the optimal coefficient level $l _{i-1}^{*}$ or $l _{i+1}^{*}$ for the up-right and down-left scanline, respectively. However, determining the optimal coefficient level involves complex RD cost calculations, in which the rate cost, in turn, depends on $pre\_level_i$ and $run_i$. 
+
+As a result, this dependency increases the complexity of the hardware design. To resolve the above problem, the $pre\_level_i$ and $run_i$ derivation and optimal coefficient level decision are implemented in a single cycle, and then utilizing data-forwarding method to resolve this dependency \cite{harris2010digital}. 
+Furthermore, to improve the timing of the design, the RD cost calculation is divided into three distinct pipeline stages, spanning from $S2$ to $S4$. 
+The pipeline stage for distortion calculation is allocated prior to the rate calculation, spanning from $S2$ to $S3$, while the rate calculation and RD cost comparison are scheduled at stage $S4$. This is because the distortion is calculated without context dependency for all candidate levels.
+
+Considering that the maximum number of candidate levels would not surpass three as listed in Tab.~\ref{tab:candidate list}, the rate calculation architectures and the distortion calcualtion architectures are instantiated in parallel for three distinct candidates. As shown in Fig.~\ref{timing diagram}, where $Dist_{0}\&R_{0}$, $Dist_{l-1}\&R_{l-1}$ and $Dist_{l}\&R_{l}$ represent the distortion cost and rate cost of different candidates. 
+
+Following the optimization of the RD cost calculation mentioned in equation \ref{pRDcost}, the calculation of distortion is determined by the following formula,
 
 \begin{equation}\label{err}
 	\left\{
 		\begin{aligned}
-			&Err_{0} 	=  Q_{p} \times err\_scale >> 20,  \\
-			&Err_{l-1} 	= \left ( Q_{p} - \left ( \lvert l-1 \rvert << q_{bits} \right ) \right ) \times err\_scale >> 20,  \\
-			&Err_{l} 	= \left ( Q_{p} - \left ( \lvert l \rvert << q_{bits} \right ) \right ) \times err\_scale >> 20,  \\ 
+			&Err_{0} 	=  P_{i} \times S_f >> 20,  \\
+			&Err_{l-1} 	= \left ( P_{i} - \left ( \lvert l-1 \rvert << q_{bits} \right ) \right ) \times S_f >> 20,  \\
+			&Err_{l} 	= \left ( P_{i} - \left ( \lvert l \rvert << q_{bits} \right ) \right ) \times S_f >> 20,  \\ 
 		\end{aligned}
 	\right.
 \end{equation}
 
 \begin{equation}\label{distortion}
 	\begin{aligned}
-		Dist_{i} = Err_{i}^{2}, i = 0, l-1, l,
+		Dist_{j} = Err_{j}^{2}, j = 0, l-1, l,
 	\end{aligned}
 \end{equation}
-where $q_{bits}$ is the shift precision, $Q_{p}$ is the multiplication result at stage $S1$, $l$ is the initial scalar quantization level, $i$ is the value of the candidates of the optimal quantization level, $err\_scale$ is the scaling factor with the $lambda$ optimization in subsection xxx. \emph{TODO: refine this.}
+where $q_{bits}$ is the shift precision, $P_{i}$ is the multiplication result at stage $S1$, $l$ is the initial scalar quantization level, $j$ is the value of the candidates of the optimal quantization level, $S_f$ is the scaling factor with the $lambda$ optimization in subsection \ref{subsecOCL:B}. To improve timing performance, the distortion calculation is distributed from stage $S2$ to $S3$, where each stage has a multiplication operation.
 
-Considering that the maximum number of candidate levels would not surpass three as listed in Tab.~\ref{tab:candidate list}, three distinct distortion calculation architectures should be instantiated in parallel. To improve timing performance, the distortion calculation is distributed from stage $S2$ to $S3$, where each stage has a multiplication operation. \emph{TODO: move to paragrah 1?}
-
-The rate calculation and RD cost comparison is scheduled at stage $S4$, where $R_{0}$, $R_{l-1}$ and $R_{l}$ represent the rate cost of different candidates. This scheduling will make the OCL decision implement in pipeline. The $pre\_level_i$ and $run_i$ derivation and optimal coefficient level decision are implemented in one cycle, and then utilizing data-forwarding method to resolve this dependency \cite{harris2010digital}. Furthermore, due to that the RD cost is optimized to a more efficient form in subsection \ref{subsecOCL:B}, there is no multiplication operation in this pipeline stage. This optimization has the potential to improve the timing of the RTL design, enabling our RTL design to operate at a higher frequency. 
-
-The rate calculation architectures are instantiated in parallel for three distinct candidates. The calculation of $R_{0}$ is relatively simple, enabling direct access. Additionally, the rate calculation architecture for $R_{l}$ and $R_{l-1}$ is divided into three datapaths, as shown in Fig.~\ref{rate cost}. In the figure, table $est\_level$ is derived from entropy coding, $ctx\_level$ represents the minimum value between $pre\_level_i$ and 5, $L$ is the value of the candidate. \emph{TODO: move to paragrah 1?}
+Due to that the RD cost is optimized to a more efficient form in subsection \ref{subsecOCL:B}, there is no multiplication operation in pipeline stage $S4$. The calculation of $R_{0}$ is relatively simple, enabling direct access. Additionally, the rate calculation architecture for $R_{l}$ and $R_{l-1}$ is divided into three datapaths, as shown in Fig.~\ref{rate cost}. 
+In this figure, table $est\_level$ is derived from entropy coding, $ctx\_level$ represents the minimum value between $pre\_level_i$ and 5, $L$ is the value of the candidate.
 
 When $L$ is equal to one, the rate cost is derived from table $est\_level$ indexed by $ctx\_level$. 
 For values of $L$ greater than eight, the rate cost calculation becomes more intricate. 
 In addition to considering the lookup value from table $est_level$, it also takes into account the Golomb coding of $L-9$. 
-For the remaining value of the candidates, the rate cost also depends on the lookup value from the table $est\_level$. Furthermore, an integral component of the rate cost calculation involves multiplying the lookup value with the value of $L$. 
-Condsidering that the value of $L$ is limited to a range between one and eight, the multiplication operation can be simplified to a shift and add operation, thus reduce the area consumption and benefit the timing greatly. 
-All multiplication operations involving $est\_level$ and the limited range of candidates (between one and eight) are implemented using separate add and shift operations, thus reduce the area consumption and benefit the timing greatly. 
+For the remaining value of the candidates, the rate cost also depends on the lookup value from the table $est\_level$. Furthermore, an integral component of the rate cost calculation involves multiplying the lookup value with the value of $L$. All multiplication operations involving $est\_level$ and the limited range of candidates (between one and eight) are implemented using separate add and shift operations, thus reduce the area consumption and benefit the timing greatly. 
 
 As mentioned earlier, the calculation of rate cost and the comparison of RD-cost are executed within a single cycle due to the context dependency. Once all rate costs have been calculated, the minimum RD-cost is identified and selected as the optimal choice. The corresponding candidate is then designated as the optimal coefficient level $l_{i}^{*}$. Subsequently, this optimal coefficient level is transmitted back to update the run-level.
 
