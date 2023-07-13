@@ -390,15 +390,27 @@ It is a fact that the RDOQ algorithm shows high computational complexity and str
 	\centerline{\includegraphics[width=0.90\textwidth]{pic_pan/overall_architecture.png}} 
 	% figure caption is below the figure
 	\caption{The hardware architecture design of the parallelized RDOQ algorithm.}
-	\label{timing diagram} % Give a unique label
+	\label{overall_architecture} % Give a unique label
 \end{figure*}
 
 \subsection{Overall Architecture}
-The TU size in AVS3 standard can range from $4\times4$ to $64\times64$. However, to reduce the coefficient coding for large TU size, only the first 32 rows/columns coefficients are kept and the high-frequency coefficients are zeroed out. As a result, the width $W$ and height $H$ of the TU for RDOQ must not exceed 32. To facilitate this constraint, the RDOQ hardware architecture is designed with a pixel parallelism of 32, which means that a maximum of 32 coefficients within the same column can be processed simultaneously. To improve parallelism for TUs with height $H$ smaller than 32, multiple TUs are combined and processed in parallel by reusing hardware resources. Specifically, the architecture can simultaneously process eight $W\times4$ TUs, four $W\times8$ TUs, and two $W\times16$ TUs, respectively. The width $W$ should be uniform across the parallelized TUs. 
+The TU size in AVS3 standard can range from $4\times4$ to $64\times64$. However, to reduce the coefficient coding for large TU size, only the first 32 rows/columns coefficients are kept and the high-frequency coefficients are zeroed out. As a result, the width $W$ and height $H$ of the TU for RDOQ must not exceed 32. To facilitate this constraint, the RDOQ hardware architecture is designed with a pixel parallelism of 32, which means that a maximum of 32 coefficients within the same column can be processed simultaneously. 
 
-The designed hardware architecture is shown in Fig.~\ref{timing diagram}. The architecture consists of nine pipeline stages, where the pre-quantization step occupies $S1$ and $S2$, the OCL decision step occupies $S2$, $S3$, and $S4$, and the LSC decision step occupies the last five pipeline stages. From $S1$ to $S6$, it will be on-the-fly processing for each column, which implements the for loop from line 2 to 31 in Algorithm \ref{the proposed LNPD algorithm}. From $S7$ to $S9$, it decides the final optimal $i_{}^{*}$, which implements the for loop from line 32 to 34 in Algorithm \ref{the proposed LNPD algorithm}. The four-input sequential comparator is adopted to get the optimal $i_{}^{*}$. As the maximum $H$ is 32, $S7$ utilized eight comparators, $S8$ utilized two comparators, and $S9$ utilized one comparator, respectively. 
+The designed hardware architecture is shown in Fig.~\ref{overall_architecture}. The architecture consists of nine pipeline stages, where the pre-quantization step occupies $S1$ and $S2$, the OCL decision step occupies $S2$, $S3$, and $S4$, and the LSC decision step occupies the last five pipeline stages. From $S1$ to $S6$, it will be on-the-fly processing for each column, which implements the for loop from line 2 to 31 in Algorithm \ref{the proposed LNPD algorithm}. From $S7$ to $S9$, it decides the final optimal $i_{}^{*}$, which implements the for loop from line 32 to 34 in Algorithm \ref{the proposed LNPD algorithm}. The comparator is adopted to get the optimal $i_{}^{*}$. As the maximum $H$ is 32, $S7$ utilized eight four-input comparators, $S8$ utilized two two-input comparators, and $S9$ utilized one four-input comparator and one two-input comparator, respectively. % There is some error exist in the stage S9, it have one four-input comparator and one two-input comparator.
 
-The timing diagram xxx. plot different TUs, Wx4 Wx8 Wx16 Wx32 cases. ... 
+The timing diagram of the TU with different sizes (Wx4 Wx8 Wx16 Wx32) is shown in Fig.~\ref{timing diagram}. The sign presented within the box below stage $S7$ signifies the column number of the current TU, while the sign within the box above stage $S7$ represents the distinct input comparator being utilized. 
+To improve parallelism for TUs with height $H$ smaller than 32, multiple TUs are combined and processed in parallel by reusing hardware resources. Specifically, the architecture can simultaneously process eight $W\times4$ TUs, four $W\times8$ TUs, and two $W\times16$ TUs, respectively. The width $W$ should be uniform across the parallelized TUs.
+Following the on-the-fly decision approach outlined in section \ref{subsecgreedy}, the LSC decision process of the former $W-1$ scanlines requires ($6 + W - 1$) cycles. Besides, the LSC decision for the remaining $H$ scanlines begins once the last column of the current TU enters stage $S7$. Consequently, the RDOQ process for one TU necessitates a total of $6 + W - 1 + 3$ cycles.
+
+
+\par
+\begin{figure*}[htbp]
+	\centering
+	\centerline{\includegraphics[width=0.90\textwidth]{pic_pan/timing diagram.png}} 
+	% figure caption is below the figure
+	\caption{The timing diagram of the parallelized RDOQ architecture.}
+	\label{timing diagram} % Give a unique label
+\end{figure*}
 
 \subsection{Pre-quantization}
 In the pre-quantization step, all the transform coefficients $c_{i}$ undergo the absolute, multiplication, and round operations according to Eq.~\eqref{round}. The division operation in Eq.~\eqref{round} is transformed to multiplication and shift operations in HPM-4.0.1. The equation is shown as follow,
@@ -416,7 +428,7 @@ In the pre-quantization step, all the transform coefficients $c_{i}$ undergo the
 \end{equation}
 where $q_{value}$ is derived according to $QP$ and TU size, $c_{i}$ is the transform coefficient, $q_{bits}$ is the shift precision, $P_{i}$ is the multiplication result at stage $S1$, $l$ is the initial scalar quantization level.
 
-It is obvious that there is no data dependency in this step, all coefficients output from different TUs can be processed in parallel. The hardware architecture is shown as $S1$ and $S2$ in Fig.~\ref{timing diagram}. 
+It is obvious that there is no data dependency in this step, all coefficients output from different TUs can be processed in parallel. The hardware architecture is shown as $S1$ and $S2$ in Fig.~\ref{overall_architecture}. 
 
 \subsection{OCL decision}
 
@@ -427,7 +439,7 @@ As a result, this dependency increases the complexity of the hardware design. To
 Furthermore, to improve the timing of the design, the RD cost calculation is divided into three distinct pipeline stages, spanning from $S2$ to $S4$. 
 The pipeline stage for distortion calculation is allocated prior to the rate calculation, spanning from $S2$ to $S3$, while the rate calculation and RD cost comparison are scheduled at stage $S4$. This is because the distortion is calculated without context dependency for all candidate levels.
 
-Considering that the maximum number of candidate levels would not surpass three as listed in Tab.~\ref{tab:candidate list}, the rate calculation architectures and the distortion calcualtion architectures are instantiated in parallel for three distinct candidates. As shown in Fig.~\ref{timing diagram}, where $Dist_{0}\&R_{0}$, $Dist_{l-1}\&R_{l-1}$ and $Dist_{l}\&R_{l}$ represent the distortion cost and rate cost of different candidates. 
+Considering that the maximum number of candidate levels would not surpass three as listed in Tab.~\ref{tab:candidate list}, the rate calculation architectures and the distortion calcualtion architectures are instantiated in parallel for three distinct candidates. As shown in Fig.~\ref{overall_architecture}, where $Dist_{0}\&R_{0}$, $Dist_{l-1}\&R_{l-1}$ and $Dist_{l}\&R_{l}$ represent the distortion cost and rate cost of different candidates. 
 
 Following the optimization of the RD cost calculation mentioned in equation \ref{pRDcost}, the calculation of distortion is determined by the following formula,
 
@@ -471,7 +483,7 @@ As mentioned earlier, the calculation of rate cost and the comparison of RD-cost
 
 The proposed greedy strategy based parallelized LSC position decision as outlined in subsection \ref{subsecgreedy}, effectively addresses the context dependency inherent in the zig-zag scan order. Consequently, the hardware architecture for the LSC position decision can be designed to incorporate high parallelism.
 
-The proposed hardware architecture of the LSC position decision is scheduled from stage $S5$ to $S9$ as shown in Fig.~\ref{timing diagram}. This architecture can be further divided into three key components, each serving a distinct purpose.
+The proposed hardware architecture of the LSC position decision is scheduled from stage $S5$ to $S9$ as shown in Fig.~\ref{overall_architecture}. This architecture can be further divided into three key components, each serving a distinct purpose.
 
 The first component is following the determination of the minimum RD-cost as the optimal choice. The calculation of $\Delta J_{j}$, $E_{non_lsc}$, and $E_{lsc}$, as listed in Eq.~\eqref{A_i,last}, is scheduled at stage $S5$, preparing for the subsequent calculation of the optimal LSC position.
 
@@ -482,7 +494,7 @@ Besides, the on-the-fly algorithm as described in subsection \ref{subsecgreedy} 
 The remaining component focuses on calculating the optimal LSC decision for the remaining $H-1$ scanlines. This process is distributed across pipeline stages $S7$ to $S9$, facilitating the determination of the final optimal LSC positions.
 Upon the final column of a given TU reaching the stage $S7$, all sub-optimal positions for each scanline are obtained. At this point, the computation process for determining the optimal LSC decision of the remaining $H-1$ scanlines commences.
 Considering that the maximum height of the TU is 32, the process of comparing sub-optimal positions using a one-by-one sequence requires a total of 32 cycles. To minimize latency and enhance efficiency, the comparison of sub-optimal positions is executed in parallel, resulting in a reduction to just three cycles.
-Take the TU with block size of 8$\times$8 for example. Once the last column of the TU enters stage S7, the two sub-optimal positions for each set of 4 scanlines are determined. These sub-optimal positions are then passed on to stage S8, where the final optimal position is obtained. Besides, the delay operation is adopted in $S9$ to align the output. Hence, the optimal LSC position is pipelined and outputted after a total of 40 ($6 + W_{max} - 1 + 3$) cycles.
+Take the TU with block size of 8$\times$8 for example. Once the last column of the TU enters stage S7, the two sub-optimal positions for each set of 4 scanlines are determined. These sub-optimal positions are then passed on to stage S8, where the final optimal position is obtained. Besides, the delay operation is adopted in $S9$ to align the output. Hence, the optimal LSC position of TU with a block size of 8$\times$8 is pipelined and outputted after a total of 16 ($6 + W - 1 + 3$) cycles.
 
 \begin{figure*}[htbp]
 	\centering
