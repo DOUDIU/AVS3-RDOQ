@@ -387,7 +387,7 @@ It is a fact that the RDOQ algorithm shows high computational complexity and str
 \par
 \begin{figure*}[htbp]
 	\centering
-	\centerline{\includegraphics[width=0.90\textwidth]{pic_pan/overall_architecture.png}} 
+	\centerline{\includegraphics[width=1.0\textwidth]{pic_pan/overall_architecture.png}} 
 	% figure caption is below the figure
 	\caption{The hardware architecture design of the parallelized RDOQ algorithm.}
 	\label{overall_architecture} % Give a unique label
@@ -396,12 +396,11 @@ It is a fact that the RDOQ algorithm shows high computational complexity and str
 \subsection{Overall Architecture}
 The TU size in the AVS3 standard can range from $4\times4$ to $64\times64$. However, to reduce the coefficient coding for large TU size, only the first 32 rows/columns coefficients are kept and the high-frequency coefficients are set to zero. Consequently, the width $W$ and height $H$ of the TU for RDOQ must not exceed 32. To accommodate this constraint, the RDOQ hardware architecture is designed with a pixel parallelism of 32, which means that a maximum of 32 coefficients within the same column can be processed simultaneously. 
 
-The overall architecture of the designed hardware is shown in Fig.~\ref{overall_architecture}. It comprises nine pipeline stages, with the pre-quantization step occupying stages $S1$ and $S2$, the OCL decision step occupying stages $S2$, $S3$, and $S4$, and the LSC decision step occupying the remaining five stages. Stages $S1$ to $S6$ are on-the-fly processing for each column, which implements the for-loop from line 2 to 31 in Algorithm \ref{the proposed LNPD algorithm}. Stages $S7$ to $S9$ decide the final optimal $i_{}^{*}$, which implements the for-loop from line 32 to 34 in Algorithm \ref{the proposed LNPD algorithm}. The comparator is employed to get the optimal $i_{}^{*}$. As the maximum height $H$ is 32, stage $S7$ utilizes eight four-input comparators, stage $S8$ utilizes two two-input comparators, and stage $S9$ employs one four-input comparator and one two-input comparator. \emph{TODO: right?, refine this and figure.}
+The overall architecture of the designed hardware is shown in Fig.~\ref{overall_architecture}. It comprises nine pipeline stages, with the pre-quantization step occupying stages $S1$ and $S2$, the OCL decision step occupying stages $S2$, $S3$, and $S4$, and the LSC decision step occupying the remaining five stages. Stages $S1$ to $S6$ are on-the-fly processing for each column, which implements the for-loop from line 2 to 31 in Algorithm \ref{the proposed LNPD algorithm}. Stages $S7$ to $S9$ decide the final optimal $i_{}^{*}$, which implements the for-loop from line 32 to 34 in Algorithm \ref{the proposed LNPD algorithm}. The comparator is employed to get the optimal $i_{}^{*}$. As the maximum height $H$ is 32, stage $S7$ utilizes eight four-input comparators, stage $S8$ utilizes two two-input comparators, and stage $S9$ employs one four-input comparator. 
 
 The space-time in Fig.~\ref{timing diagram} illustrates the time scheduling for different TU sizes, including $W\times4$, $W\times8$, $W\times16$, and $W\times32$. It is shown that the stages from $S1$ to $S6$ are seamlessly pipelined, and stages from $S7$ to $S9$ are sparsely scheduled when all $W$ columns are processed. 
 To enhance parallelism for TUs with a height $H$ less than 32, multiple TUs are combined and processed simultaneously by reusing hardware resources. Specifically, the architecture can simultaneously process eight $W\times4$ TUs, four $W\times8$ TUs, and two $W\times16$ TUs, respectively. The width $W$ needs to be consistent across the parallelized TUs. 
-Following the on-the-fly decision approach outlined in subsection \ref{subsecgreedy}, the LSC decision process for the first $W$ scanlines requires ($6 + W - 1$) cycles. Furthermore, the LSC decision for the remaining $H-1$ scanlines commences once the last column of the current TU enters stage $S7$. Therefore, the RDOQ process for one TU requires a total of $6 + W - 1 + 3$ clock cycles. \emph{change some number. please check.}
-
+Following the on-the-fly decision approach outlined in subsection \ref{subsecgreedy}, the LSC decision process for the first $W$ scanlines requires ($6 + W - 1$) cycles. Furthermore, the LSC decision for the remaining $H-1$ scanlines commences once the last column of the current TU enters stage $S7$. Therefore, the RDOQ process for one TU requires a total of $6 + W - 1 + 3$ clock cycles.
 
 \par
 \begin{figure*}[htbp]
@@ -458,11 +457,12 @@ Following the optimization of the RD cost calculation mentioned in Eq. \ref{pRDc
 where $q_{bits}$ is the shift precision, $P_{i}$ is the multiplication result at stage $S1$, $l$ is the initial scalar quantization level, $j$ is the value of the candidate levels, $S_f$ is the scaling factor with the $\lambda$ optimization in subsection \ref{subsecOCL:B}. To improve timing performance, the distortion calculation is distributed from stage $S2$ to $S3$, where each stage has a multiplication operation. 
 
 Due to that the RD cost is optimized to a more efficient form in subsection \ref{subsecOCL:B}, there is no multiplication operation in pipeline stage $S4$. The calculation of $R_{0}$ is relatively simple. The rate calculation architecture for $R_{l}$ and $R_{l-1}$ is divided into three datapaths, as shown in Fig.~\ref{rate cost}. 
-In this figure, table $est\_level$ is derived from entropy coding, $ctx\_level$ represents the minimum value between $pre\_level_i$ and 5, and $lvl$ is the value of the candidate. \emph{TODO: san tiao path neng ming xian biao xia ma?}
-When $L$ is equal to one, the rate cost is derived from table $est\_level$ indexed by $ctx\_level$. 
-For values of $L$ greater than eight, the rate cost calculation becomes more intricate. 
+In this figure, table $est\_level$ is derived from entropy coding, $ctx\_level$ represents the minimum value between $pre\_level_i$ and 5, and $L_i$ is the value of the candidate. 
+
+When $L_i$ is equal to one, the rate cost is derived from table $est\_level$ indexed by $ctx\_level$. 
+For values of $L_i$ greater than eight, the rate cost calculation becomes more intricate. 
 In addition to considering the lookup value from table $est_level$, it also takes the Golomb coding of $L-9$ into account. 
-For the remaining value of the candidate level, the rate cost also depends on the lookup value from the table $est\_level$. Furthermore, an integral component of the rate cost calculation involves multiplying the lookup value with the value of $L$. All multiplication operations involving $est\_level$ and the limited range of candidates (between one and eight) are implemented using separate add and shift operations, thus reducing the area consumption and benefiting the timing greatly. \emph{TODO: L using lvl instead?}
+For the remaining value of the candidate level, the rate cost also depends on the lookup value from the table $est\_level$. Furthermore, an integral component of the rate cost calculation involves multiplying the lookup value with the value of $L_i$. All multiplication operations involving $est\_level$ and the limited range of candidates (between one and eight) are implemented using separate add and shift operations, thus reducing the area consumption and benefiting the timing greatly. 
 
 As mentioned earlier, the calculation of rate cost and the comparison of RD cost are executed within a single cycle due to context dependency. Once all rate costs have been calculated, the minimum RD cost is identified and selected as the optimal one. The corresponding candidate is then designated as the optimal coefficient level $l_{i}^{*}$. Subsequently, this optimal coefficient level is transmitted back to update the run-level context. 
 
@@ -471,13 +471,11 @@ As mentioned earlier, the calculation of rate cost and the comparison of RD cost
 	\centering
 	\centerline{\includegraphics[width=0.49\textwidth]{pic_pan/rate_calculation.png}} 
 	% figure caption is below the figure
-	\caption{Three datapaths of the rate calculation design for $R_{l}$ and $R_{l-1}$. \emph{TODO: refine }}
+	\caption{Three datapaths of the rate calculation design for $R_{l}$ and $R_{l-1}$.}
 	\label{rate cost} % Give a unique label
 \end{figure}
 
 \subsection{LSC position decision}
-
-% The proposed greedy strategy based parallelized LSC position decision as outlined in subsection \ref{subsecgreedy}, effectively addresses the context dependency inherent in the zig-zag scan order. Consequently, the hardware architecture for the LSC position decision can be designed to incorporate high parallelism.
 
 The hardware architecture for the LSC position decision is scheduled from stage $S5$ to $S9$, as shown in Fig.~\ref{overall_architecture}. This architecture can be divided into three key components, each serving a distinct purpose. 
 
@@ -492,8 +490,6 @@ At this point, the computation process for determining the optimal LSC decision 
 Considering that the maximum height of the TU is 32, carrying out a one-by-one sequential comparison of sub-optimal positions will require 32 cycles. 
 To minimize latency and improve efficiency, the comparison of sub-optimal positions is executed in parallel, reducing the number of cycles to three. 
 As an example, for a TU with a block size of 8$\times$8, the sub-optimal 7 scanlines results enter the stage $S7$. After parallel comparison in stage $S7$, the two sub-optimal positions will be decided and get the final optimal LSC in stage $S8$. Besides, the bypass operation is adopted in $S9$ to align the output. Hence, the optimal LSC position of TU with a block size of 8$\times$8 is pipelined with a total of 16 ($6 + W - 1 + 3$) cycles. 
-
-% Take the TU with block size of 8$\times$8 for example. Once the last column of the TU enters stage S7, the two sub-optimal positions for each set of 4 scanlines are determined. These sub-optimal positions are then passed on to stage S8, where the final optimal position is obtained. Besides, the delay operation is adopted in $S9$ to align the output. Hence, the optimal LSC position of TU with a block size of 8$\times$8 is pipelined and outputted after a total of 16 ($6 + W - 1 + 3$) cycles.
 
 \begin{figure*}[htbp]
 	\centering
