@@ -51,8 +51,14 @@ Beijing 100871, China (e-mail: swma@pku.edu.cn).}
 
 \begin{abstract}
 
-The rate-distortion optimized quantization (RDOQ) provides significant coding gain in the third generation of Audio Video coding Standard (AVS3). However, the high computational complexity and strong data dependency in RDOQ impede the hardware implementation. To address these issues, we propose a zig-zag scanline-level parallelized RDOQ algorithm and its fully pipelined hardware architecture for AVS3 video coding. For algorithm optimization, we update the run-level context for rate estimation in the inner zig-zag scanline and adopt an efficient RD cost form in the optimal coefficient level (OCL) decision step. In the last significant coefficient (LSC) position decision step, a greedy strategy-based algorithm is proposed to optimize the determination process in parallel. Moreover, the proposed parallelized RDOQ algorithm is accelerated by single incrustation multiple data (SIMD) on the Intel X86 platform. 
+The rate-distortion optimized quantization (RDOQ) provides significant coding gain in the third generation of Audio Video coding Standard (AVS3). However, the high computational complexity and strong data dependency in RDOQ impede the hardware implementation. To address these issues, we propose a zig-zag scanline-level parallelized RDOQ algorithm and its fully pipelined hardware architecture for AVS3 video coding. 
+%
+For algorithm optimization, we update the run-level context for rate estimation in the inner zig-zag scanline and adopt an efficient RD cost form in the optimal coefficient level (OCL) decision step. In the last significant coefficient (LSC) position decision step, a greedy strategy-based algorithm is proposed to optimize the determination process in parallel. Moreover, the proposed parallelized RDOQ algorithm is accelerated by single incrustation multiple data (SIMD) on the Intel X86 platform. 
+%
 For hardware architecture design, a fully pipelined hardware architecture is proposed with nine pipeline stages. 
+This design facilitates the processing of multiple TUs (Transform Units) in parallel. In the OCL step, the data-forwarding technology is employed to resolve the strong context dependency. 
+Additionally, the utilization of multiple comparators in the determination of the LSC position serves to minimize latency and expedite the overall processing speed.
+%
 Experimental results show that the proposed algorithm achieves 31.42\%, 28.60\%, and 28.58\% time-saving by a 0.23\%, 0.24\%, and 0.26\% Bjøntegaard delta rate (BD-rate) increase on average under All-Intra (AI), Random-Access (RA), and Low-Delay B (LDB) configurations, respectively. 
 The hardware implementation achieves 32 coefficients per cycle, and the area consumption is 1223.2K logic gates (0.67mm2) when working at 471.2MHz. It is proven that the proposed algorithm and hardware architecture design achieve a good trade-off between coding efficiency and hardware throughput. 
 
@@ -574,13 +580,13 @@ As shown in Table \ref{Compare:BD-Rate}, work \cite{lee2015fastquantizationmetho
 		\cmidrule[0.75pt]{1-3}
 		DSPs  		& 481 		& 224 		\\     
 		\cmidrule[0.75pt]{1-3} 
-		Parallelism	& 4-32		& 32		\\
+		Parallelism	& 4-32		& 32		\\       
 		\cmidrule[0.75pt]{1-3}
-		Cycles  	& 538 		& 40		\\     
+		Throughput 	& 4K@45fps 	& 8K@89fps	\\    
 		\cmidrule[0.75pt]{1-3}
-		Frequency  	& 200MHz	& 116MHz	\\       
+		Frequency  	& 200MHz	& 116MHz	\\   
 		\cmidrule[0.75pt]{1-3}
-		Throughput 	& 4K@45fps 	& 8K@89fps	\\     
+		Cycles  	& 538 		& 40		\\   
 		\midrule[0.75pt] \specialrule{0em}{0.35pt}{0.35pt} \midrule[0.75pt] 
 	\end{tabular}
 \end{table}
