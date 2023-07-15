@@ -51,7 +51,10 @@ Beijing 100871, China (e-mail: swma@pku.edu.cn).}
 
 \begin{abstract}
 
-The rate-distortion optimized quantization (RDOQ) provides significant coding gain in the third generation of Audio Video coding Standard (AVS3). However, the high computational complexity and strong data dependency in RDOQ impede the hardware implementation. To address these issues, we propose a zig-zag scanline-level parallelized RDOQ algorithm and its fully pipelined hardware architecture for AVS3 video coding. For algorithm optimization, we update the run-level context for rate estimation in the inner zig-zag scanline and adopt an efficient RD cost form in the optimal coefficient level (OCL) decision. In the last significant coefficient (LSC) position decision, a greedy strategy-based algorithm is proposed to calculate the determination in parallel. Moreover, the proposed parallelized RDOQ algorithm is accelerated by single incrustation multiple data (SIMD) on the Intel X86 platform. \emph{TODO: hardwareMoreover, the hardware architecture is implemented in Verilog based on the proposed parallelized algorithm. It can support the real-time encoding requirements for 4K@30fps. It is evident that a good trade-off exists between coding efficiency and hardware throughput.} Experimental results show that the proposed algorithm achieves 31.42\%, 28.60\%, and 28.58\% time-saving by a 0.23\%, 0.24\%, and 0.26\% Bjøntegaard delta rate (BD-rate) increase on average under All-Intra (AI), Random-Access (RA), and Low-Delay B (LDB) configurations, respectively. 
+The rate-distortion optimized quantization (RDOQ) provides significant coding gain in the third generation of Audio Video coding Standard (AVS3). However, the high computational complexity and strong data dependency in RDOQ impede the hardware implementation. To address these issues, we propose a zig-zag scanline-level parallelized RDOQ algorithm and its fully pipelined hardware architecture for AVS3 video coding. For algorithm optimization, we update the run-level context for rate estimation in the inner zig-zag scanline and adopt an efficient RD cost form in the optimal coefficient level (OCL) decision. In the last significant coefficient (LSC) position decision, a greedy strategy-based algorithm is proposed to calculate the determination in parallel. Moreover, the proposed parallelized RDOQ algorithm is accelerated by single incrustation multiple data (SIMD) on the Intel X86 platform. 
+%\emph{TODO: hardware}
+Moreover, the hardware architecture is implemented in Verilog based on the proposed parallelized algorithm. It can support the real-time encoding requirements for 8K@89fps. It is evident that a good trade-off exists between coding efficiency and hardware throughput.
+Experimental results show that the proposed algorithm achieves 31.42\%, 28.60\%, and 28.58\% time-saving by a 0.23\%, 0.24\%, and 0.26\% Bjøntegaard delta rate (BD-rate) increase on average under All-Intra (AI), Random-Access (RA), and Low-Delay B (LDB) configurations, respectively. 
 
 
 % which also suffers from a high computational complexity and strong data dependency hinders hardware implementation. To address the issues, we propose a zig-zag scanline level parallelied RDOQ algorithm and its pipelined hardware architecture. For algorithm optimization, the run-level context for the rate estimation is updated in the inner zig-zag scanline and an efficient RD cost form is adopted in the optimal coefficient level (OCL) decision step. In the last significant coefficient (LSC) position decision step, a greedy strategy-based algorithm is proposed to enable the LSC position to be calculated in parallel. Meanwhile, the improved RDOQ process is accelerated based on SIMD. The experimental results show that compared with HPM-4.0.1, the proposed algorithm can achieves a 0.23\%, 0.24\% and 0.26\% Bjøntegaard delta rate (BD-rate) loss and a 31.42\%, 28.60\% and 28.58\% average RDOQ time-saving under All-Intra (AI), Random-Access (RA) and Low-Delay B (LDB) configurations, respectively.
@@ -88,7 +91,9 @@ From Fig.~\ref{summary}, it is evident that most of the current fast algorithms 
 	\label{summary} % Give a unique label
 \end{figure}
 \par
-In this work, we propose a zig-zag scanline level parallelized RDOQ algorithm and its fully pipelined hardware architecture design for the AVS3 video encoder. Our parallelized algorithm achieves significant time savings with only a slight BD-Rate loss. Compared with the vanilla HPM-4.0.1 software, our algorithm increases BD-Rate by 0.23\%, 0.24\%, and 0.26\% and saves RDOQ time by 31.42\%, 28.60\%, and 28.58\% under All-Intra (AI), Random-Access (RA), and Low-Delay B (LDB) configurations, respectively. Unlike existing bypass and fast RDOQ algorithm \cite{lee2016all-zero, wang2017fastrdoq, fan2016hybridzreoblock, cui2018hybrid, cui2017adaptive, wei2019all, yin2018efficient, yin2020multistageallzerodetection, lee2015fastquantizationmethod, zhang2015fastrdoq, xu2018simplifiedrdoq, xu2020simplifiedLevelEstimation, huang2015efficientquantization, cui2017Laplacedistributionbased, he2015highimplementationrdoq, wang2016improvedrdoq, canh2018rate, kianfar2020parallelized}, our algorithm is more friendly for the efficient hardware implementation. \emph{TODO: hardware related description. } The algorithm improves the accuracy compared with the hardware-oriented implementation in \cite{igarashi2018parallelGPU, xu2022hardwarefriendlyforrdoq}, and \cite{zhao2023scanline}. The main contributions of this work are summarized as follows. 
+In this work, we propose a zig-zag scanline level parallelized RDOQ algorithm and its fully pipelined hardware architecture design for the AVS3 video encoder. Our parallelized algorithm achieves significant time savings with only a slight BD-Rate loss. Compared with the vanilla HPM-4.0.1 software, our algorithm increases BD-Rate by 0.23\%, 0.24\%, and 0.26\% and saves RDOQ time by 31.42\%, 28.60\%, and 28.58\% under All-Intra (AI), Random-Access (RA), and Low-Delay B (LDB) configurations, respectively. Unlike existing bypass and fast RDOQ algorithm \cite{lee2016all-zero, wang2017fastrdoq, fan2016hybridzreoblock, cui2018hybrid, cui2017adaptive, wei2019all, yin2018efficient, yin2020multistageallzerodetection, lee2015fastquantizationmethod, zhang2015fastrdoq, xu2018simplifiedrdoq, xu2020simplifiedLevelEstimation, huang2015efficientquantization, cui2017Laplacedistributionbased, he2015highimplementationrdoq, wang2016improvedrdoq, canh2018rate, kianfar2020parallelized}, our algorithm is more friendly for the efficient hardware implementation. 
+%\emph{TODO: hardware related description. } 
+The propsoed fully pipelined hardware architecture takes advantage of the parallelized RDOQ algorithm, which can achieve real-time encoding of 8K@89fps on FPGA while minimizing area consumption. Besides, the algorithm improves the accuracy compared with the hardware-oriented implementation in \cite{igarashi2018parallelGPU, xu2022hardwarefriendlyforrdoq}, and \cite{zhao2023scanline}. The main contributions of this work are summarized as follows. 
 
 % In this work, an FPGA-based 4K@30fps real-time high-parallelism RDOQ algorithm and the corresponding hardware architecture are proposed for the AVS3 encoder. First, from an algorithm point of view, Our proposed parallelized algorithm significantly achieved time saving at a slight BD-Rate loss. Compared with the HPM-4.0.1 software, the proposed parallelized algorithm leads to a 0.23\%, 0.24\% and 0.26\% BD-Rate loss and a 31.42\%, 28.60\% and 28.58\% average RDOQ time-saving under All-Intra (AI), Random-Access (RA) and Low-Delay B (LDB) configurations, respectively. Moreover, unlike these bypass and fast algorithm \cite{lee2016all-zero, wang2017fastrdoq, fan2016hybridzreoblock, cui2018hybrid, cui2017adaptive, wei2019all, yin2018efficient, yin2020multistageallzerodetection, lee2015fastquantizationmethod, zhang2015fastrdoq, xu2018simplifiedrdoq, xu2020simplifiedLevelEstimation, huang2015efficientquantization, cui2017Laplacedistributionbased, he2015highimplementationrdoq, wang2016improvedrdoq, canh2018rate, kianfar2020parallelized}, our proposed algorithm is friendly to apply to an efficient hardware architecture. Second, from a hardware architecture perspective, \emph{TODO: hardware architecture}
 
@@ -520,6 +525,16 @@ where $T_{OriginQ}$ and $T_{SIMDQ}$ represent the RDOQ time for the original and
 \subsection{RD Performance and Computational Complexity Evaluation}
 The overall experimental results that compared our parallelized RDOQ with vanilla HPM are presented in Table \ref{tab:BD-Rate}. Both the RD performance and time-saving results are evaluated under the AI, RA, and LDB configurations for each individual sequence in Table \ref{tab:BD-Rate}. It can be observed that the BD-Rate of the proposed parallelized RDOQ algorithm increases by 0.23\% in the AI configuration, 0.24\% in the RA configuration, and 0.26\% in the LDB configuration, respectively. The coding performance loss is insignificant, and the BD-Rate increment is relatively consistent across each sequence. Moreover, we show some R-D curves of several sequences in Fig. \ref{RD curves}. One sequence is selected from each video resolution, making total four sequences. These curves show that the BD-Rate of the proposed algorithm is very close to the original RDOQ in HPM-4.0.1, and the performance loss for these different resolution sequences fluctuates very small. 
 
+\begin{figure}[htbp]
+	\centering
+	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/UHD.png}} \hspace{2pt}
+	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/HD.png}} \vspace{-5pt} \\
+	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/P720.png}} \hspace{2pt}
+	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/P240.png}}
+	\caption{The time-saving results in the four sequence cases including UHD (a), HD (b), 720p (c) and 240p (d) under AI configuration.}
+	\label{Time curves}
+\end{figure}
+
 In addition, we also give the time-saving results for proposed parallelized RDOQ algorithm based on SIMD in Table \ref{tab:BD-Rate}. It can be observed that the RDOQ process time is reduced by 31.42\%, 28.6\%, and 28.58\% under AI, RA, and LDB configurations on average, respectively. And, it can save 8.80\%, 6.84\%, and 6.96\% under AI, RA, and LDB configurations on average for the total encoding time. To evaluate the effect of QP on time-saving, we conduct tests for the $TS_{Q}$ results using four different resolution test sequences for comparison. As shown in Fig. \ref{Time curves}, as the QP value becomes larger, the more time is saved in the RDOQ process based on SIMD. This is because a higher QP value corresponds to a higher probability that the quantization coefficient will become zero, resulting in a higher chance that all the four parallelized coefficients in Fig. \ref{selection} become zero in the TU. When we accelerate the SIMD-based OCL decision process, we can skip the decision process if all four coefficients to be executed are zero. 
 
 As analyzed above, the proposed scheme effectively reduces coding complexity while incurring insignificant RD performance loss compared to the original RDOQ. Furthermore, computation complexity has been significantly reduced. These results demonstrate that our proposed parallelized RDOQ method can achieve a well trade-off between coding performance and computational complexity. 
@@ -537,17 +552,47 @@ As shown in Table \ref{Compare:BD-Rate}, work \cite{lee2015fastquantizationmetho
 % As you can see from the Table \ref{Compare:BD-Rate}, work \cite{lee2015fastquantizationmethod} and work \cite{xu2020simplifiedLevelEstimation} both speed up in software by simplifying the RDOQ process, and they can achieve a time saving of 12.9\%-15.8\% with a negligible BD-Rate loss under AI, RA and LD configurations. Compared with \cite{lee2015fastquantizationmethod} and \cite{xu2020simplifiedLevelEstimation}, our parallel algorithm can achieve more time reduction with a close coding efficiency and mainly focus on the fully pipelined hardware implementation. Work \cite{igarashi2018parallelGPU} proposed a parallel RDOQ algorithm for HEVC encoder. It achieves 4K/60FPS real-time encoding on GPU with a high 2.51\% BD-Rate loss. Compared with \cite{igarashi2018parallelGPU}, our proposed parallel RDOQ algorithm achieves 4K/30FPS real-time encoding on FPGAs with only 0.24\% BD-Rate loss on average under RA configuration, which is a good trade-off between encoding performance and hardware implementation. Work \cite{xu2022hardwarefriendlyforrdoq} introduces all-zero block skipping and an optimized rate estimation algorithm. It can be seen that it obtains 27.6\% and 30.6\% time savings in the RA and LD configurations, respectively, but the BD-Rate loss is 0.86\% and 0.64\%. Compared to \cite{xu2022hardwarefriendlyforrdoq}, the BD-Rate loss of our proposed parallel scheme is only 0.24\% and 0.26\% with similar time savings in RA and LD configurations, respectively. In addition, we add our previous work \cite{zhao2023scanline} into comparison as well, and it can be seen that the improved parallel algorithm in this paper has better coding performance by comparing the BD-Rate in RA and LD configurations provided in \cite{zhao2023scanline}.
 
 \subsection{Hardware Implementation Result}
-The proposed hardware architecture has been implemented in Verilog and synthesized in FPGAs.
 
-\begin{figure}[htbp]
+\begin{table}[!ht]
+	%\usepackage{hhline}
+	\caption{Comparasion of hardware resource consumption.}
+	\label{hardware resource consumption}
 	\centering
-	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/UHD.png}} \hspace{2pt}
-	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/HD.png}} \vspace{-5pt} \\
-	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/P720.png}} \hspace{2pt}
-	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/P240.png}}
-	\caption{The time-saving results in the four sequence cases including UHD (a), HD (b), 720p (c) and 240p (d) under AI configuration.}
-	\label{Time curves}
-\end{figure}
+	\tabcolsep 7pt  % 
+	\arrayrulewidth 0.75pt
+	\begin{tabular}{c | c  c } 
+		\midrule[0.75pt] \specialrule{0em}{0.35pt}{0.35pt} \midrule[0.75pt] 
+		Design 		& \cite{zhao2023scanline}     & Proposed    \\   
+		\cmidrule[0.75pt]{1-3}  
+		LUTs   		& 109759 	& 72017 	\\ 
+		\cmidrule[0.75pt]{1-3}
+		FFs   		& 29576 	& 23440 	\\      
+		\cmidrule[0.75pt]{1-3}
+		DSPs  		& 481 		& 224 		\\     
+		\cmidrule[0.75pt]{1-3} 
+		Parallelism	& 32		& 32		\\
+		\cmidrule[0.75pt]{1-3}
+		Cycles  	& 538 		& 40		\\     
+		\cmidrule[0.75pt]{1-3}
+		Frequency  	& 200MHz	& 116MHz	\\       
+		\cmidrule[0.75pt]{1-3}
+		Throughput 	& 4K@45fps 	& 8K@89fps	\\     
+		\midrule[0.75pt] \specialrule{0em}{0.35pt}{0.35pt} \midrule[0.75pt] 
+	\end{tabular}
+\end{table}
+
+Currently, there are limited studies focusing on hardware implementations of the RDOQ algorithm for AVS3 encoders. This is primarily due to its high content dependency and algorithmic complexity. 
+The proposed RDOQ hardware architecture in our research is based on the parallelized algorithm. This implementation allows for parallel processing of multiple TUs with high parallelism, while minimizing resource utilization. 
+
+To demonstrate the advancements of our work, we conducted a comprehensive comparison on Field-Programmable Gate Array (FPGA) with Zhao et al. \cite{zhao2023scanline}, and the results are tabulated in Table \ref{hardware resource consumption}. Our proposed design was implemented using Verilog Hardware Description Language (HDL) and synthesized at a clock frequency of 200MHz using Synplify pro 2019.03 for the Xilinx UltraScale+ MPSoCs 7ev. 
+
+As shown in Table \ref{hardware resource consumption}, our proposed design achieves a 34.39\% reduction in LUTs $((109759 - 72017) \div 109759)$ and over 50\% reduction in DSPs compared to Zhao et al. \cite{zhao2023scanline}. 
+Moreover, apart from minimizing area consumption, our design boasts a significantly higher processing throughput compared to their deisgn.
+The processing of a TU with size of 32$\times$32 only requires 40 cycles at a frequency of 116MHz, which can meet the real-time encoding of 8K@89fps $((32\times32\times116\times10^6) \div (7680\times4320\times40))$. 
+While their method operates at a higher frequency of 200MHz, it necessitates a considerably larger number of cycles, resulting in lower overall throughput. 
+
+Furthermore, the proposed deisgn has also beed synthesized by Design Compiler with the UMC 28nm cell library at a clock frequency of 800MHz, the gate count is 1,223.2K and the maximum frequency is 471.2MHz.
+
 
 \begin{table*}[!h]
 	%\usepackage{hhline}
@@ -640,31 +685,6 @@ The proposed hardware architecture has been implemented in Verilog and synthesiz
 	\end{tabular}
 \end{table}
 
-\begin{table}[!ht]
-	%\usepackage{hhline}
-	\caption{Comparasion of hardware resource consumption.}
-	\label{hardware resource consumption}
-	\centering
-	\tabcolsep 7pt  % 
-	\arrayrulewidth 0.75pt
-	\begin{tabular}{c | c  c } 
-		\midrule[0.75pt] \specialrule{0em}{0.35pt}{0.35pt} \midrule[0.75pt] 
-		Design 		& \cite{zhao2023scanline}     & Proposed    \\   
-		\cmidrule[0.75pt]{1-3}  
-		LUTs   		& 109759 	& 72017 	\\ 
-		\cmidrule[0.75pt]{1-3}
-		FFs   		& 29576 	& 23440 	\\      
-		\cmidrule[0.75pt]{1-3}
-		DSPs  		& 481 		& 224 		\\     
-		\cmidrule[0.75pt]{1-3} 
-		Parallelism	& 32		& 32		\\
-		\cmidrule[0.75pt]{1-3}
-		Cycles  	& 538 		& 40		\\     
-		\cmidrule[0.75pt]{1-3}
-		Frequency  	& 200MHz	& 116MHz	\\            
-		\midrule[0.75pt] \specialrule{0em}{0.35pt}{0.35pt} \midrule[0.75pt] 
-	\end{tabular}
-\end{table}
 
 \begin{table*}[!ht]
 	%\usepackage{hhline}
