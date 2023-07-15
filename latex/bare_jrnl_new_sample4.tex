@@ -52,15 +52,12 @@ Beijing 100871, China (e-mail: swma@pku.edu.cn).}
 \begin{abstract}
 
 The rate-distortion optimized quantization (RDOQ) provides significant coding gain in the third generation of Audio Video coding Standard (AVS3). However, the high computational complexity and strong data dependency in RDOQ impede the hardware implementation. To address these issues, we propose a zig-zag scanline-level parallelized RDOQ algorithm and its fully pipelined hardware architecture for AVS3 video coding. 
-%
 For algorithm optimization, we update the run-level context for rate estimation in the inner zig-zag scanline and adopt an efficient RD cost form in the optimal coefficient level (OCL) decision step. In the last significant coefficient (LSC) position decision step, a greedy strategy-based algorithm is proposed to optimize the determination process in parallel. Moreover, the proposed parallelized RDOQ algorithm is accelerated by single incrustation multiple data (SIMD) on the Intel X86 platform. 
-%
 For hardware architecture design, a fully pipelined hardware architecture is proposed with nine pipeline stages. 
-This design facilitates the processing of multiple TUs (Transform Units) in parallel. In the OCL step, the data-forwarding technology is employed to resolve the strong context dependency. 
-Additionally, the utilization of multiple comparators in the determination of the LSC position serves to minimize latency and expedite the overall processing speed.
-%
+This design facilitates the processing of multiple transform units in parallel. In the OCL decision step, the rate and distortion calculation are designed by multiple pipeline stages to keep the context dependency. 
+Additionally, the utilization of multiple comparators in the LSC position decision step serves to minimize latency. 
 Experimental results show that the proposed algorithm achieves 31.42\%, 28.60\%, and 28.58\% time-saving by a 0.23\%, 0.24\%, and 0.26\% Bjøntegaard delta rate (BD-rate) increase on average under All-Intra (AI), Random-Access (RA), and Low-Delay B (LDB) configurations, respectively. 
-The hardware implementation achieves 32 coefficients per cycle, and the area consumption is 1223.2K logic gates (0.67mm2) when working at 471.2MHz. It is proven that the proposed algorithm and hardware architecture design achieve a good trade-off between coding efficiency and hardware throughput. 
+The hardware implementation achieves 32 coefficients per cycle, and the area consumption is 1223.2K logic gates (0.67$mm^2$) when working at 471.2MHz. It is proven that the proposed algorithm and hardware architecture design achieve a good trade-off between coding efficiency and hardware throughput. 	
 
 %The rate-distortion optimized quantization (RDOQ) provides significant coding gain in the third generation of Audio Video coding Standard (AVS3). However, the high computational complexity and strong data dependency in RDOQ impede the hardware implementation. To address these issues, we propose a zig-zag scanline-level parallelized RDOQ algorithm and its fully pipelined hardware architecture for AVS3 video coding. For algorithm optimization, we update the run-level context for rate estimation in the inner zig-zag scanline and adopt an efficient RD cost form in the optimal coefficient level (OCL) decision. In the last significant coefficient (LSC) position decision, a greedy strategy-based algorithm is proposed to calculate the determination in parallel. Moreover, the proposed parallelized RDOQ algorithm is accelerated by single incrustation multiple data (SIMD) on the Intel X86 platform. 
 %\emph{TODO: hardware}
@@ -728,7 +725,7 @@ Furthermore, the proposed design has been synthesized by Design Compiler with th
 \section{Conclusion and Future Work}
 \label{sec:6}
 In this paper, a parallelized RDOQ algorithm and its fully pipelined hardware architecture design is presented for AVS3 video coding standard. For the parallelized algorithm, the run-level context for the rate estimation is updated in the inner zig-zag scanline and an efficient RD cost form is adopted in the OCL decision step. In the LSC position decision step, a greedy strategy-based algorithm is proposed to achieve the LSC position decision compute in parallel. Moreover, the parallelized algorithm is accelerated based on SIMD. The experimental results show that the BD-rate of the parallelized algorithm is increased by 0.23\%, 0.24\%, and 0.26\% under the AI, RA, and LDB configurations, respectively. The computational time is reduced by 31.42\%, 28.60\%, and 28.58\% compared to the vanilla HPM-4.0.1, respectively. 
-For the hardware architecture, we design a nine-stage fully pipelined architecture which achieves 32 coefficients per cycle. It can process mutltiple TUs when the height is less than 32. The area consumption is 1223.2K gate count (0.67mm2) when working at 471.2MHz. It proves that our design achieves a good tradeoff between coding efficiency and hardware throughput. 
+For the hardware architecture, we design a nine-stage fully pipelined architecture which achieves 32 coefficients per cycle. It can process mutltiple TUs when the height is less than 32. The area consumption is 1223.2K gate count (0.67$mm^2$) when working at 471.2MHz. It proves that our design achieves a good tradeoff between coding efficiency and hardware throughput. 
 In our future study, we will extend the proposed parallelized algorithm to RDOQ in HEVC and explore novel methods to speed-up the dependent quantization computation in VVC. 
 
 % \section*{Acknowledgments}
