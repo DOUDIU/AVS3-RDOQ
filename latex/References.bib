@@ -13,15 +13,15 @@
 	year= 1994
 }
 
-@ARTICLE{avcoverview,
-  author={Wiegand, T. and Sullivan, G.J. and Bjontegaard, G. and Luthra, A.},
-  journal={IEEE Transactions on Circuits and Systems for Video Technology}, 
-  title={Overview of the H.264/AVC video coding standard}, 
-  year={2003},
+@article{avcoverview,
+  title={Overview of the H.264/AVC video coding standard},
+  author={Wiegand, Thomas and Sullivan, Gary J and Bjontegaard, Gisle and Luthra, Ajay},
+  journal={IEEE Transactions on circuits and systems for video technology},
   volume={13},
   number={7},
-  pages={560-576},
-  doi={10.1109/TCSVT.2003.815165}
+  pages={560--576},
+  year={2003},
+  publisher={IEEE}
 }
 
 @article{sullivan2012hevcoverview,
@@ -112,6 +112,16 @@
   pages={1--4},
   year={2017},
   organization={IEEE}
+}
+
+@article{yin2019efficient,
+  title={Efficient hard-decision quantization using an adaptive deadzone offset model for video coding},
+  author={Yin, Haibing and Wang, Hongkui and Huang, Xiaofeng and Yin, Huabing},
+  journal={IEEE Access},
+  volume={7},
+  pages={151215--151229},
+  year={2019},
+  publisher={IEEE}
 }
 
 @article{wang2021trellis,
@@ -286,6 +296,22 @@
   organization={IEEE}
 }
 
+@inproceedings{canh2018rate,
+  title={Rate-distortion optimized quantization: A deep learning approach},
+  author={Canh, Thuong Nguyen and Xu, Motong and Jeon, Byeungwoo},
+  booktitle={IEEE High Performance Extreme Computing Conference},
+  year={2018}
+}
+
+@inproceedings{kianfar2020parallelized,
+  title={Parallelized rate-distortion optimized quantization using deep learning},
+  author={Kianfar, Dana and Wiggers, Auke and Said, Amir and Pourreza, Reza and Cohen, Taco},
+  booktitle={2020 IEEE 22nd International Workshop on Multimedia Signal Processing (MMSP)},
+  pages={1--6},
+  year={2020},
+  organization={IEEE}
+}
+
 @inproceedings{igarashi2018parallelGPU,
   title={Parallel rate distortion optimized quantization for 4K real-time GPU-based HEVC encoder},
   author={Igarashi, Hiroaki and Takano, Fumiyo and Takenaka, Takashi and Inoue, Hiroaki and Moriyoshi, Tatsuji},
@@ -313,21 +339,36 @@
 }
 
 @inproceedings{zhao2023scanline,
-	title={Scanline-based fast algorithm and pipelined hardware design of rate-distortion optimized quantization for AVS3},
-	author={Zhao, Jiachen and Yang, Fan and Huang, Xiaofeng and Xiang, Guoqing and Zhang, Peng and Zhao, Liping and Yan, Wei},
-	booktitle={2023 IEEE International Conference on Consumer Electronics (ICCE)},
-	pages={1--6},
-	year={2023},
-	organization={IEEE}
+  title={Scanline-based fast algorithm and pipelined hardware design of rate-distortion optimized quantization for AVS3},
+  author={Zhao, Jiachen and Yang, Fan and Huang, Xiaofeng and Xiang, Guoqing and Zhang, Peng and Zhao, Liping and Yan, Wei},
+  booktitle={2023 IEEE International Conference on Consumer Electronics (ICCE)},
+  pages={1--6},
+  year={2023},
+  organization={IEEE}
+}
+
+@article{huang2023rate,
+  title={Rate-Distortion Optimization-Based Learned Fractional Interpolation Filter Design for HEVC},
+  author={Huang, Xiaofeng and Niu, Weihong and Zhang, Qiuyang and Yin, Haibing and Xiang, Guoqing and Wang, Shanshe and Ma, Siwei},
+  journal={IEEE Transactions on Broadcasting},
+  year={2023},
+  publisher={IEEE}
+}
+
+@misc{HPM4.0,
+    author={},
+    title={{AVS3 Software Repository.}},
+    organization={Accessed}, 
+    url={https://gitlab.com/AVS3 software/hpm/-/tags/HPM-4.0.},
 }
 
 @inproceedings{wang2013transform,
-	title={Transform coefficient coding design for AVS2 video coding standard},
-	author={Wang, Jing and Wang, Xiaofeng and Ji, Tianying and He, Dake},
-	booktitle={2013 Visual Communications and Image Processing (VCIP)},
-	pages={1--6},
-	year={2013},
-	organization={IEEE}
+  title={Transform coefficient coding design for AVS2 video coding standard},
+  author={Wang, Jing and Wang, Xiaofeng and Ji, Tianying and He, Dake},
+  booktitle={2013 Visual Communications and Image Processing (VCIP)},
+  pages={1--6},
+  year={2013},
+  organization={IEEE}
 }
 
 @manual{wang2019coding,
@@ -338,95 +379,101 @@
 }
 
 @inproceedings{braatz2018high,
-	title={High-throughput and low-power integrated direct/inverse hevc quantization hardware design},
-	author={Braatz, Luciano and Zatt, Bruno and Palomino, Daniel and Agostini, Luciano and Porto, Marcelo},
-	booktitle={2018 IEEE International Symposium on Circuits and Systems (ISCAS)},
-	pages={1--5},
-	year={2018},
-	organization={IEEE}
+  title={High-throughput and low-power integrated direct/inverse hevc quantization hardware design},
+  author={Braatz, Luciano and Zatt, Bruno and Palomino, Daniel and Agostini, Luciano and Porto, Marcelo},
+  booktitle={2018 IEEE International Symposium on Circuits and Systems (ISCAS)},
+  pages={1--5},
+  year={2018},
+  organization={IEEE}
 }
 
 @article{fan2019pipelined,
-	title={A pipelined 2D transform architecture supporting mixed block sizes for the VVC standard},
-	author={Fan, Yibo and Zeng, Yixuan and Sun, Heming and Katto, Jiro and Zeng, Xiaoyang},
-	journal={IEEE Transactions on Circuits and Systems for Video Technology},
-	volume={30},
-	number={9},
-	pages={3289--3295},
-	year={2019},
-	publisher={IEEE}
+ title={A pipelined 2D transform architecture supporting mixed block sizes for the VVC standard},
+ author={Fan, Yibo and Zeng, Yixuan and Sun, Heming and Katto, Jiro and Zeng, Xiaoyang},
+ journal={IEEE Transactions on Circuits and Systems for Video Technology},
+ volume={30},
+ number={9},
+ pages={3289--3295},
+ year={2019},
+ publisher={IEEE}
 }
 
 @article{meher2013efficient,
-	title={Efficient integer DCT architectures for HEVC},
-	author={Meher, Pramod Kumar and Park, Sang Yoon and Mohanty, Basant Kumar and Lim, Khoon Seong and Yeo, Chuohao},
-	journal={IEEE Transactions on Circuits and systems for Video Technology},
-	volume={24},
-	number={1},
-	pages={168--178},
-	year={2013},
-	publisher={IEEE}
+ title={Efficient integer DCT architectures for HEVC},
+ author={Meher, Pramod Kumar and Park, Sang Yoon and Mohanty, Basant Kumar and Lim, Khoon Seong and Yeo, Chuohao},
+ journal={IEEE Transactions on Circuits and systems for Video Technology},
+ volume={24},
+ number={1},
+ pages={168--178},
+ year={2013},
+ publisher={IEEE}
 }
 
 @ARTICLE{Hao2023Multiple,
-	author={Hao, Zhijian and Sun, Heming and Xiang, Guoqing and Zhang, Peng and Zeng, Xiaoyang and Fan, Yibo},
-	journal={IEEE Transactions on Very Large Scale Integration (VLSI) Systems}, 
-	title={A Reconfigurable Multiple Transform Selection Architecture for VVC}, 
-	year={2023},
-	volume={31},
-	number={5},
-	pages={658-669},
-	doi={10.1109/TVLSI.2023.3245291}
-}
+  author={Hao, Zhijian and Sun, Heming and Xiang, Guoqing and Zhang, Peng and Zeng, Xiaoyang and Fan, Yibo},
+  journal={IEEE Transactions on Very Large Scale Integration (VLSI) Systems}, 
+  title={A Reconfigurable Multiple Transform Selection Architecture for VVC}, 
+  year={2023},
+  volume={31},
+  number={5},
+  pages={658-669},
+  doi={10.1109/TVLSI.2023.3245291}
+  }
 
 @article{sun2017fast,
-	title={Fast algorithm and VLSI architecture of rate distortion optimization in H. 265/HEVC},
-	author={Sun, Heming and Zhou, Dajiang and Hu, Landan and Kimura, Shinji and Goto, Satoshi},
-	journal={IEEE Transactions on Multimedia},
-	volume={19},
-	number={11},
-	pages={2375--2390},
-	year={2017},
-	publisher={IEEE}
+  title={Fast algorithm and VLSI architecture of rate distortion optimization in H. 265/HEVC},
+  author={Sun, Heming and Zhou, Dajiang and Hu, Landan and Kimura, Shinji and Goto, Satoshi},
+  journal={IEEE Transactions on Multimedia},
+  volume={19},
+  number={11},
+  pages={2375--2390},
+  year={2017},
+  publisher={IEEE}
 }
 
 
 @article{zhang2018highly,
-	title={A highly parallel hardware architecture of table-based CABAC bit rate estimator in an HEVC intra encoder},
-	author={Zhang, Yuanzhi and Lu, Chao},
-	journal={IEEE Transactions on Circuits and Systems for Video Technology},
-	volume={29},
-	number={5},
-	pages={1544--1558},
-	year={2018},
-	publisher={IEEE}
+  title={A highly parallel hardware architecture of table-based CABAC bit rate estimator in an HEVC intra encoder},
+  author={Zhang, Yuanzhi and Lu, Chao},
+  journal={IEEE Transactions on Circuits and Systems for Video Technology},
+  volume={29},
+  number={5},
+  pages={1544--1558},
+  year={2018},
+  publisher={IEEE}
 }
 
-@article{huang2018three,
-	title={Three-level pipelined multi-resolution integer motion estimation engine with optimized reference data sharing search for AVS},
-	author={Huang, Xiaofeng and Wei, Kaijin and Yin, Haibing and Zhu, Chuang and Jia, Huizhu and Xie, Don},
-	journal={Journal of Real-Time Image Processing},
-	volume={15},
-	pages={43--55},
-	year={2018},
-	publisher={Springer}
+  @article{huang2018three,
+  title={Three-level pipelined multi-resolution integer motion estimation engine with optimized reference data sharing search for AVS},
+  author={Huang, Xiaofeng and Wei, Kaijin and Yin, Haibing and Zhu, Chuang and Jia, Huizhu and Xie, Don},
+  journal={Journal of Real-Time Image Processing},
+  volume={15},
+  pages={43--55},
+  year={2018},
+  publisher={Springer}
 }
 
 @article{zhang2018efficient,
-	title={Efficient algorithm adaptations and fully parallel hardware architecture of H. 265/HEVC intra encoder},
-	author={Zhang, Yuanzhi and Lu, Chao},
-	journal={IEEE Transactions on Circuits and Systems for Video Technology},
-	volume={29},
-	number={11},
-	pages={3415--3429},
-	year={2018},
-	publisher={IEEE}
+  title={Efficient algorithm adaptations and fully parallel hardware architecture of H. 265/HEVC intra encoder},
+  author={Zhang, Yuanzhi and Lu, Chao},
+  journal={IEEE Transactions on Circuits and Systems for Video Technology},
+  volume={29},
+  number={11},
+  pages={3415--3429},
+  year={2018},
+  publisher={IEEE}
 }
-
 
 @book{harris2010digital,
   title={Digital design and computer architecture},
   author={Harris, David and Harris, Sarah},
   year={2010},
   publisher={Morgan Kaufmann}
+}
+
+@article{AVS3CTC,
+  title={{AVS3-P2 Common Test Conditions V9.0}},
+  author={Chen, J},
+  journal={AVS-Doc, N2813},
+  year={2020},
 }
