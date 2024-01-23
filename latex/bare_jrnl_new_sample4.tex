@@ -27,14 +27,13 @@
 % \author{IEEE Publication Technology,~\IEEEmembership{Staff,~IEEE,}
         % <-this % stops a space
 
-\thanks{This work was supported in part by the National Natural Science Foundation of China under Grant 61901150, 61931008, and 61972123, and in part by the National Key R\&D Program of China under Grant 2021ZD0109800.}% <-this % stops a space
+\thanks{This work was supported in part by the National Natural Science Foundation of China under Grant 61901150, 61931008, and 61972123; in part by the National Key R\&D Program of China under Grant 2021ZD0109800; in part by the “Leading Goose” R\&D Program of Zhejiang Province under grants 2024C01107. \textit{(Corresponding author: Haibing Yin)}}% <-this % stops a space
 \thanks{Xiaofeng Huang and Haibing Yin are with the School of Communication Engineering, Hangzhou Dianzi University, Hangzhou 310018, China, and also with the Advanced Institute of Information Technology, Peking University, Hangzhou 311215, China (e-mail: \{xfhuang; yhb\}@hdu.edu.cn).}
 \thanks{Ran Tang is with the School of Communication Engineering, Hangzhou Dianzi University,
 Hangzhou 310018, China (e-mail: rtang@hdu.edu.cn).}
 \thanks{Rui Pan is with the School of Electronics and Information, Hangzhou Dianzi University, Hangzhou 310018, China (e-mail: 222040188@hdu.edu.cn).}
 \thanks{Shiqi Wang is with the Department of Computer Science, City University of Hong Kong, Hong Kong (e-mail: shiqwang@cityu.edu.hk).}
 \thanks{Zhao Wang and Siwei Ma are with the School of Computer Science, Peking University, Beijing 100871, China (e-mail: \{zhaowang; swma\}@pku.edu.cn).}
-
 %\thanks{This paper was produced by the IEEE Publication Technology Group. They are in Piscataway, NJ.}% <-this % stops a space
 %\thanks{Manuscript received April 19, 2021; revised August 16, 2021.}
 }
@@ -51,12 +50,12 @@ Hangzhou 310018, China (e-mail: rtang@hdu.edu.cn).}
 
 \begin{abstract}
 The rate-distortion optimized quantization (RDOQ) provides significant coding gain in the third generation of Audio Video coding Standard (AVS3). However, the high computational complexity and strong data dependency in RDOQ impede the hardware implementation. To address these issues, we propose a zig-zag scanline-level parallelized RDOQ algorithm and its fully pipelined hardware architecture for AVS3 video coding. 
-For algorithm optimization, we update the run-level context for rate estimation in the inner zig-zag scanline and adopt an efficient RD cost calculation form in the optimal coefficient level (OCL) decision step. In the last significant coefficient (LSC) position decision step, a greedy strategy-based algorithm is proposed to optimize the determination process in parallel. Moreover, the proposed parallelized RDOQ algorithm is accelerated by single instruction multiple data (SIMD) on the Intel X86 platform. 
+For algorithm optimization, we update the run-level context for rate estimation in the inner zig-zag scanline and propose an efficient RD cost calculation form in the optimal coefficient level (OCL) decision step. In the last significant coefficient (LSC) position decision step, a greedy strategy based algorithm is proposed to optimize the determination process in parallel. Moreover, the proposed parallelized RDOQ algorithm is accelerated by single instruction multiple data (SIMD) on the Intel X86 platform. 
 For hardware architecture design, a fully pipelined hardware architecture is proposed with nine pipeline stages. 
 This design can process multiple transform units in parallel when the height is less than 32. 
 %In the OCL decision step, the rate and distortion calculations are designed by multiple pipeline stages to keep the context dependency. 
 % Additionally, the utilization of multiple comparators in the LSC position decision step serves to minimize latency. 
-Experimental results show that the proposed algorithm achieves 31.42\%, 28.60\%, and 28.58\% time-saving by a 0.23\%, 0.24\%, and 0.26\% Bjøntegaard delta rate (BD-rate) increase on average under All-Intra (AI), Random-Access (RA), and Low-Delay B (LDB) configurations, respectively. 
+Experimental results show that the proposed algorithm achieves 31.37\%, 28.58\%, and 28.53\% time-saving by 0.25\%, 0.26\%, and 0.27\% Bjøntegaard delta rate (BD-Rate) increase on average under all intra (AI), random access (RA), and low delay B (LDB) configurations, respectively. 
 The hardware implementation achieves 32 coefficients per cycle, and the area consumption is 1223.2K logic gates when working at 471.2MHz. It is proven that the proposed algorithm and hardware architecture design achieve a good trade-off between coding efficiency and hardware throughput. 
 \end{abstract}
 
@@ -66,45 +65,82 @@ The hardware implementation achieves 32 coefficients per cycle, and the area con
 
 \section{Introduction}
 \label{sec:1}
-\IEEEPARstart{W}{ith} the growing popularity of ultra-high definition (UHD) video content such as 4K and 8K, the amount of video data has shown an explosive increment. According to Cisco's report, video data accounted for 82\% of all mobile data traffic in 2022, up from 59\% in 2017 \cite{barnett2018cisco}. This has resulted in an urgent need for more advanced video compression coding tools that can provide high compression efficiency to alleviate the burden of video data transmission and storage. To address this challenge, several standard groups have established novel video coding standards. The Joint Video Exploration Team (JVET) formed by the ISO/IEC Moving Picture Experts Group (MPEG) and ITU-T Video Coding Experts Group (VCEG) has developed several video coding standards \cite{1994H.262/MPEG-2, avcoverview, sullivan2012hevcoverview}, and the latest one is called Versatile Video Coding (VVC) \cite{bross2021vvcoverview}. The Chinese AVS working group officially initiated the next-generation video coding standard - AVS3 in March 2018 and finalized the first phase of AVS3 in 2019 \cite{zhang2019avs3overview}. These video coding standards enable more efficient transmission and storage of video data while maintaining high video quality. 
+\IEEEPARstart{W}{ith} the growing popularity of ultra-high definition (UHD) video content such as 4K and 8K, the amount of video data has shown an explosive increment. According to Cisco's report, video data accounted for 82\% of all mobile data traffic in 2022, up from 59\% in 2017 \cite{barnett2018cisco}. This has resulted in an urgent need for more advanced video compression coding tools that can provide high compression efficiency to alleviate the burden of video data transmission and storage. To address this challenge, several standard groups have established novel video coding standards. The Joint Video Exploration Team (JVET) formed by the ISO/IEC Moving Picture Experts Group (MPEG) and ITU-T Video Coding Experts Group (VCEG) has developed several video coding standards \cite{1994H.262/MPEG-2, avcoverview, sullivan2012hevcoverview}, and the latest one is called Versatile Video Coding (VVC) \cite{bross2021vvcoverview}. The AVS working group officially initiated the next-generation video coding standard - AVS3 in March 2018 and finalized the first phase of AVS3 in 2019 \cite{zhang2019avs3overview}. 
+% These video coding standards enable more efficient transmission and storage of video data while maintaining high video quality. 
 
-The AVS3 standard is an improvement over its predecessor AVS2, which aims to provide better video compression capability and support for broader video services like virtual reality (VR). To achieve better coding efficiency, several advanced coding tools have been adopted in AVS3. In block partitioning, AVS3 extends the quadtree partition in AVS2 to a more flexible partition mechanism, including quadtree (QT), binary tree (BT) \cite{huang2019vvcbt}, and extended quadtree (EQT) partition \cite{wang2019extendedpartition}. The QT/BT combined with the EQT partition allows the appearance of a non-square coding unit (CU), which makes the CU partition adapt to the video content better. In intra-coding, new coding tools including intra-derived tree (Intra-DT), intra-prediction filter (IPF), and two-step cross-component prediction mode (TSCPM) are specially designed for AVS3. In inter coding, AVS3 introduces adaptive motion vector resolution (AMVR), enhanced motion vector resolution (EMVR), and affine motion mode, which improve the efficiency of temporal redundancy removal \cite{fan2020avs3codingtools}. In transform coding, more transform types like DST-VII and DCT-VIII are supported in AVS3 \cite{avs3standard}. These advanced coding tools make AVS3 show a significant improvement over AVS2 in terms of compression efficiency. 
+The AVS3 standard is an improvement over its predecessor AVS2, which aims to provide better video compression capability. Several advanced coding tools have been adopted in AVS3. In block partitioning, AVS3 extends the quadtree partition in AVS2 to a more flexible partition mechanism, including quadtree, binary tree \cite{huang2019vvcbt}, and extended quadtree partition \cite{wang2019extendedpartition}. In intra-coding, new coding tools including intra-derived tree, intra-prediction filter, and two-step cross-component prediction mode are specially designed for AVS3. In inter coding, AVS3 introduces adaptive motion vector resolution, enhanced motion vector resolution, and affine motion mode \cite{fan2020avs3codingtools}. In transform coding, more transform types like DST-VII and DCT-VIII are supported in AVS3 \cite{avs3standard}. These advanced coding tools make AVS3 show a significant improvement over AVS2 in terms of compression efficiency. The coding tools are required to undergo a complex mode decision process to determine the optimal mode~\cite{jamali2018fast}. The optimal mode is obtained with the minimum rate-distortion cost. To speed up the mode decision process, several pieces of research have been proposed~\cite{pastuszak2015algorithm, zhang2019high, yan2022efficient, sainio2023rdo, liu2023deep}. Works~\cite{pastuszak2015algorithm, zhang2019high} presented hardware-friendly fast algorithms and high-performance hardware architectures for HEVC intra mode decision. Work~\cite{yan2022efficient} proposed a fast rate estimation algorithm and its hardware architecture for AVS3. Works~\cite{sainio2023rdo,liu2023deep} proposed fast mode decision algorithms through candidate mode selection. However, these existing mode decision works are based on uniform scalar quantization (USQ), where the complex rate-distortion optimized quantization (RDOQ) is disabled or ignored. 
 
 \IEEEpubidadjcol
 
-In addition to the advanced coding tools mentioned above, AVS3 adopts rate-distortion optimized quantization (RDOQ) to improve coding efficiency further. RDOQ offers significant performance gains compared to conventional uniform scalar quantization (USQ). The coding gain is achieved by searching for the best coefficient level and last significant coefficient position in a rate-distortion (RD) optimal way. Specifically, to determine the optimal quantization level for each transform coefficient, RDOQ repeatedly computes the RD cost for all possible candidate levels. The rate cost is computed sequentially due to entropy coding with context model update. Similarly, the decision-making process for the last significant coefficient position is also sequential as all the quantized coefficients are searched one by one. The position with the minimum summed RD cost is chosen as the optimal one. The coefficients are accessed in zig-zag scan order during the RDOQ process, which yields memory access conflicts when trying to parallelize in hardware implementation. As a result, the high computational complexity of RDOQ and its sequential processing characteristics pose challenges for real-time video coding applications. 
+%For traversing all modes lots of computations are required in optimizing each CTU, numerous optimization algorithms for mode decision have been proposed~\cite{pastuszak2015algorithm, zhang2019high, yan2022efficient, sainio2023rdo, liu2023deep}. In~\cite{pastuszak2015algorithm},~\cite{zhang2019high} presented the optimizations from mode decision and rate estimation for intra encoder respectively, and gave the hardware architectures. Similarly, work~\cite{yan2022efficient} proposed a fast algorithm and hardware architecture for rate estimation. In addition, works~\cite{sainio2023rdo},~\cite{liu2023deep} proposed a fast mode decision method through mode prediction and RDO candidate selection, respectively. However, these above optimizations are done at the mode and bit rate level, and the research on quantization has not been mentioned. In fact, quantization is also extremely valuable in encoder optimization.
+
+% In addition, these advanced coding tools need to go through the complex mode decision process to decide the optimal mode. And the optimal mode is obtained based on the minimum RD cost. Several researches have been proposed for mode decision~\cite{pastuszak2015algorithm, zhang2019high, yan2022efficient, sainio2023rdo, liu2023deep}. For example, work~\cite{pastuszak2015algorithm},~\cite{zhang2019high} presented the optimizations from mode decision and rate estimation for intra encoder, and gave the hardware architectures. Similarly, work~\cite{yan2022efficient} proposed a fast algorithm and hardware architecture for rate estimation. In addition, works~\cite{sainio2023rdo},~\cite{liu2023deep} proposed a fast mode decision method through mode prediction and RDO candidate selection, respectively. However, these above mode decision works are based on uniform scalar quantization (USQ), and the complex rate-distortion optimized quantization (RDOQ) coding tool are disabled or not focused.
+
+%In addition to the advanced coding tools mentioned above, 
+AVS3 adopts RDOQ to boost coding efficiency. RDOQ offers significant performance gains compared to conventional USQ. The coding gain is achieved by searching for the optimal coefficient level (OCL) and last significant coefficient (LSC) position in a rate-distortion (RD) optimal way. Specifically, to determine the OCL for each transform coefficient, RDOQ repeatedly computes the RD cost for all possible candidate levels. The rate cost is computed sequentially due to entropy coding with context model update. Similarly, the decision-making process for the LSC position is also sequential as all the quantized coefficients are searched one by one. The position with the minimum RD cost is chosen as the optimal one. The coefficients are accessed in zig-zag scan order during the RDOQ process, which yields memory access conflicts when trying to parallelize in hardware implementation. As a result, the high computational complexity of RDOQ and its sequential processing characteristics pose challenges for real-time video coding applications. 
 
 Over the past decade, numerous researchers have attempted to simplify the RDOQ process in different ways to reduce its computational complexity \cite{yin2014fasttrellis, wang2017fast, yin2019efficient, wang2021trellis}. These optimization methods can be classified into two main categories, bypass RDOQ and fast RDOQ. Bypass RDOQ skips the RDOQ process entirely by utilizing techniques such as all zero block (AZB) detection. In contrast, fast RDOQ seeks to simplify the computation process within RDOQ. From another perspective, existing methods can be classified as software or hardware-based, depending on the target optimization platform. The research on RDOQ is summarized in Fig.~\ref{summary}. 
 
-In the bypass RDOQ methods, pieces of research skip the redundant process by pre-detecting all-zero blocks to reduce the computational complexity \cite{lee2016all-zero, wang2017fastrdoq}. In \cite{fan2016hybridzreoblock, cui2018hybrid}, these two works detected genuine all-zero block (GZB) and pseudo all-zero block (PZB) to early terminate the process. Work \cite{fan2016hybridzreoblock} introduced a sum of absolute difference (SAD) lower bound as a threshold to detect GZB and proposed an RD estimation method to detect PZB. However, several empirical values were introduced in \cite{fan2016hybridzreoblock} which tends to be sensitive to the initial values. To resolve this problem, work \cite{cui2018hybrid} proposed a PZB detection method, where rate-distortion optimization (RDO) with adaptive RD estimation is employed. Similarly, works \cite{cui2017adaptive, wei2019all} utilized the maximum transform coefficient in the transform block as the threshold for fast AZB detection. To improve the detection accuracy, multi-stage all-zero block detection methods are proposed in \cite{yin2018efficient, yin2020multistageallzerodetection}. Work \cite{yin2018efficient} proposed a coefficient-level zero-quantized threshold model by fully simulating RDOQ for AZB detection. And, multi-stage AZB detection using a machine learning model was introduced in \cite{yin2020multistageallzerodetection}, where a model was offline trained for all-zero block determination based on eight influenced features. For the blocks with few RDOQ coding gains, works \cite{lee2015fastquantizationmethod, zhang2015fastrdoq} used USQ instead of RDOQ directly. For the coefficient-level RDOQ bypass method, works \cite{xu2018simplifiedrdoq, xu2020simplifiedLevelEstimation} proposed an adaptive dead zone offset to adjust the quantization level from one to zero at the high-frequency domain in large transform blocks. These algorithms can save significant computational time on certain conditions, but the processing logic is still redundant when the condition is not met. Therefore, these bypass RDOQ methods are of limited use for real-time hardware RDOQ applications, as the sequential and redundant processing is still the bottleneck when implemented in hardware. 
+In the bypass RDOQ methods, pieces of research skip the redundant process by pre-detecting AZBs to reduce the computational complexity \cite{lee2015fastquantizationmethod, zhang2015fastrdoq, lee2016all-zero, wang2017fastrdoq}. In \cite{fan2016hybridzreoblock, cui2018hybrid}, these two works detected genuine all-zero block (GZB) and pseudo all-zero block (PZB) to early terminate the process. Work \cite{fan2016hybridzreoblock} introduced a sum of absolute difference (SAD) lower bound as a threshold to detect GZB and proposed an RD estimation method to detect PZB. 
+To resolve the problem that distortion and rate estimation models for PZB determination tend to be sensitive to the initial values in work \cite{fan2016hybridzreoblock}, work \cite{cui2018hybrid} proposed a novel PZB detection method, where rate distortion optimization (RDO) with adaptive RD estimation is employed. Similarly, works \cite{cui2017adaptive, wei2019all} utilized the maximum transform coefficient in the transform block as the threshold for fast AZB detection. To improve the detection accuracy, multi-stage AZB detection methods were proposed in \cite{yin2018efficient, yin2020multistageallzerodetection}. For the coefficient-level RDOQ bypass method, works \cite{xu2018simplifiedrdoq, xu2020simplifiedLevelEstimation} proposed an adaptive dead zone offset to adjust the quantization level from one to zero at the high-frequency domain in large transform blocks. 
+These algorithms have shown significant time savings under specific conditions. However, their processing logic remains redundant when the conditions are not met. Consequently, these bypass RDOQ methods are of limited use for real-time hardware RDOQ applications, as the complexity is still the bottleneck when implemented in hardware. 
 
-In the fast RDOQ methods, they focus on the simplification of RD calculation. Rate estimation in RDOQ is usually derived by the entropy coding with context model update which impedes parallel computing. To resolve this problem, work \cite{huang2015efficientquantization} proposed a rate model through an analytical method to speed up the RDOQ, and it can predict the bitrate by different entropy coding methods. However, the method \cite{huang2015efficientquantization} is no longer suitable for HEVC as HEVC has more complex transform types. Therefore, work \cite{cui2017Laplacedistributionbased} proposed a low-complexity RDOQ optimization algorithm based on a hybrid Laplacian model. An alternative approach is to calculate the difference of RD cost between two candidate quantized levels, rather than calculating the two RD costs separately \cite{he2015highimplementationrdoq}. Similarly, works \cite{lee2015fastquantizationmethod} and \cite{wang2016improvedrdoq} built a low-complexity $\Delta$J model based on syntax elements involved in the rate estimation, which significantly reduce encoder complexity during the RDOQ process. Moreover, works \cite{canh2018rate} and \cite{kianfar2020parallelized} accelerated the RDOQ process utilizing deep learning methods. In work \cite{canh2018rate}, the optimal quantization level was determined using a residual depth convolutional neural network, eliminating the need for RD cost calculation. Work \cite{kianfar2020parallelized} trained neural networks to predict an additive adjustment value per transform coefficient, and the networks had fewer parameters compared to \cite{canh2018rate}. 
+% These bypass methods can save significant computation time when the certain condition is met, but 
 
-From Fig.~\ref{summary}, it is evident that most of the current fast algorithms are developed for software platforms, while only a few are designed for hardware platforms. Work \cite{igarashi2018parallelGPU} parallelized the RD cost calculation by utilizing the entropy at the previous frame and utilized a bi-directional (forward and reverse) parallel scan to accumulate the RD cost for the last significant coefficient position search. It can achieve 4K@60fps real-time processing on GPU, but it comes with a significant 2.6\% increase in Bjøntegaard delta Rate (BD-rate) \cite{bjontegaard2001calculationofPSNR}. In \cite{xu2022hardwarefriendlyforrdoq}, a hardware-friendly fast RDOQ algorithm for AVS3 was proposed. It eliminates the data dependency during rate estimation, but the optimization of the last significant coefficient position search has not been addressed which poses challenges for parallel implementation in hardware. In our previous work \cite{zhao2023scanline}, we proposed a zig-zag scanline-based fast algorithm and its hardware implementation. However, to facilitate hardware implementation, we fixed the context during RDOQ processing, which resulted in some BD-rate increase. 
+% These contributions can save significant computational time on certain conditions, but the processing logic is still redundant and useless when calculating within RDOQ.
+
+%In the bypass RDOQ methods, pieces of research skip the redundant process by pre-detecting all-zero blocks to reduce the computational complexity \cite{lee2016all-zero, wang2017fastrdoq}. In \cite{fan2016hybridzreoblock, cui2018hybrid}, these two works detected genuine all-zero block (GZB) and pseudo all-zero block (PZB) to early terminate the process. Work \cite{fan2016hybridzreoblock} introduced a sum of absolute difference (SAD) lower bound as a threshold to detect GZB and proposed an RD estimation method to detect PZB. However, several empirical values were introduced in \cite{fan2016hybridzreoblock} which tends to be sensitive to the initial values. To resolve this problem, work \cite{cui2018hybrid} proposed a PZB detection method, where rate-distortion optimization (RDO) with adaptive RD estimation is employed. Similarly, works \cite{cui2017adaptive, wei2019all} utilized the maximum transform coefficient in the transform block as the threshold for fast AZB detection. To improve the detection accuracy, multi-stage all-zero block detection methods are proposed in \cite{yin2018efficient, yin2020multistageallzerodetection}. Work \cite{yin2018efficient} proposed a coefficient-level zero-quantized threshold model by fully simulating RDOQ for AZB detection. And, multi-stage AZB detection using a machine learning model was introduced in \cite{yin2020multistageallzerodetection}, where a model was offline trained for all-zero block determination based on eight influenced features. For the blocks with few RDOQ coding gains, works \cite{lee2015fastquantizationmethod, zhang2015fastrdoq} used USQ instead of RDOQ directly. For the coefficient-level RDOQ bypass method, works \cite{xu2018simplifiedrdoq, xu2020simplifiedLevelEstimation} proposed an adaptive dead zone offset to adjust the quantization level from one to zero at the high-frequency domain in large transform blocks. These algorithms can save significant computational time on certain conditions, but the processing logic is still redundant when the condition is not met. Therefore, these bypass RDOQ methods are of limited use for real-time hardware RDOQ applications, as the sequential and redundant processing is still the bottleneck when implemented in hardware. 
+
+In the fast RDOQ methods, they focus on the simplification of RD calculation. Rate estimation in RDOQ is usually derived by the entropy coding with context model update which impedes parallel computing. To resolve this problem, work \cite{huang2015efficientquantization} proposed a rate model through an analytical method to speed up the RDOQ, and it can predict the bitrate by different entropy coding methods. However, the method \cite{huang2015efficientquantization} is no longer suitable for HEVC as HEVC has more complex transform types. Therefore, work \cite{cui2017Laplacedistributionbased} proposed a low-complexity RDOQ optimization algorithm based on a hybrid Laplacian model. An alternative approach is to calculate the difference of RD cost between two candidate quantized levels, rather than calculating the two RD costs separately \cite{he2015highimplementationrdoq}. Similarly, work \cite{wang2016improvedrdoq} built a low-complexity $\Delta$J model based on syntax elements involved in the rate estimation. Moreover, works \cite{canh2018rate} and \cite{kianfar2020parallelized} accelerated the RDOQ process utilizing deep learning methods. 
+Although these algorithms have reduced computational complexity significantly, they have not adequately addressed the data dependency problem. The coefficients in RDOQ still require sequential processing, which hinders parallelized hardware acceleration. 
+
+% the data dependency problem pays little attention as the data dependency will not incur computational complexity but incurs the parallelization problem. Thus, the sequantial processing in fast algorithms impedes the acceleration in hardware. 
+
+% However, these fast RDOQ methods are of limited use for real-time hardware RDOQ applications because sequential and redundant processing remains the bottleneck when implemented in hardware.
+
+%In the fast RDOQ methods, they focus on the simplification of RD calculation. Rate estimation in RDOQ is usually derived by the entropy coding with context model update which impedes parallel computing. To resolve this problem, work \cite{huang2015efficientquantization} proposed a rate model through an analytical method to speed up the RDOQ, and it can predict the bitrate by different entropy coding methods. However, the method \cite{huang2015efficientquantization} is no longer suitable for HEVC as HEVC has more complex transform types. Therefore, work \cite{cui2017Laplacedistributionbased} proposed a low-complexity RDOQ optimization algorithm based on a hybrid Laplacian model. An alternative approach is to calculate the difference of RD cost between two candidate quantized levels, rather than calculating the two RD costs separately \cite{he2015highimplementationrdoq}. Similarly, works \cite{lee2015fastquantizationmethod} and \cite{wang2016improvedrdoq} built a low-complexity $\Delta$J model based on syntax elements involved in the rate estimation, which significantly reduce encoder complexity during the RDOQ process. Moreover, works \cite{canh2018rate} and \cite{kianfar2020parallelized} accelerated the RDOQ process utilizing deep learning methods. In work \cite{canh2018rate}, the optimal quantization level was determined using a residual depth convolutional neural network, eliminating the need for RD cost calculation. Work \cite{kianfar2020parallelized} trained neural networks to predict an additive adjustment value per transform coefficient, and the networks had fewer parameters compared to \cite{canh2018rate}. 
+
+From Fig.~\ref{summary}, it is evident that most of the current fast algorithms are developed for software platforms, while only a few are designed for hardware platforms. Work \cite{igarashi2018parallelGPU} parallelized the RD cost calculation by utilizing the entropy at the previous frame and utilized a bi-directional parallel scan to accumulate the RD cost for the LSC position search. It can achieve 4K@60fps real-time processing on GPU, but it brings a significant 2.6\% increase in Bjøntegaard delta Rate (BD-Rate) \cite{bjontegaard2001calculationofPSNR}. In \cite{xu2022hardwarefriendlyforrdoq}, a hardware-friendly fast RDOQ algorithm for AVS3 was proposed. It eliminates the data dependency during rate estimation, but the optimization of the LSC position search has not been addressed. In work \cite{zhao2023scanline}, a zig-zag scanline-based RDOQ algorithm is proposed. However, to facilitate hardware implementation, it fixed the context during RDOQ processing, which resulted in some BD-Rate increase. 
+These hardware-oriented methods take the data dependency problem into full consideration and utilize straightforward methods like fixed context. These methods achieve parallelization but at the cost of significant coding performance loss. 
+
+% The data dependency problem in these works are solved by straightforward methods, like fixed context. It enables the parallelization, but at the cost of insignificant coding performance loss. 
 
 %\par
 \begin{figure}[!t]
 	\centering
-	\centerline{\includegraphics[width=0.48\textwidth]{figure/Summary_rdoq.png}} 
+	\centerline{\includegraphics[width=0.49\textwidth]{figure/Summary_rdoq.png}}
+    \vspace{-5pt}
 	\caption{Summary of the existing research on RDOQ.}
 	\label{summary} % Give a unique label
 \end{figure}
 \par
-In this work, we propose a zig-zag scanline level parallelized RDOQ algorithm and its fully pipelined hardware architecture design for the AVS3 video encoder. Our parallelized algorithm achieves significant time savings with only a slight BD-Rate loss. Compared with the vanilla HPM-4.0 software \cite{HPM4.0}, our algorithm increases BD-Rate by 0.23\%, 0.24\%, and 0.26\% and saves RDOQ time by 31.42\%, 28.60\%, and 28.58\% under All-Intra (AI), Random-Access (RA), and Low-Delay B (LDB) configurations, respectively. Unlike existing bypass and fast RDOQ algorithm \cite{lee2016all-zero, wang2017fastrdoq, fan2016hybridzreoblock, cui2018hybrid, cui2017adaptive, wei2019all, yin2018efficient, yin2020multistageallzerodetection, lee2015fastquantizationmethod, zhang2015fastrdoq, xu2018simplifiedrdoq, xu2020simplifiedLevelEstimation, huang2015efficientquantization, cui2017Laplacedistributionbased, he2015highimplementationrdoq, wang2016improvedrdoq, canh2018rate, kianfar2020parallelized}, our algorithm is more friendly for the efficient hardware implementation. 
-The proposed fully pipelined hardware architecture design takes advantage of the parallelized RDOQ algorithm, which can achieve parallelism with 32 coefficients per cycle while minimizing area consumption. 
+
+In this work, we propose a novel parallelized RDOQ algorithm and its fully pipelined hardware architecture for the AVS3 video encoder. Our primary objectives are to address the following three challenges: 1) achieving a high degree of data parallelism while minimizing coding loss, 2) resolving data access mismatch caused by zig-zag order in RDOQ, 3) designing a parallelized hardware architecture to support UHD applications. Compared with the vanilla HPM-4.0 software \cite{HPM4.0}, the parallelized RDOQ algorithm reduces 31.37\% RDOQ calculation time with a 0.25\% BD-Rate loss. The proposed fully pipelined hardware architecture takes advantage of the parallelized RDOQ algorithm, which can achieve parallelism with 32 coefficients per cycle and have a higher throughput with less area consumption than previous work \cite{zhao2023scanline}. The main contributions of this work are summarized as follows. 
+
+% In this work, we propose a parallelized RDOQ algorithm and its fully pipelined hardware architecture for the AVS3 video encoder. Compared to previous hardware implementation work, the proposed parallelized algorithm improves both in performance and its hardware throughput. For parallelized algorithm implementation at lower performance, we remain local context dependency in OCL decision and employ a parallelized LSC location decision based on a greedy strategy without performance loss. For hardware architecture, the mitigated data dependency in parallelized algorithm enables higher processing throughput to support UHD applications.The main contributions of this work are summarized as follows.
+
+% In this work, we propose a parallelized RDOQ algorithm and its fully pipelined hardware architecture for the AVS3 video encoder. We aim to  resolve the following three challenges: 1) how to achieve high-degree of data parallelism but with less coding loss? 2) how to resolve data access mismatch by zig-zag order in RDOQ? 3) how to design a high-degree parallelism hardware architecture to support UHD applications.  
+
+% In this work, we aim to resolve the following three challenges. how to achieve high degree of parallelism but remains local context dependency? How to resolve the mismatch between column-order ouput from DCT and zig-zag input for RDOQ. How to design a high-degree parallelism hardware architecture to support UHD applications. We propose a parallelized RDOQ algorithm and its fully pipelined hardware architecture for the AVS3 video encoder. 
+% The proposed fully pipelined hardware architecture takes advantage of the parallelized RDOQ algorithm, which can achieve parallelism with 32 coefficients per cycle and have a higher throughput at comparable area consumption with previous work \cite{zhao2023scanline}. 
+% Meanwhile, the accuracy is improved compared with the hardware-oriented implementation in \cite{igarashi2018parallelGPU, xu2022hardwarefriendlyforrdoq, zhao2023scanline}. 
+% The main contributions of this work are summarized as follows. 
+
+% In this work, to enable high processing throughput with a lower performance loss, we propose a parallelized RDOQ algorithm and its fully pipelined hardware architecture for the AVS3 video encoder. Compared with the vanilla HPM-4.0 software \cite{HPM4.0}, the parallelized RDOQ algorithm reduces 31.42\% RDOQ calculation time with a 0.24\% BD-Rate loss. Moreover, unlike existing bypass and fast RDOQ algorithm \cite{lee2016all-zero, wang2017fastrdoq, fan2016hybridzreoblock, cui2018hybrid, cui2017adaptive, wei2019all, yin2018efficient, yin2020multistageallzerodetection, lee2015fastquantizationmethod, zhang2015fastrdoq, xu2018simplifiedrdoq, xu2020simplifiedLevelEstimation, huang2015efficientquantization, cui2017Laplacedistributionbased, he2015highimplementationrdoq, wang2016improvedrdoq, canh2018rate, kianfar2020parallelized}, our algorithm is more friendly for the efficient hardware implementation. The proposed fully pipelined hardware architecture takes advantage of the parallelized RDOQ algorithm, which can achieve parallelism with 32 coefficients per cycle and have a higher throughput at comparable area consumption with previous work \cite{zhao2023scanline}. Meanwhile, the accuracy is improved compared with the hardware-oriented implementation in \cite{igarashi2018parallelGPU, xu2022hardwarefriendlyforrdoq, zhao2023scanline}.
+%while minimizing area consumption. 
 %Besides, the algorithm improves the compression efficiency compared to the hardware-oriented implementation in \cite{igarashi2018parallelGPU, xu2022hardwarefriendlyforrdoq, zhao2023scanline}. 
-The main contributions of this work are summarized as follows. 
+% The main contributions of this work are summarized as follows. 
 
 % In this work, an FPGA-based 4K@30fps real-time high-parallelism RDOQ algorithm and the corresponding hardware architecture are proposed for the AVS3 encoder. First, from an algorithm point of view, Our proposed parallelized algorithm significantly achieved time saving at a slight BD-Rate loss. Compared with the HPM-4.0 software, the proposed parallelized algorithm leads to a 0.23\%, 0.24\% and 0.26\% BD-Rate loss and a 31.42\%, 28.60\% and 28.58\% average RDOQ time-saving under All-Intra (AI), Random-Access (RA) and Low-Delay B (LDB) configurations, respectively. Moreover, unlike these bypass and fast algorithm \cite{lee2016all-zero, wang2017fastrdoq, fan2016hybridzreoblock, cui2018hybrid, cui2017adaptive, wei2019all, yin2018efficient, yin2020multistageallzerodetection, lee2015fastquantizationmethod, zhang2015fastrdoq, xu2018simplifiedrdoq, xu2020simplifiedLevelEstimation, huang2015efficientquantization, cui2017Laplacedistributionbased, he2015highimplementationrdoq, wang2016improvedrdoq, canh2018rate, kianfar2020parallelized}, our proposed algorithm is friendly to apply to an efficient hardware architecture. Second, from a hardware architecture perspective, \emph{TODO: hardware architecture}
 
-\begin{enumerate}[]
-	\item In the OCL decision step, the run-level context dependency for the rate estimation is optimized to the inner zig-zag scanline level, and an efficient RD cost form is adopted to optimize bit-width and rate cost calculation. It simplifies the computational complexity of OCL decision and parallelized the calculation at the scanline level. 
+\begin{itemize}[]
+	\item In the OCL decision step, the run-level context dependency for the rate estimation is optimized to the inner zig-zag scanline level, and an efficient RD cost form is proposed to optimize bit-width and rate cost calculation. It simplifies the computational complexity of the OCL decision and parallelizes the calculation at the scanline level with only a slight BD-Rate loss. 
 	 % updated in the inner zig-zag scanline and an efficient RD cost form is adopted, which simplify the computational complexity of OCL decision for parallel purpose.
-	 \item In the LSC position decision step, a greedy strategy-based algorithm is proposed. It searches the optimal LSC position $i_{k}^{*}$ at a scanline $k$, and determines the optimal LSC position $i^{*}$ from these $i_{k}^{*}$ candidates. It enables the parallelized computation for the LSC position decision. 
-	 \item In the whole RDOQ flow, the scan order of the RDOQ can be changed from zig-zag order to column-first order, which can align with the output of discrete cosine transform (DCT). Moreover, the proposed algorithm is further accelerated by single instruction multiple data (SIMD) on the Intel X86 platform. 
+	 \item In the LSC position decision step, we propose a greedy strategy based parallelized algorithm, which searches the sub-optimal LSC position $i_{k}^{*}$ at a scanline $k$, and determines the optimal LSC position $i^{*}$ from these $i_{k}^{*}$ candidates. It enables parallelized computation without any performance degradation for the LSC position decision. 
+	 \item In the whole RDOQ flow, the scan order of the RDOQ is changed from zig-zag order to column-first order, which can address the memory conflict problem caused by zig-zag scan. Moreover, the proposed algorithm is further accelerated by single instruction multiple data (SIMD) on the Intel X86 platform. 
 	 % \item The proposed algorithm is hardware friendly and also considers the RD performance, the detailed test results are given in Section \ref{sec:5}. Moreover, the algorithm improves the accuracy compared with the hardware-oriented implementation in \cite{igarashi2018parallelGPU, xu2022hardwarefriendlyforrdoq}, and \cite{zhao2023scanline}.
-	\item The proposed fully pipelined hardware architecture design is implemented with nine pipeline stages. The parallelism is 32 coefficients per cycle, and it can process multiple TUs when the height is smaller than 32. The results show that our work achieves a good trade-off between coding efficiency and hardware throughput. 
-\end{enumerate}
+	\item The proposed fully pipelined hardware architecture design is implemented with nine pipeline stages. The parallelism is 32 coefficients per cycle, and it can process multiple transform units (TUs) when the height is smaller than 32. The results show that our work achieves a good trade-off between coding efficiency and hardware throughput. 
+\end{itemize}
 \par
 The rest of this paper is organized as follows. The RDOQ process in AVS3 and its hardware design challenges are briefly described in Section \ref{sec:2}. Section \ref{sec:3} presents the proposed parallelized RDOQ algorithm, and Section \ref{sec:4} gives the hardware architecture design and timing diagrams. The experiment results and comparisons under the common test conditions are shown in Section \ref{sec:5}, followed by the conclusion and future work in Section \ref{sec:6}. 
 
@@ -113,11 +149,13 @@ The rest of this paper is organized as follows. The RDOQ process in AVS3 and its
 In this section, we will first provide an overview of the AVS3 RDOQ process, followed by an analysis of the challenges that arise during hardware design. 
 \subsection{AVS3 RDOQ Overview}
 \label{sec:2A}
-RDOQ is a soft quantization decision technique that aims to find out the optimal quantized coefficient level considering a trade-off between rate and distortion  \cite{zhao2023scanline},\cite{huang2023rate}. The flow of the RDOQ in AVS3 is shown in Fig.~\ref{rdoq process}. This flow is similar to RDOQ in HEVC \cite{cui2017Laplacedistributionbased} but differs in two crucial ways. One is that the transform unit (TU) level zig-zag scan order is adopted by AVS3, instead of the coefficient group (CG) scan in HEVC. An example is shown in Fig.~\ref{scan}. The other is that AVS3 supports rectangular blocks such as $16\times8$ and $64\times8$. The detailed AVS3 RDOQ flow in Fig.~\ref{rdoq process} consists of four internal components, which are pre-quantization, optimal coefficient level (OCL) decision, last significant coefficient (LSC) position decision, and uncoded coefficient zero assignment. 
+RDOQ is a soft quantization decision technique that aims to find out the optimal quantized coefficient level considering a trade-off between rate and distortion  \cite{zhao2023scanline},\cite{huang2023rate}. The flow of the RDOQ in AVS3 is shown in Fig.~\ref{rdoq process}. This flow is similar to RDOQ in HEVC \cite{cui2017Laplacedistributionbased} but differs in two crucial ways. One is that the TU level zig-zag scan order is adopted by AVS3, instead of the coefficient group (CG) scan in HEVC. The other is that AVS3 supports rectangular blocks such as $16\times8$ and $64\times8$. The detailed AVS3 RDOQ flow in Fig.~\ref{rdoq process} consists of four internal components, which are pre-quantization, OCL decision, LSC position decision, and uncoded coefficient zero assignment. 
+%RDOQ is a soft quantization decision technique that aims to find out the optimal quantized coefficient level considering a trade-off between rate and distortion  \cite{zhao2023scanline},\cite{huang2023rate}. The flow of the RDOQ in AVS3 is shown in Fig.~\ref{rdoq process}. This flow is similar to RDOQ in HEVC \cite{cui2017Laplacedistributionbased} but differs in two crucial ways. One is that the transform unit (TU) level zig-zag scan order is adopted by AVS3, instead of the coefficient group (CG) scan in HEVC. An example is shown in Fig.~\ref{scan}. The other is that AVS3 supports rectangular blocks such as $16\times8$ and $64\times8$. The detailed AVS3 RDOQ flow in Fig.~\ref{rdoq process} consists of four internal components, which are pre-quantization, optimal coefficient level (OCL) decision, last significant coefficient (LSC) position decision, and uncoded coefficient zero assignment. 
 \par
 \begin{figure}[!t]
 	\centering
-	\centerline{\includegraphics[width=0.42\textwidth]{figure/OriRDOQ.png}} 
+	\centerline{\includegraphics[width=0.40\textwidth]{figure/OriRDOQ.png}}
+    \vspace{-5pt}
 	% figure caption is below the figure
 	\caption{Flowchart of the RDOQ in AVS3.}
 	\label{rdoq process} % Give a unique label
@@ -137,8 +175,9 @@ l_{i}^{*}  =\mathop{\arg\min}\limits_{L_{i} } \ J, \quad where \quad J=D+\lambda
 % \min_{l_{i} \in L_{i}  } \left \{ J \right \} , \quad where \quad J=D+\lambda \cdot R
 \end{equation}
 where $R$ and $D$ are the rate and distortion, $\lambda$ is the Lagrangian multiplier associated with the QP, and $J$ is the calculated RD cost, respectively. Specifically, the rate $R$ is derived through entropy coding with a context model update. In the AVS3 reference software HPM-4.0, the rate $R$ is estimated using a look-up table, where the table index is determined based on the run-level context update \cite{wang2013transform, wang2019coding}. 
-\begin{table}[!t]
+\begin{table}[!b]
 	%\usepackage{hhline}
+     \vspace{-10pt}
 	\caption{derivation of candidate levels\label{tab:candidate list}}
 	\centering
 	\tabcolsep 10pt  % 
@@ -155,20 +194,14 @@ where $R$ and $D$ are the rate and distortion, $\lambda$ is the Lagrangian multi
 \end{table}
 
 Then in the LSC position decision step, the optimal LSC position $i_{}^{*}$ is derived based on the sum of RD cost. The algorithm scans through each coefficient position $i$ in zig-zag order and determines the optimal position by the following formula,
-\begin{figure}[!b]
-	\centering
-	\centerline{\includegraphics[width=0.45\textwidth]{figure/scan.png}} 
-	% figure caption is below the figure
-	\caption{Scan order comparison. (a) zig-zag scan in AVS3, (b) CG-based diagonal scan in HEVC.}
-	\label{scan} % Give a unique label
-\end{figure}
+%\begin{figure}[!b]
+%	\centering
+%	\centerline{\includegraphics[width=0.45\textwidth]{figure/scan.png}} 
+%	% figure caption is below the figure
+%	\caption{Scan order comparison. (a) zig-zag scan in AVS3, (b) CG-based diagonal scan in HEVC.}
+%	\label{scan} % Give a unique label
+%\end{figure}
 
-%\begin{equation}
-%\begin{aligned}
-%\label{optimal}
-%&i_{optimal} = \\ &\mathop{\arg\min}\limits_{i\epsilon \left ( firstpos,...,lastpos \right ) } \left \{ \sum_{j=0}^{i}\left ( J_{i,coded} - J_{i,uncoded}\right ) + E_{i,last}   \right \} 
-%\end{aligned}
-%\end{equation}
 \begin{equation}
 	\begin{aligned}
 		\label{i_optimal}
@@ -195,21 +228,21 @@ The pre-quantization and uncoded coefficient zero assignment steps in Fig.~\ref{
 
 In the OCL decision step, the RD calculations using Eq.~\eqref{rdcost} are executed to get the optimal level $l_{i}^{*}$. It can be parallelized as the input context for rate estimation is identical for all candidate levels in $L_{i}$. However, it must be processed serially between coefficient positions $i$ and $i+1$. It is because the run-level context for the next coefficient $i+1$ depends on the optimal level $l_{i}^{*}$. Thus, the next coefficient cannot start until the $l_{i}^{*}$ is decided and the context is updated. Similarly, the LSC position decision step cannot be implemented in parallel as the optimal $i_{}^{*}$ derived from Eq.~\eqref{i_optimal} is searched serially for all coefficient positions in zig-zag order. The serial processing hinders the throughput of RDOQ and thereby reduces its overall efficiency. 
 
-Based on the above analysis, the data dependencies in the OCL decision and LSC position decision steps pose challenges to the parallel hardware implementation of RDOQ. Assuming that the pixel parallelism is 1 coefficient/cycle, processing a $32\times32$ TU will require a total of 1024 clock cycles. This is far from pixel parallelism in the hardware implementation of DCT, where the parallelism can be 32 coefficients/cycle \cite{meher2013efficient,fan2019pipelined,Hao2023Multiple}. This pixel parallelism mismatch will reduce the throughput of the pipelined hardware design of the mode decision in video coding, where RDOQ is an essential stage in the mode decision pipeline \cite{sun2017fast,zhang2018efficient,huang2018three,zhang2018highly}.
+Based on the above analysis, the data dependencies in the OCL decision and LSC position decision steps pose challenges to the parallel hardware implementation of RDOQ. Assuming that the pixel parallelism is 1 coefficient/cycle, processing a $32\times32$ TU will require a total of 1024 clock cycles. This is far from pixel parallelism in the hardware implementation of discrete cosine transform (DCT), where the parallelism can be 32 coefficients/cycle \cite{meher2013efficient,fan2019pipelined,Hao2023Multiple}. This pixel parallelism mismatch will reduce the throughput of the pipelined hardware design of the mode decision in video coding, where RDOQ is an essential stage in the mode decision pipeline \cite{sun2017fast,zhang2018efficient,huang2018three,zhang2018highly}.
 
 Several methods have been proposed to address the data dependency problem in RDOQ \cite{igarashi2018parallelGPU,xu2022hardwarefriendlyforrdoq,zhao2023scanline}. They primarily aim to address the dependency issue caused by context update-based rate estimation, utilizing approaches such as fixed context. This allows the OCL decision process to be implemented in parallel between different coefficient positions, at the expense of some coding performance loss. Despite this, it is still challenging to parallelize the LSC position decision process due to two factors. One is that the zig-zag scan order searching in Eq.~\eqref{i_optimal} hinders the parallelism. The transform coefficients output by the previous stage DCT in mode decision pipeline is column first style, which means the coefficients at positions (0, 2, 3, 9, ...) are output in one cycle \cite{fan2019pipelined}. If we try to parallelize the coefficients at positions from $i$ to $i+3$ in one cycle, the coefficients $c_i$ need to be reshaped from column-first style to zig-zag first style. This reshaping process will consume additional clock cycles and memory resources. The other is that the calculation of the accumulated cost $S_{i}$ impedes the parallelism. If we try to achieve parallelism with 4 coefficients/cycle, $S_{i}$, $S_{i+1}$, $S_{i+2}$, and $S_{i+3}$ need to be derived in one cycle. It is obvious that the computational logic is too heavy, and it will become the critical path resulting in worse timing and lower working frequency. 
 
-In this work, we resolve these problems by proposing a zig-zag scanline-level parallelized RDOQ algorithm and implementing a fully pipelined hardware architecture design for AVS3 video coding. 
+%In this work, we resolve these problems by proposing a zig-zag scanline-level parallelized RDOQ algorithm and implementing a fully pipelined hardware architecture design for AVS3 video coding. 
 
 \section{Proposed parallelized RDOQ Algorithm}
 \label{sec:3}
-In this section, we will discuss a parallelized RDOQ algorithm to speed up the process. In the OCL decision step, the run-level context for rate estimation is updated in the inner zig-zag scanline, and the RD cost formula presented in Eq.~\eqref{rdcost} is optimized to a more efficient form. In the LSC position decision step, a greedy strategy-based algorithm is proposed, which enables the implementation of Eq.~\eqref{i_optimal} in parallel between zig-zag scanlines. Finally, we summarize the parallelized RDOQ algorithm and accelerate the entire process using a SIMD approach. 
+In this section, we will present a parallelized RDOQ algorithm to speed up the process. In the OCL decision step, the run-level context for rate estimation is updated in the inner zig-zag scanline, and the RD cost formula presented in Eq.~\eqref{rdcost} is optimized to a more efficient form. In the LSC position decision step, a greedy strategy based algorithm is proposed, which enables the implementation of Eq.~\eqref{i_optimal} in parallel between zig-zag scanlines. Finally, we summarize the parallelized RDOQ algorithm and accelerate the entire process using a SIMD approach. 
 
 \subsection{Parallelized OCL decision} 
 \label{subsecOCL:B}
 As described in subsection \ref{subsec:B}, the run-level context update during rate estimation hinders the parallelized implementation of the OCL decision step. Specifically, this dependency arises from the use of variables $prev\_level$ and $run$ in HPM-4.0. Here, $prev\_level$ represents the former non-zero optimal quantization level, and $run$ denotes the number of zeros between two non-zero quantization coefficients. For example, if the optimal coefficient levels from positions 0 to 4 are (15, 1, 0, 0, 0), the values of $prev\_level$ and $run$ for position 5 are 1 and 3, respectively. In this subsection, we propose a simplified derivation of these two variables in order to enable the parallelization of the OCL decision step. 
 
-Before illustrating the algorithm, we analyze the zig-zag scan in Fig.~\ref{scan}(a). It is observed that the zig-zag scan follows two different directions, either the down-left scan or the up-right scan. These two different scans have different properties in terms of deriving the variables $prev\_level$ and $run$. For coefficients located on the down-left scanline, the calculation of these two variables depends on the coefficients with a column index greater than the current index. On the other hand, for coefficients located on the up-right scanline, the calculation depends on the coefficients with a column index less than the current one. As illustrated in subsection \ref{subsec:B}, the transform coefficients are output from the DCT in the column-first order, meaning that coefficients with smaller column indices are output first. Therefore, different strategies are required to adapt to the two different scan directions. 
+Before illustrating the algorithm, we analyze the zig-zag scan in Fig.~\ref{zig2col}(a). It is observed that the zig-zag scan follows two different directions, either the down-left scan or the up-right scan. These two different scans have different properties in terms of deriving the variables $prev\_level$ and $run$. For coefficients located on the down-left scanline, the calculation of these two variables depends on the coefficients with a column index greater than the current index. On the other hand, for coefficients located on the up-right scanline, the calculation depends on the coefficients with a column index less than the current one. As illustrated in subsection \ref{subsec:B}, the transform coefficients are output from the DCT in the column-first order, meaning that coefficients with smaller column indices are output first. Therefore, different strategies are required to adapt to the two different scan directions. 
 
 For the value of variable $prev\_level$ at a zig-zag scan index $i$, the simplified derivation is formulated as below, 
 \begin{equation}
@@ -222,8 +255,12 @@ For the value of variable $prev\_level$ at a zig-zag scan index $i$, the simplif
 	\end{cases},
 \end{equation}
 where the ($u, v$) is the coordinate index of the zig-zag scan position $i$, $H^{'}$ is the TU height $H$ minus one, $l_{i}$ is the pre-quantization level at position $i$, $l_{i-1}^{*}$ is the OCL at previous position $i-1$, and the label ! represents the not operation, respectively. 
+The $prev\_level$ is assigned to one when the coefficient is at the start of the scanline or the previous coefficients at the scanline are all zero.
 
-Similarly, the derivation of the variable $run$ at index $i$ for the up-right scanline ($(u+v)\&1$==0) is formulated as Eq.~\eqref{run}. The derivation for the $run_{i}$ at the down-left scanline ($(u+v)\&1$==1) is analogous to the Eq.~\eqref{run}, except that it is calculated based on $l_{i+1}^{*}$ and $run_{i+1}$. 
+% The specified value 1 indicates that $prev\_level$ is a constant value at the start position or when the quantization level is zero on each scanline.
+
+Similarly, the derivation of the variable $run$ at index $i$ for the up-right scanline ($(u+v)\&1$==0) is formulated as Eq.~\eqref{run}. The $run$ is assigned to zero when the previous coefficient or the coefficient at the start scanline is not zero. The $run$ is assigned to one when the coefficient at the start scanline is zero. 
+The derivation for the $run_{i}$ at the down-left scanline ($(u+v)\&1$==1) is analogous to the Eq.~\eqref{run}, except that it is calculated based on $l_{i+1}^{*}$ and $run_{i+1}$. 
 \begin{equation}
 	run_{i}=\begin{cases}
 	\label{run}
@@ -233,6 +270,8 @@ Similarly, the derivation of the variable $run$ at index $i$ for the up-right sc
 	run_{i-1}+1,  & else  \\
 \end{cases} .
 \end{equation}
+% where the $run$ is assigned to zero when the 
+% the specified value 0 indicates that $run$ is a constant when the quantization level is not zero on each scanline, and the specified value 1 indicates that $run$ is a constant when the quantization level is zero at the first position of the scanline.
 
 Based on the above simplification, it is observed that the derivation of variables $prev\_level_{i}$ and $run_{i}$ exhibits the data dependency within a scanline, and it relies on the coefficients where the column index $u$ is smaller than the current column. This implies that the OCL decision process for coefficients at different rows $v$ in one column can be executed in parallel, and the coefficients at different columns should be processed serially. This method can not only enhance the parallelism and preserve the context update for rate estimation but also ensure that the access aligns with the column-first order from DCT. 
 
@@ -243,21 +282,21 @@ Furthermore, the RD cost calculation in Eq.~\eqref{rdcost} is optimized to a mor
 \end{equation}
 where the $D$ is the distortion that requires multiplication by the scaling factor $err\_scale$ in HPM-4.0. The $err\_scale$ is correlated with the QP and TU size and remains constant for a TU. Therefore, the $err\_scale$ and $\lambda$ can be combined to optimize the division operation in Eq.~\eqref{pRDcost} to a multiplication-shift operation. The adoption of $J_{f}$ brings two benefits. One is that it requires a lower bit-width for the representation of RD cost, which is beneficial for the chip area. In our design, the bit-width for $J_{f}$ is limited to 34. The other is that it eliminates the multiplication operation for the rate cost. Compared to the independent calculation for distortion, there are still some data dependencies in the rate estimation according to Eq.~\eqref{prevlevel} and Eq.~\eqref{run}. This form benefits the hardware design of rate calculation. 
 
-\subsection{Greedy strategy-based parallelized LSC position decision}
+\subsection{Greedy strategy based parallelized LSC position decision}
 \label{subsecgreedy}
-As shown in Fig.~\ref{rdoq process} and Eq.~\eqref{i_optimal}, the optimal last LSC position $i^{*}$ is determined by searching the minimum accumulated RD cost. The cost is accumulated in the zig-zag scan order, and its hardware design challenges are illustrated in subsection \ref{subsec:B}. To overcome these challenges, a greedy strategy-based LSC position decision algorithm is proposed. In this algorithm, the sub-optimal LSC position $i_{k}^{*}$ at a scanline $k$ is derived first as follows, 
+As shown in Fig.~\ref{rdoq process} and Eq.~\eqref{i_optimal}, the optimal last LSC position $i^{*}$ is determined by searching the minimum accumulated RD cost. The cost is accumulated in the zig-zag scan order, and its hardware design challenges are illustrated in subsection \ref{subsec:B}. To overcome these challenges, a greedy strategy based LSC position decision algorithm is proposed. In this algorithm, the sub-optimal LSC position $i_{k}^{*}$ at a scanline $k$ is derived first as follows, 
 \begin{equation}
 	\begin{aligned}
 		\label{lk_optimal}
 		\bigcup_{k=0}^{n} i_{k}^{*} 
-		=\mathop{\arg\min}\limits_{i \in \left \{ b(k),...,e(k)\right \} } \left ( \widetilde{S}_{i}+ E_{i,lsc} \right ) 
+		=\mathop{\arg\min}\limits_{i \in \left \{ b(k),...,e(k)\right \} } \left ( \widetilde{S}_{i}+ E_{i,lsc} \right ), 
 	\end{aligned}
 \end{equation}
 and
 \begin{equation}
 	\begin{aligned}
 		\label{S'i,last}
-		\widetilde{S}_{i} = \sum_{j=b(k)}^{i}\left ( \Delta J_{j} \right)
+		\widetilde{S}_{i} = \sum_{j=b(k)}^{i}\left ( \Delta J_{j} \right),
 	\end{aligned}
 \end{equation}
 where $n$ is the total number of scanlines in the TU which is equal to $W+H-1$, $\widetilde{S}_{i}$ is the accumulated cost similar to Eq.~\eqref{A_i,last}, and $b(k)$ and $e(k)$ represent the begin and end position on the $k$-th scanline, respectively. For example, the $b(k)$ and $e(k)$ are 6 and 9 for the 3-rd scanline in Fig.~\ref{zig2col}(a), respectively. 
@@ -271,7 +310,7 @@ Then, the optimal $i^{*}$ is derived from the candidate positions $i_{k}^{*}$, a
 	\end{aligned}
 \end{equation}
 
-Eq.~\eqref{lk_optimal} and Eq.~\eqref{li_to_lk} are the keys to our greedy strategy-based LSC position decision. It indicates that the optimal $i^{*}$ is derived from the sub-optimal LSC position $i_{k}^{*}$. Furthermore, the derivation of $i_{k}^{*}$ can be parallelized across different scanlines, as the $J$, $E_{j,lsc}$, and $E_{j,non\_lsc}$ in Eq.~\eqref{lk_optimal} and Eq.~\eqref{S'i,last} are calculated independently between scanlines. 
+Eq.~\eqref{lk_optimal} and Eq.~\eqref{li_to_lk} are the keys to our greedy strategy based LSC position decision. It indicates that the optimal $i^{*}$ is derived from the sub-optimal LSC position $i_{k}^{*}$. Furthermore, the derivation of $i_{k}^{*}$ can be parallelized across different scanlines, as the $J$, $E_{j,lsc}$, and $E_{j,non\_lsc}$ in Eq.~\eqref{lk_optimal} and Eq.~\eqref{S'i,last} are calculated independently between scanlines. 
   \begin{equation}
       \begin{aligned}
       \label{down_left_ik}
@@ -287,6 +326,7 @@ There is a problem with the derivation of the $i_{k}^{*}$ for the down-left scan
 \begin{figure}[!t]
 	\centering
 	\centerline{\includegraphics[width=0.45\textwidth]{figure/abcompare.png}} 
+    \vspace{-8pt}
 	% figure caption is below the figure
 	\caption{The illustration of the accumulated cost variables $S$.}
 	\label{abcompare} % Give a unique label
@@ -294,7 +334,7 @@ There is a problem with the derivation of the $i_{k}^{*}$ for the down-left scan
 \par
 \begin{figure}[!ht]
 	\centering
-	\centerline{\includegraphics[width=0.45\textwidth]{figure/ProRDOQ.png}} 
+	\centerline{\includegraphics[width=0.40\textwidth]{figure/ProRDOQ.png}} 
 	% figure caption is below the figure
 	\caption{The flowchart of the proposed parallelized RDOQ algorithm.}
 	\label{ProRDOQ} % Give a unique label
@@ -303,23 +343,18 @@ For the optimal $i^{*}$ derived based on Eq.~\eqref{li_to_lk}, it will need to b
 \begin{equation}
 	\begin{aligned}
 	\label{ur_compare}
-	J_{i_{u-1 }^{*}} = \left ( \sum_{k=0}^{u-2} \widetilde{S}_{e(k)} + \widetilde{S}_{i_{u-1 }^{*}} + E_{i_{u-1 }^{*},lsc}   \right) 
+	J_{i_{u-1 }^{*}} = \left ( \sum_{k=0}^{u-2} \widetilde{S}_{e(k)} + \widetilde{S}_{i_{u-1 }^{*}} + E_{i_{u-1 }^{*},lsc}   \right). 
 \end{aligned}
 \end{equation}
 \subsection{Proposed parallelized RDOQ algorithm}
 \label{subsec:paraRDOQ}
-As described previously, we propose a parallelized RDOQ scheme that consists of two components: a parallel OCL decision and a greedy strategy-based parallel LSC position decision. An overview of the flowchart is shown in Fig.~\ref{ProRDOQ}. In the parallel OCL decision, we calculate the simplified ($run$, $prev\_level$) pair to remove partial dependency for rate estimation and propose an efficient RD cost form $J_{f}$ to reduce rate cost computation and save chip area. In the greedy strategy-based parallel LSC position decision, the optimal $i^{*}$ is derived based on the suboptimal $i_{k}^{*}$ for each scanline $k$, where the derivation of $i_{k}^{*}$ can be executed in parallel for each scanline. Moreover, a shift buffer is utilized to save the buffer. With these optimizations, the scan order of the RDOQ can be changed from zig-zag order to column-first order, which aligns with the output of DCT. The data dependency only exists within the scanline, which means that all coefficients in the same column can be processed in parallel. This is illustrated in Fig.~\ref{zig2col}. We provide a detailed description of the proposed parallelized RDOQ algorithm in Algorithm \ref{the proposed LNPD algorithm}. 
-\begin{figure}[!h]
-	\centering
-	\centerline{\includegraphics[width=0.38\textwidth]{figure/SIMDSEL.png}} 
-	% figure caption is below the figure
-	\caption{An example of OCL decision process using SIMD.}
-	\label{selection} % Give a unique label
-\end{figure} 
+As described previously, we propose a parallelized RDOQ scheme that consists of two components: a parallel OCL decision and a greedy strategy based parallel LSC position decision. An overview of the flowchart is shown in Fig.~\ref{ProRDOQ}. In the parallel OCL decision, we calculate the simplified ($run$, $prev\_level$) pair to remove partial dependency for rate estimation and propose an efficient RD cost form $J_{f}$ to reduce rate cost computation and save chip area. In the greedy strategy based parallel LSC position decision, the optimal $i^{*}$ is derived based on the suboptimal $i_{k}^{*}$ for each scanline $k$, where the derivation of $i_{k}^{*}$ can be executed in parallel for each scanline. Moreover, a shift buffer is utilized to save the buffer. With these optimizations, the scan order of the RDOQ can be changed from zig-zag order to column-first order, which aligns with the output of DCT. The data dependency only exists within the scanline, which means that all coefficients in the same column can be processed in parallel. This is illustrated in Fig.~\ref{zig2col}. We provide a detailed description of the proposed parallelized RDOQ algorithm in Algorithm \ref{the proposed LNPD algorithm}. 
 
-\begin{figure}[!h]
+\begin{figure}[!b]
 	\centering
+    \vspace{-10pt}
 	\centerline{\includegraphics[width=0.49\textwidth]{figure/zig2col.png}} 
+    \vspace{-6pt}
 	% figure caption is below the figure
 	\caption{Diagram of the scan order conversion from (a) zig-zag order to (b) column-first order. In (b), the dark gray coefficient depends on the previous light gray coefficients in the inner zig-zag scanline.}
 	\label{zig2col} % Give a unique label
@@ -378,13 +413,23 @@ As described previously, we propose a parallelized RDOQ scheme that consists of 
 	\end{algorithmic}
 \end{algorithm}
 
-
 \subsection{SIMD-based fast RDOQ} 
-Although the algorithm proposed in subsection \ref{subsec:paraRDOQ} can be run in parallel for all coefficients within the same column, it may take longer execution time on the Intel X86 platform as each coefficient is processed without skipping. A SIMD-based approach is adopted to address this issue, and the implementation and design are explained below. 
+\label{subsec:3D}
+Although the algorithm proposed in subsection \ref{subsec:paraRDOQ} can be run in parallel for all coefficients within the same column, it may take longer execution time on the Intel X86 platform as each coefficient is processed without skipping.
+%A SIMD-based approach is adopted to address this issue, and the implementation and design are explained below. 
+A SIMD-based approach is adopted to address this issue, which is implemented on an Intel(R) Core (TM) i9-9900K CPU @ 3.60GHz platform in this paper. The detailed SIMD design is explained below.
 
+\begin{figure}[!t]
+	\centering
+	\centerline{\includegraphics[width=0.32\textwidth]{figure/SIMDSEL.png}} 
+	% figure caption is below the figure
+	\caption{An example of OCL decision process using SIMD.}
+	\label{selection} % Give a unique label
+\end{figure}
 During the pre-quantization step, each transform coefficient is processed independently. In the SIMD optimization, we execute four coefficients simultaneously by utilizing intrinsics. Similarly, the parallelism is four coefficients per instruction in the OCL decision step, consistent with the parallelism of the pre-quantization step. For the decision of $l_{i}^{*}$, there may have different numbers of candidate level $L_{i}$ for each of the four parallelized coefficients, which will impact the parallelization by intrinsic due to its irregularity. To address this issue, all coefficients will calculate the RD cost for three candidate levels as shown in Fig.~\ref{selection}. It should be noted that the candidate levels for the gray color block will not participate in the optimal level $l_{i}^{*}$ comparison. For the intrinsic of minimum cost comparison, the PCMPGTD instruction is used and the result is bit-inverted by the VPANDN instruction.
 \par
 In the LSC position decision step, the pixel parallelism is four coefficients similar to the previous steps. The shift buffer is adopted to save the buffer as illustrated in subsection \ref{subsecgreedy}. Rotation instruction is needed to implement this behavior. We use the VPSRLDQ, Extract, and Insert operations to rotate the data. VPSRLDQ instruction shifts the data in the 128-bit channel by a specified byte, the extract operation extracts the data in the channel, and the insert operation inserts the data into a specified location, respectively. 
+
 
 \section{Fully pipelined Hardware Architecture Design}
 \label{sec:4}
@@ -392,7 +437,9 @@ It is a fact that the RDOQ algorithm shows high computational complexity and str
 \par
 \begin{figure*}[htbp]
 	\centering
-	\centerline{\includegraphics[width=1.00\textwidth]{figure/overall_architecture.png}} 
+    \vspace{-5pt}
+	\centerline{\includegraphics[width=0.95\textwidth]{figure/overall_architecture.png}} 
+    \vspace{-5pt}
 	% figure caption is below the figure
 	\caption{The hardware architecture design of the parallelized RDOQ algorithm.}
 	\label{overall_architecture} % Give a unique label
@@ -403,27 +450,35 @@ The TU size in the AVS3 standard can range from $4\times4$ to $64\times64$. Howe
 
 The overall architecture of the hardware design is shown in Fig.~\ref{overall_architecture}. It comprises nine pipeline stages, with the pre-quantization step occupying stages $S1$ and $S2$, the OCL decision step occupying stages $S2$, $S3$, and $S4$, and the LSC decision step occupying the remaining five stages. Stages $S1$ to $S6$ are on-the-fly processing for each column, which implements the for-loop from line 2 to 31 in Algorithm \ref{the proposed LNPD algorithm}. Stages $S7$ to $S9$ decide the final optimal $i_{}^{*}$, which implements the for-loop from line 32 to 34 in Algorithm \ref{the proposed LNPD algorithm}. The comparator is employed to get the optimal $i_{}^{*}$. To accommodate various TU sizes, stage $S7$ utilizes eight four-input comparators, stage $S8$ utilizes four two-input comparators, and stage $S9$ employs one four-input comparator. 
 
-The space-time in Fig.~\ref{timing diagram} illustrates the time scheduling for different TU sizes, including $W\times4$, $W\times8$, $W\times16$, and $W\times32$. It is shown that the stages from $S1$ to $S6$ are seamlessly pipelined, and stages from $S7$ to $S9$ are sparsely scheduled when all $W$ columns are processed. 
+The space-time diagram in Fig.~\ref{timing diagram} illustrates the time scheduling for different TU sizes. It takes $W\times16$ and $W\times32$ as an example. It is shown that the stages from $S1$ to $S6$ are seamlessly pipelined, and stages from $S7$ to $S9$ are sparsely scheduled when all $W$ columns are processed. 
 To enhance parallelism for TUs with a height $H$ less than 32, multiple TUs are combined and processed simultaneously by reusing hardware resources. Specifically, the architecture can simultaneously process eight $W\times4$ TUs, four $W\times8$ TUs, and two $W\times16$ TUs, respectively. The width $W$ needs to be consistent across the parallelized TUs. 
 Following the on-the-fly decision approach outlined in subsection \ref{subsecgreedy}, the LSC decision process for the first $W$ scanlines requires ($6 + W - 1$) cycles. Furthermore, the LSC decision for the remaining $H-1$ scanlines commences once the last column of the current TU enters stage $S7$. Therefore, the RDOQ process for one TU requires a total of ($6 + W - 1 + 3$) clock cycles. 
+\begin{figure}[!hb]
+	\centering
+    \vspace{-2pt}
+	\centerline{\includegraphics[width=0.49\textwidth]{figure/timing diagram.png}}
+    \vspace{-2pt}
+	% figure caption is below the figure
+	\caption{The space-time diagram of the pipelined RDOQ design.}
+	\label{timing diagram} % Give a unique label
+\end{figure}
 
-\subsection{Pre-quantization}
-In the pre-quantization step, all the transform coefficients $c_{i}$ undergo the absolute, multiplication, and round operations according to Eq.~\eqref{round}. The division operation in Eq.~\eqref{round} is transformed to multiplication and shift operations in HPM-4.0. The equations are shown as follows,
+%\subsection{Pre-quantization}
+%In the pre-quantization step, all the transform coefficients $c_{i}$ undergo the absolute, multiplication, and round operations according to Eq.~\eqref{round}. The division operation in Eq.~\eqref{round} is transformed to multiplication and shift operations in HPM-4.0. The equations are shown as follows,
 
-\begin{equation}\label{Qp}
-	\begin{aligned}
-		P_{i} = \lvert c_{i} \rvert \times q_{value},
-	\end{aligned}
-\end{equation}
+%\begin{equation}\label{Qp}
+%	\begin{aligned}
+%		P_{i} = \lvert c_{i} \rvert \times q_{value},
+%	\end{aligned}
+%\end{equation}
+%\begin{equation}\label{l}
+%	\begin{aligned}
+%		l = round \left ( P_{i} \right ) >> q_{bits},
+%	\end{aligned}
+%\end{equation}
+%where $q_{value}$ is derived according to $QP$ and TU size, $c_{i}$ is the transform coefficient, $q_{bits}$ is the shift precision, $P_{i}$ is the multiplication result at stage $S1$, $l$ is the initial scalar quantization level.
 
-\begin{equation}\label{l}
-	\begin{aligned}
-		l = round \left ( P_{i} \right ) >> q_{bits},
-	\end{aligned}
-\end{equation}
-where $q_{value}$ is derived according to $QP$ and TU size, $c_{i}$ is the transform coefficient, $q_{bits}$ is the shift precision, $P_{i}$ is the multiplication result at stage $S1$, $l$ is the initial scalar quantization level.
-
-It is obvious that there is no data dependency in this step, all coefficients output from different TUs can be processed in parallel. The hardware architecture is shown as $S1$ and $S2$ in Fig.~\ref{overall_architecture}. 
+%It is obvious that there is no data dependency in this step, all coefficients output from different TUs can be processed in parallel. The hardware architecture is shown as $S1$ and $S2$ in Fig.~\ref{overall_architecture}. 
 
 \subsection{OCL decision}
 
@@ -431,7 +486,7 @@ The strong run-level context dependency between neighboring coefficients poses a
 The proposed algorithm segregates the context dependency from TU-level to zig-zag scanline line level, which makes the data dependency exist within one scanline. The scanline-level dependency exists for the derivation of the variables $pre\_level_i$ and $run_i$, and their derivation process is shown in Eq.~\eqref{prevlevel} and Eq.~\eqref{run}. From these two formulas, it indicates that the $pre\_level_i$ and $run_i$ depend on the optimal coefficient level $l _{i-1}^{*}$ or $l _{i+1}^{*}$ for the up-right and down-left scanline, respectively. However, determining the optimal coefficient level involves complex RD cost calculations, in which the rate cost, in turn, depends on $pre\_level_i$ and $run_i$. As a result, this dependency increases the complexity of the hardware design. To resolve the above problem, the $pre\_level_i$ and $run_i$ derivation and optimal coefficient level decision are implemented in a single cycle, and then utilizing a data-forwarding method to implement this dependency \cite{harris2010digital}. 
 Furthermore, to improve the timing of the design, the RD cost calculation is divided into three distinct pipeline stages, spanning from $S2$ to $S4$. 
 The pipeline stage for distortion calculation is allocated prior to the rate calculation, spanning from $S2$ to $S3$, while the rate calculation and RD cost comparison are scheduled at stage $S4$. This is because the distortion is calculated without context dependency for all candidate levels. 
-
+\par
 Considering that the maximum number of candidate levels would not surpass three as listed in Table.~\ref{tab:candidate list}, the rate calculation design and the distortion calculation design are instantiated in parallel for all three distinct candidate levels. As shown in Fig.~\ref{overall_architecture}, $Dist_{0}\&R_{0}$, $Dist_{l-1}\&R_{l-1}$ and $Dist_{l}\&R_{l}$ represent the distortion and rate design of different candidate levels. 
 Following the optimization of the RD cost calculation mentioned in Eq.~\eqref{pRDcost}, the calculation of distortion is determined by the following formulas,
 
@@ -461,13 +516,6 @@ For the remaining value of the candidate level, the rate cost also depends on th
 
 As mentioned earlier, the calculation of rate cost and the comparison of RD cost are executed within a single cycle due to context dependency. Once all rate costs have been calculated, the minimum RD cost is identified and selected as the optimal one. The corresponding candidate is then designated as the optimal coefficient level $l_{i}^{*}$. Subsequently, this optimal coefficient level is transmitted back to update the run-level context. 
 \par
-\begin{figure*}[!t]
-	\centering
-	\centerline{\includegraphics[width=0.90\textwidth]{figure/timing diagram.png}} 
-	% figure caption is below the figure
-	\caption{The space-time diagram of the pipelined RDOQ design.}
-	\label{timing diagram} % Give a unique label
-\end{figure*}
 
 \begin{figure}[!b]
 	\centering
@@ -483,7 +531,7 @@ The hardware architecture for the LSC position decision is scheduled from stage 
 
 The first component is following the determination of the minimum RD cost as the optimal choice. The calculation of $\Delta J_{j}$, $E_{non\_lsc}$, and $E_{lsc}$, as listed in Eq.~\eqref{A_i,last}, is scheduled at stage $S5$, preparing for the subsequent calculation of the optimal LSC position. 
 
-The second component is dedicated to making on-the-fly sub-optimal scanline LSC position decisions, which is used to calculate the optimal LSC position for the previous $W$ scanlines. This calculation is scheduled at the pipeline stage $S6$. In this stage, a shift buffer is incorporated to align the temporary calculate results of each scanline, which corresponds to the for loop from line 28 to 30 in Algorithm \ref{the proposed LNPD algorithm}. 
+The second component is dedicated to making on-the-fly sub-optimal scanline LSC position decisions, which is used to calculate the optimal LSC position for the previous $W$ scanlines. This calculation is scheduled at the pipeline stage $S6$. In this stage, a shift buffer is incorporated to align the temporary calculated results of each scanline, which corresponds to the for loop from line 28 to 30 in Algorithm \ref{the proposed LNPD algorithm}. 
 Besides, the on-the-fly algorithm as described in subsection \ref{subsecgreedy} results in a sub-optimal position of an entire scanline being obtained in each cycle. Subsequently, a comparison is carried out between the obtained results and the previous scanlines, enabling the determination of the optimal position. 
 
 The remaining component focuses on calculating the optimal LSC decision for the remaining $H-1$ scanlines. This process is distributed across stages $S7$ to $S9$. 
@@ -491,49 +539,40 @@ Once the final column of a given TU reaches stage $S7$, all sub-optimal position
 At this point, the computation process for determining the optimal LSC decision of the remaining $H-1$ scanlines begins. 
 Considering that the maximum height of the TU is 32, carrying out a one-by-one sequential comparison of sub-optimal positions will require 32 cycles. 
 To minimize latency and improve efficiency, the comparison of sub-optimal positions is executed in parallel, reducing the number of cycles to three. 
-As an example, for a TU with a block size of 8$\times$8, the sub-optimal 7 scanlines results enter the stage $S7$. After parallel comparison in stage $S7$, the two sub-optimal positions will be decided and get the final optimal LSC in stage $S8$. Besides, the bypass operation is adopted in $S9$ to align the output. Hence, the optimal LSC position of TU with a block size of 8$\times$8 is pipelined with a total of 16 ($6 + W - 1 + 3$) cycles. 
+As an example, for a TU with a block size of 8$\times$8, the sub-optimal 7 scanlines results enter the stage $S7$. After parallel comparison in stage $S7$, the two sub-optimal positions will be decided, and the final optimal LSC will be derived in stage $S8$. Besides, the bypass operation is adopted in $S9$ to align the output. Hence, the optimal LSC position of TU with a block size of 8$\times$8 is pipelined with a total of 16 ($6 + W - 1 + 3$) cycles. 
 
-
-\begin{figure*}[!t]
-	\centering
-	\subfloat[]{\includegraphics[width=.95\columnwidth]{figure/Campfire1.png}} \hspace{3pt}
-	\subfloat[]{\includegraphics[width=.95\columnwidth]{figure/Cactus1.png}} \\
-	\subfloat[]{\includegraphics[width=.95\columnwidth]{figure/Crew1.png}} \hspace{3pt}
-	\subfloat[]{\includegraphics[width=.95\columnwidth]{figure/RaceHorses1.png}}
-	\caption{RD curves for sequences Campfire, Cactus, Crew, and RaceHorses with various resolutions under AI configuration.}
-    \label{RD curves}
-\end{figure*}
+%\begin{figure*}[!t]
+%	\centering
+%	\subfloat[]{\includegraphics[width=.95\columnwidth]{figure/Campfire1.png}} \hspace{3pt}
+%	\subfloat[]{\includegraphics[width=.95\columnwidth]{figure/Cactus1.png}} \\
+%	\subfloat[]{\includegraphics[width=.95\columnwidth]{figure/Crew1.png}} \hspace{3pt}
+%	\subfloat[]{\includegraphics[width=.95\columnwidth]{figure/RaceHorses1.png}}
+%	\caption{RD curves for sequences Campfire, Cactus, Crew, and RaceHorses with various resolutions under AI configuration.}
+%    \label{RD curves}
+%\end{figure*}
 
 \section{Experimental Results}
 \label{sec:5}
-In this section, software and hardware-related results are carried out and analyzed. Firstly, we describe the experimental environment setting. Then, we present and analyze the software-related results such as coding performance and computational complexity. Finally, we provide the hardware-related results including area and throughput. 
+In this section, software and hardware-related results are carried out and analyzed. Firstly, the experimental environment settings are given. Then, we present and analyze the software-related results such as coding performance and computational complexity. Finally, we provide the hardware-related results including area and throughput. 
 
 \subsection{Experimental Settings} 
-To validate the accuracy and efficiency of the proposed scheme, we implement the parallelized RDOQ algorithm in the AVS3 reference software HPM-4.0. The coding performance of the proposed algorithm is evaluated under AI, RA, and LDB configurations based on the AVS3 common test conditions (CTC) \cite{AVS3CTC}. We test 16 sequences in four categories, namely 240p (416×240), 720p (1280×720), HD (1920×1080), and UHD (4320×2160). The quantization parameters are set to 27, 32, 38, and 45. The coding performance is measured by BD-Rate and negative values represent performance gains \cite{bjontegaard2001calculationofPSNR}. The computational complexity of the proposed SIMD-based optimized parallelized RDOQ algorithm is measured by the actual encoding time. The test platform is Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz. The time-saving $TS_{Q}$ of the RDOQ process and the time-saving $TS_{Esc}$ of the entire encoding process are obtained as follows, 
+To validate the accuracy and efficiency of the proposed scheme, we implement the parallelized RDOQ algorithm in the AVS3 reference software HPM-4.0. The coding performance of the proposed algorithm is evaluated under all intra (AI), random access (RA), and low delay B (LDB) configurations based on the AVS3 common test conditions (CTC) \cite{AVS3CTC}. 
+%The test sequences consist of four categories, namely 240p (416×240), 720p (1280×720), HD (1920×1080), and UHD (4320×2160). 
+% Apart from that the test sequences consist of four categories specified in CTC, namely 240p (416×240), 720p (1280×720), HD (1920×1080), and UHD (4320×2160), an additional category with 4K (3840×2160) is used (Beauty, Bosphorus, HoneyBee, Jackey, Ready Steady Go, Shake \& Dry, YachtRide)~\cite{UVG}.
+In addition to the test sequences consisting of four categories specified in CTC, which are 240p (416×240), 720p (1280×720), HD (1920×1080), and UHD (4320×2160), an additional category with 4K (3840×2160) resolution is included in the evaluation (Beauty, Bosphorus, HoneyBee, Jackey, Ready Steady Go, Shake \& Dry, YachtRide)~\cite{UVG}. 
+The quantization parameters are set to 27, 32, 38, and 45. The coding performance is measured by BD-Rate and negative values represent performance gains \cite{bjontegaard2001calculationofPSNR}. The computational complexity of the proposed parallelized RDOQ algorithm (with SIMD optimization) is measured by the actual encoding time. The test platform is Intel(R) Core(TM) i9-9900K CPU @ 3.60GHz. The time-saving $TS_{Q}$ of the RDOQ process and the time-saving $TS_{Enc}$ of the entire encoding process are obtained as follows, 
 \begin{equation}
 	\label{TSQ}
-    TS_{Q} = \frac{T_{OriginQ}-T_{SIMDQ}}{T_{OriginQ}} \times 100\%,
+    TS_{Q} = \frac{T_{Org\_Q}-T_{Pro\_Q}}{T_{Org\_Q}} \times 100\%,
 \end{equation}
 
 \begin{equation}
 	\label{TSEnc}
-	TS_{Enc} = \frac{T_{Origin}-T_{SIMD}}{T_{Origin}} \times 100\%,
+	TS_{Enc} = \frac{T_{Org}-T_{Pro}}{T_{Org}} \times 100\%,
 \end{equation}
-where $T_{OriginQ}$ and $T_{SIMDQ}$ represent the RDOQ time for the original and proposed SIMD-based parallelized schemes, respectively. Similarly, $T_{Origin}$ and $T_{SIMD}$ represent the total coding time for the original and proposed parallelized algorithm, respectively. 
+where $T_{Org\_Q}$ and $T_{Pro\_Q}$ represent the RDOQ time for the original and proposed SIMD-based parallelized schemes, respectively. Similarly, $T_{Org}$ and $T_{Pro}$ represent the total coding time for the original and proposed parallelized algorithm, respectively. 
 
-\subsection{RD Performance and Computational Complexity Evaluation}
-The overall experimental results that compared our parallelized RDOQ with vanilla HPM are presented in Table \ref{tab:BD-Rate}. Both the RD performance and time-saving results are evaluated under the AI, RA, and LDB configurations for each sequence in Table \ref{tab:BD-Rate}. It can be observed that the BD-Rate of the proposed parallelized RDOQ algorithm increases by 0.23\% in the AI configuration, 0.24\% in the RA configuration, and 0.26\% in the LDB configuration, respectively. The coding performance loss is insignificant, and the BD-Rate increment is relatively consistent across each sequence. Moreover, we plot some R-D curves of several sequences in Fig. \ref{RD curves}. One sequence is selected from each video resolution, making a total of four sequences. These curves show that the BD-Rate of the proposed algorithm is very close to the original RDOQ in HPM-4.0, and the performance loss for these different resolution sequences fluctuates very small. 
-\begin{figure}[!hb]
-	\centering
-	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/UHD.png}} \hspace{2pt}
-	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/HD.png}} \vspace{-4pt} \\
-	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/P720.png}} \hspace{2pt}
-	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/P240.png}}
-	\caption{The time-saving results in the four sequence cases including (a) UHD, (b) HD, (c) 720p, and (d) 240p under AI configuration.}
-	\label{Time curves}
-\end{figure}
-
-\begin{table*}[!h]
+\begin{table*}[!t]
 	%\usepackage{hhline}
 	\caption{BD-Rate of parallelized RDOQ in HPM-4.0 under AI, RA, and LDB configurations.}
     \label{tab:BD-Rate}
@@ -574,20 +613,50 @@ The overall experimental results that compared our parallelized RDOQ with vanill
 	    \cmidrule[0.75pt]{2-11} 
 	           & Average        & 0.23\% & 31.80\% & 9.07\% & 0.24\% & 28.78\% & 6.94\% & 0.29\% & 28.52\% & 6.98\% \\ 
 	    \cmidrule[0.75pt]{1-11} 
-	    Summary & \textbf{Overall} & \textbf{0.23\%} & \textbf{31.42\%} & \textbf{8.80\%} & \textbf{0.24\%} & \textbf{28.60\%} & \textbf{6.84\%} & \textbf{0.26\%} & \textbf{28.58\%} & \textbf{6.96\%} \\ 
+	           & Beauty         & 0.65\% & 32.43\% & 9.47\% & 0.58\% & 28.64\% & 6.46\% & 0.52\% & 27.52\% & 6.21\% \\       
+              & Bosphorus      & 0.22\% & 30.26\% & 8.32\% & 0.47\% & 28.93\% & 7.02\% & 0.50\% & 28.68\% & 7.24\% \\
+	           & HoneyBee       & 0.35\% & 30.06\% & 8.05\% & 0.04\% & 27.65\% & 6.08\% & 0.17\% & 27.96\% & 6.35\% \\  
+	     4K      & Jockey         & 0.25\% & 31.12\% & 8.85\% & 0.21\% & 29.28\% & 8.12\% & 0.32\% & 29.89\% & 7.59\% \\               & Ready Set Go   & 0.46\% & 30.89\% & 8.76\% & 0.59\% & 27.95\% & 6.36\% & 0.21\% & 27.38\% & 6.53\% \\
+	           & Shake \& Dry    & 0.39\% & 31.68\% &8.82\% & 0.24\% & 29.16\% & 8.01\% & 0.22\% & 28.65\% & 7.13\% \\  
+              & YachtRide      & 0.16\% & 30.56\% & 8.43\% & 0.26\% & 28.13\% & 6.40\% & 0.07\% & 28.24\% & 7.07\% \\
+	    \cmidrule[0.75pt]{2-11} 
+	           & Average        & 0.35\% & 31.17\% & 8.72\% & 0.34\% & 28.53\% & 6.92\% & 0.29\% & 28.33\% & 6.87\% \\ 
+	    \cmidrule[0.75pt]{1-11} 
+	    Summary & \textbf{Overall} & \textbf{0.25\%} & \textbf{31.37\%} & \textbf{8.78\%} & \textbf{0.26\%} & \textbf{28.58\%} & \textbf{6.85\%} & \textbf{0.27\%} & \textbf{28.53\%} & \textbf{6.94\%} \\ 
 		\midrule[0.75pt] \specialrule{0em}{0.35pt}{0.35pt} \midrule[0.75pt] % \bottomrule
 	\end{tabular}
 \end{table*}
 
-In addition, we also give the time-saving results for the proposed parallelized RDOQ algorithm based on SIMD in Table \ref{tab:BD-Rate}. It can be observed that the RDOQ process time is reduced by 31.42\%, 28.6\%, and 28.58\% under AI, RA, and LDB configurations on average, respectively. And, it can save 8.80\%, 6.84\%, and 6.96\% under AI, RA, and LDB configurations on average for the total encoding time. To evaluate the effect of QP on time-saving, we conduct tests for the $TS_{Q}$ results using four different resolution test sequences for comparison. As shown in Fig. \ref{Time curves}, as the QP value increases, more time is saved in the RDOQ process based on SIMD. This is because a higher QP value corresponds to a higher probability that the quantization coefficient will become zero, resulting in a higher chance that all the four parallelized coefficients in Fig. \ref{selection} become zero in the TU. When we accelerate the SIMD-based OCL decision process, we can skip the decision process if all four coefficients to be executed are zero. 
+
+\subsection{RD Performance and Computational Complexity Evaluation}
+The overall experimental results that compared our parallelized RDOQ with vanilla HPM-4.0 are presented in Table \ref{tab:BD-Rate}. Both the RD performance and time-saving results are evaluated for each sequence under the AI, RA, and LDB configurations from Table \ref{tab:BD-Rate}. It can be observed that the BD-Rate increments of our proposed scheme are 0.25\%, 0.26\%, and 0.27\% under the AI, RA, and LDB configurations, respectively. The coding performance loss is insignificant, and the BD-Rate increment is relatively consistent across each sequence. %Moreover, we plot some R-D curves of several sequences in Fig. \ref{RD curves}. One sequence is selected from each video resolution, making a total of four sequences. These curves show that the BD-Rate of the proposed algorithm is very close to the original RDOQ in HPM-4.0, and the performance loss for these different resolution sequences fluctuates very small. 
+
+\begin{figure}[!b]
+	\centering
+    \vspace{-6pt}
+	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/UHD.png}} \hspace{2pt}
+	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/4K.png}} \vspace{-6pt} \\
+	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/HD.png}} \hspace{2pt}
+	\subfloat[]{\includegraphics[width=.48\columnwidth]{figure/P720.png}}
+	\caption{The time-saving results in the four sequence cases including (a) UHD, (b) 4K, (c) HD, and (d) 720p under AI configuration.}
+	\label{Time curves}
+\end{figure}
+
+We give the time-saving results for the proposed parallelized RDOQ algorithm based on SIMD in Table \ref{tab:BD-Rate}. It can be observed that the time of the RDOQ process is reduced by 31.37\%, 28.58\%, and 28.53\% under AI, RA, and LDB configurations on average, respectively. And, it can save 8.78\%, 6.85\%, and 6.94\% under AI, RA, and LDB configurations on average for the total encoding time. Furthermore, we conduct experiments to evaluate the time-saving $TS_{Q}$ on various QPs. As shown in Fig. \ref{Time curves}, it is found that more time can be saved as the QP increases. The reason mainly lies in that higher QP corresponds to a higher probability that the quantization coefficient will become zero, resulting in a higher chance that all the four parallelized coefficients in Fig. \ref{selection} become zero in the TU. When we accelerate the SIMD-based OCL decision process, we can skip the decision process if all four coefficients to be executed are zero. 
 
 As analyzed above, the proposed scheme effectively reduces coding complexity while incurring insignificant RD performance loss compared to the original RDOQ. Furthermore, computational complexity has been significantly reduced. These results demonstrate that our proposed parallelized RDOQ method can achieve a good trade-off between coding performance and computational complexity. 
 
 \subsection{Ablation Study}
-In order to evaluate the effectiveness of the proposed method, we conduct ablation experiments in this subsection. In terms of the ablation study on coding performance, the performance changes of the simplified run-level context, the improved RD cost form based on Eq.~\eqref{pRDcost}, and the greedy strategy-based LSC position decision are presented in Table \ref{Ablation:BD-Rate}. It is shown that the simplified run-level context gives a 0.23\%, 0.26\%, and 0.30\% BD-Rate increase under the AI, RA, and LDB configurations, respectively. The improved RD cost form shows a 0.00\% (0.23\%-0.23\%), -0.02\% (0.24-0.26), and -0.04\% (0.26\%-0.30\%) BD-Rate increase under the AI, RA, and LDB configurations, respectively. There is no BD-rate loss for the greedy strategy-based LSC position step. Therefore, the results indicate that the performance loss is primarily attributed to the simplified run-level context. And the improved RD cost form has a minimal effect, with some sequences even showing slight improvements. This is because the simplified run-level context remains the dependency for only the up-right scan lines, which impacts the rate calculation. Whereas, the improved RD cost form is affected only by a decimal precision error in the calculation of $D/\lambda$. The greedy strategy-based LSC location decision has no coding efficiency impact because the dependency in the TU is moved to the scanline level in the OCL decision step. The optimized greedy strategy-based LSC decision will not impact the final result from this point of view. 
+In order to evaluate the effectiveness of the proposed method, we conduct ablation experiments in this subsection. In terms of the ablation study on coding performance, the performance changes of the simplified run-level context, the improved RD cost form based on Eq.~\eqref{pRDcost}, and the greedy strategy based LSC position decision are presented in Table \ref{Ablation:BD-Rate}. It is shown that the simplified run-level context gives a 0.26\%, 0.28\%, and 0.31\% BD-Rate increase under the AI, RA, and LDB configurations, respectively. The improved RD cost form eventually brings a -0.01\% (0.25\%-0.26\%), -0.02\% (0.26-0.28), and -0.04\% (0.27\%-0.31\%) BD-Rate increase under the AI, RA, and LDB configurations, respectively. As for the greedy strategy-based LSC position step, it shows no influence on the coding performance. Therefore, it is concluded that the performance loss is primarily attributed to the simplified run-level context. The improved RD cost form has a minimal effect, with some sequences even showing slight improvements. This is because the simplified run-level context remains the dependency for only the up-right scan lines, which impacts the rate calculation. Whereas, the improved RD cost form is affected only by a decimal precision error in the calculation of $D/\lambda$. The greedy strategy-based LSC location decision has no coding efficiency impact because the dependency in the TU is moved to the scanline level in the OCL decision step. The optimized greedy strategy-based LSC decision will not impact the final result from this point of view. 
 
-In terms of the ablation study on time-saving, the results for the three stages using SIMD optimization are tabulated in Table \ref{Ablation:Time}. The results show that the pre-quantization step using SIMD can achieve 21.53\%, 20.35\%, and 19.92\% time savings under the AI, RA, and LDB configurations, respectively. For the OCL decision step, an 8.94\% (30.47\% - 21.53\%), 7.01\% (27.36\% - 20.35\%) and 7.14\% (27.06\% - 19.92\%) time savings can be obtained, respectively. For the LSC location decision step, a 0.88\% (31.35\% - 30.47\%), 1.27\% (28.63\% - 27.36\%) and 1.5\% (28.56\% - 27.06\%) time saving is obtained, respectively. The results indicate that the pre-quantization step has the most significant time savings primarily due to its independent calculation process, which is more amenable to SIMD optimization. The reason for the poor optimization process of the LSC process is that the data in the look-up table needs to be exchanged between register and memory when calculating the rate. And for the LSC location decision step with the least time-saving, the reason for this derives from two factors. One is that the parallelized algorithm needs to decide the sub-optimal $i_{k}^{*}$ for different scanlines and to calculate multiple temporary variables as shown in Algorithm \ref{the proposed LNPD algorithm}. The other is that when we optimize $if$ and $else\ if$ statements in Algorithm \ref{the proposed LNPD algorithm} based on SIMD, it needs the help of mask operation to achieve this function. The mask operation leads to a reduction in efficiency. 
-\begin{table}[!t]
+% In terms of the ablation study on time-saving, the results for the three stages with and without SIMD optimization are tabulated in Table IV. For the time-saving $TS_{PQ}$ of the RDOQ process without the SIMD instructions, it is obtained as Eq.~\eqref{TSQ}, where $T_{Pro\_Q}^{}$ is replaced with the RDOQ time for the proposed parallel scheme. The results show that the pre-quantization step without SIMD optimization can achieve 0.00\% time saving under the AI, RA, and LDB configurations. For the OCL decision step, a -0.92\% (-0.92\% - 0.00\%), -1.28\% (-1.28\% - 0.00\%) and -1.32\% (-1.32\% - 0.00\%) time savings can be obtained, respectively. For the LSC location decision step, a -3.83\% (-4.75\% -(-0.92\%)), 4.97\% (-6.25\% - (-1.28\%)) and -5.04\% (-6.36\% - (-1.32\%)) time saving is obtained, respectively. The results indicate that the quantization step is influence-free due to the fact that only the processing order of the coefficients is changed after the parallel optimization. Negative value represents an increase of the time, The main reason for the slight increase in LSC decision is that each coefficient is processed without skipping. The time increase in LSC location decision step is caused by numerous temporary variables and if and else if statements are added when processing data at different scan lines.
+
+In terms of the ablation study on time-saving, the results for the three stages with and without SIMD optimization are tabulated in Table~\ref{Ablation:Time}. For the time-saving $TS_{PQ}$ of the RDOQ process without the SIMD instructions, it is obtained as Eq.~\eqref{TSQ}, where $T_{Pro\_Q}^{}$ is replaced with the RDOQ time for the proposed parallel scheme. The results show that the pre-quantization step without SIMD optimization shows no time saving under the AI, RA, and LDB configurations. For the OCL decision step, 0.92\% (0.92\% - 0.00\%), 1.28\% (1.28\% - 0.00\%), and 1.32\% (1.32\% - 0.00\%) time increments are shown, respectively. For the LSC location decision step, 3.83\% (4.75\% -0.92\%), 4.97\% (6.25\% - 1.28\%), and 5.04\% (6.36\% - 1.32\%) time increments are shown, respectively. The negative value in Table~\ref{Ablation:Time} represents an increase of the time. It shows a longer execution time as each coefficient is processed without skipping, which is illustrated in subsection~\ref{subsec:3D}. Besides, some temporary variables and if-else-if statements are added when processing data at different scanlines, which will also cause a longer execution time. 
+
+The results also show that the pre-quantization step using SIMD can achieve 21.53\%, 20.35\%, and 19.92\% time savings under the AI, RA, and LDB configurations, respectively. For the OCL decision step, an 8.94\% (30.47\% - 21.53\%), 7.01\% (27.36\% - 20.35\%) and 7.14\% (27.06\% - 19.92\%) time savings can be obtained, respectively. For the LSC location decision step, a 0.88\% (31.35\% - 30.47\%), 1.27\% (28.63\% - 27.36\%) and 1.5\% (28.56\% - 27.06\%) time saving is obtained, respectively. The results indicate that the pre-quantization step has the most significant time savings primarily due to its independent calculation process, which is more amenable to SIMD optimization. The reason for the poor optimization process of the LSC process is that the data in the look-up table needs to be exchanged between register and memory when calculating the rate. For the LSC location decision step with the least time-saving, the reason for this derives from two factors. One is that the parallelized algorithm needs to decide the sub-optimal $i_{k}^{*}$ for different scanlines and to calculate multiple temporary variables as shown in Algorithm \ref{the proposed LNPD algorithm}. The other is that when we optimize $if$ and $else\ if$ statements in Algorithm \ref{the proposed LNPD algorithm} based on SIMD, it needs the help of mask operation to achieve this function. The mask operation leads to a reduction in efficiency. 
+
+%In terms of the ablation study on time-saving, the results for the three stages using SIMD optimization are tabulated in Table \ref{Ablation:Time}. The results show that the pre-quantization step using SIMD can achieve 21.53\%, 20.35\%, and 19.92\% time savings under the AI, RA, and LDB configurations, respectively. For the OCL decision step, an 8.94\% (30.47\% - 21.53\%), 7.01\% (27.36\% - 20.35\%) and 7.14\% (27.06\% - 19.92\%) time savings can be obtained, respectively. For the LSC location decision step, a 0.88\% (31.35\% - 30.47\%), 1.27\% (28.63\% - 27.36\%) and 1.5\% (28.56\% - 27.06\%) time saving is obtained, respectively. The results indicate that the pre-quantization step has the most significant time savings primarily due to its independent calculation process, which is more amenable to SIMD optimization. The reason for the poor optimization process of the LSC process is that the data in the look-up table needs to be exchanged between register and memory when calculating the rate. And for the LSC location decision step with the least time-saving, the reason for this derives from two factors. One is that the parallelized algorithm needs to decide the sub-optimal $i_{k}^{*}$ for different scanlines and to calculate multiple temporary variables as shown in Algorithm \ref{the proposed LNPD algorithm}. The other is that when we optimize $if$ and $else\ if$ statements in Algorithm \ref{the proposed LNPD algorithm} based on SIMD, it needs the help of mask operation to achieve this function. The mask operation leads to a reduction in efficiency. 
+\begin{table}[!b]
 	%\usepackage{hhline}
 	\caption{BD-Rate result of ablation study.}
 	\label{Ablation:BD-Rate}
@@ -600,54 +669,38 @@ In terms of the ablation study on time-saving, the results for the three stages 
 		\cmidrule[0.75pt]{2-4} 
 		& AI     & RA     & LDB \\   
 		\cmidrule[0.75pt]{1-4}  
-		Simplified run-level context                     & 0.23\% & 0.26\% & 0.30\% \\ 
+		Simplified run-level context                     & 0.26\% & 0.28\% & 0.31\% \\ 
 		\cmidrule[0.75pt]{1-4}
-		\makecell[c]{Simplified run-level context \\ + Optimized RD cost} & 0.23\% & 0.24\% & 0.26\%  \\
+		\makecell[c]{Simplified run-level context \\ + Optimized RD cost} & 0.25\% & 0.26\% & 0.27\%  \\
 	    \cmidrule[0.75pt]{1-4}
-		\makecell[c]{Simplified run-level context \\ + Optimized RD cost \\ + greedy strategy-based LSC \\ position decision} & 0.23\% & 0.24\% & 0.26\%  \\             
+		\makecell[c]{Simplified run-level context \\ + Optimized RD cost \\ + greedy strategy based LSC \\ position decision} & 0.25\% & 0.26\% & 0.27\%  \\             
 		\midrule[0.75pt] \specialrule{0em}{0.35pt}{0.35pt} \midrule[0.75pt] % \bottomrule
 	\end{tabular}
 \end{table}
 
-\begin{table}[!t]
+\begin{table*}[!b]
 	%\usepackage{hhline}
 	\caption{Time-saving result of ablation study.}
 	\label{Ablation:Time}
 	\centering
-	\tabcolsep 7pt  % 
+	\tabcolsep 8pt  % 
 	\arrayrulewidth 0.75pt
-	\begin{tabular}{c | c  c  c } 
+	\begin{tabular}{c | c  c  c | c  c  c} 
 		\midrule[0.75pt] \specialrule{0em}{0.35pt}{0.35pt} \midrule[0.75pt] % \toprule
-		\multirow{2}{*}{SIMD-based method combination} & \multicolumn{3}{c}{$TS_{Q}$} \\ 
-		\cmidrule[0.75pt]{2-4} 
-		& AI     & RA     & LDB \\   
-		\cmidrule[0.75pt]{1-4}  
-		Pre-quantization                      & 21.53\% & 20.35\% & 19.92\% \\ 
-		\cmidrule[0.75pt]{1-4}
-		Pre-quantization  + OCL decision      & 30.47\% & 27.36\% & 27.06\%  \\      
-		\cmidrule[0.75pt]{1-4}
-		\makecell[c]{Pre-quantization + OCL decision \\ + LSC position decision} & 31.35\% & 28.63\% & 28.56\%  \\            
+		\multirow{2}{*}{SIMD-based method combination} & \multicolumn{3}{c|}{$TS_{PQ}$} & \multicolumn{3}{c}{$TS_{Q}$} \\ 
+		\cmidrule[0.75pt]{2-7} 
+		& AI     & RA     & LDB     & AI     & RA     & LDB \\   
+		\cmidrule[0.75pt]{1-7}  
+		Pre-quantization                      & 0.00\% & 0.00\% & 0.00\%  & 21.53\% & 20.35\% & 19.92\% \\ 
+		\cmidrule[0.75pt]{1-7}
+		Pre-quantization  + OCL decision      & -0.92\% & -1.28\% & -1.32\%  & 30.47\% & 27.36\% & 27.06\% \\      
+		\cmidrule[0.75pt]{1-7}
+		\makecell[c]{Pre-quantization + OCL decision \\ + LSC position decision} & -4.75\% & -6.25\% & -6.36\%  & 31.35\% & 28.63\% & 28.56\% \\            
 		\midrule[0.75pt] \specialrule{0em}{0.35pt}{0.35pt} \midrule[0.75pt] % \bottomrule
 	\end{tabular}
-\end{table}
+\end{table*}
 
-\subsection{Performance Comparison with Other Methods} 
-To validate the efficiency of our proposed scheme, a comparison between our method and five other existing methods is shown in Table \ref{Compare:BD-Rate}. It is worth noting that these methods have been implemented on two different reference software platforms, namely HM (HEVC) and HPM (AVS3). For the work proposed on HM, we use the results from the original work for comparison directly. Since the parallel algorithm proposed in this paper is implemented on HPM-4.0, we re-implement the HPM platform-based algorithms and get the results for comparison. 
 
-As shown in Table \ref{Compare:BD-Rate}, work \cite{lee2015fastquantizationmethod} and work \cite{xu2020simplifiedLevelEstimation} both speed up for the software platform, and they can achieve a time-saving ranging from 12.9\% to 15.8\% with a negligible BD-Rate loss. Compared with \cite{lee2015fastquantizationmethod} and \cite{xu2020simplifiedLevelEstimation}, our parallelized algorithm can achieve more time saving with closely matched coding efficiency and focuses on the fully pipelined hardware implementation. Work \cite{igarashi2018parallelGPU} proposed a parallelized RDOQ algorithm for the HEVC encoder. It achieves 4K@60fps real-time encoding on GPU with a significant 2.51\% BD-Rate loss. However, our proposed RDOQ algorithm achieves parallel processing with only 0.24\% BD-Rate loss, which is a good trade-off between coding efficiency and hardware implementation. Work \cite{xu2022hardwarefriendlyforrdoq} introduces all-zero block skipping and an optimized rate estimation algorithm. It is shown that it obtains 27.6\% and 30.6\% time savings in the RA and LDB configurations, respectively, but the BD-Rate loss is 0.86\% and 0.64\%. Our coding efficiency loss is smaller than work \cite{xu2022hardwarefriendlyforrdoq}. In addition, we add our previous work \cite{zhao2023scanline} into comparison as well, and it is shown that the improved parallelized algorithm in this paper has better coding performance than in \cite{zhao2023scanline}. 
-
-\subsection{Hardware Implementation Results}
-Currently, there are limited studies focusing on hardware implementations of the RDOQ algorithm for AVS3 encoders. This is primarily due to its strong context dependency and computational complexity. 
-The proposed RDOQ hardware architecture in our research is based on the parallelized algorithm. This implementation allows for parallel processing of multiple TUs with high parallelism, while minimizing resource utilization. 
-
-To demonstrate the advancements of our work, we conduct a comprehensive comparison on Field-Programmable Gate Array (FPGA) platform with Zhao et al. \cite{zhao2023scanline}, and the results are tabulated in Table \ref{hardware resource consumption}. Our proposed design was implemented using Verilog Hardware Description Language (HDL) and synthesized using Synplify Pro 2019.03 for the Xilinx UltraScale+ MPSoCs 7ev. 
-
-As shown in Table \ref{hardware resource consumption}, our proposed design achieves a 34.39\% reduction in LUTs $((109759 - 72017) \div 109759)$ and over 50\% reduction in DSPs compared to Zhao et al. \cite{zhao2023scanline}. 
-Moreover, apart from minimizing area consumption, our design has a significantly higher processing throughput compared to their design.
-The processing of a TU with the size of 32$\times$32 only requires 40 cycles at a frequency of 116MHz, which can meet the real-time encoding of 8K@89fps $((32\times32\times116\times10^6) \div (7680\times4320\times40))$. 
-While their method operates at a higher frequency of 200MHz, it needs a considerably large number of clock cycles, resulting in lower overall throughput. 
-
-Furthermore, the proposed design has been synthesized by Design Compiler with the UMC 28nm cell library, the gate count is 1,223.2K, the chip area is 0.67$mm^2$, and the maximum working frequency is 471.2MHz. 
 \begin{table*}[!ht]
 	%\usepackage{hhline}
 	\caption{Comparison with other works.}
@@ -661,31 +714,50 @@ Furthermore, the proposed design has been synthesized by Design Compiler with th
 		\cmidrule[0.75pt]{4-9} 
 		&        &        & BD-Rate & $TS_{Q}$ & BD-Rate & $TS_{Q}$ & BD-Rate & $ TS_{Q}$\\   
 		\cmidrule[0.75pt]{1-9}
-		Work \cite{lee2015fastquantizationmethod}   & HM 11.0   & Software & 0.09\% & 14.4\% & 0.11\% & 15.8\% & 0.08\% & 14.9\% \\ 
+		Lee \emph{et al.'s} \cite{lee2015fastquantizationmethod}   & HM-11.0   & Software & 0.09\% & 14.4\% & 0.11\% & 15.8\% & 0.08\% & 14.9\% \\ 
 		\cmidrule[0.75pt]{1-9}  
-		Work \cite{xu2020simplifiedLevelEstimation} & HM 16.15  & Software & 0.00\% & 14.4\% & 0.04\% & 12.9\% & 0.12\% & 12.9\% \\ 
+		Xu \emph{et al.'s} \cite{xu2020simplifiedLevelEstimation} & HM-16.15  & Software & 0.00\% & 14.4\% & 0.04\% & 12.9\% & 0.12\% & 12.9\% \\ 
 		\cmidrule[0.75pt]{1-9} 
-		Work \cite{igarashi2018parallelGPU}         & HM 16.0   & Hardware & N/A    & N/A    & 2.51\% & N/A    & N/A    & N/A  \\ 
-		\cmidrule[0.75pt]{1-9}
-		Work \cite{xu2022hardwarefriendlyforrdoq}   & HPM-4.0 & Hardware & N/A    & N/A    & 0.86\% & 27.6\% & 0.64\% & 30.6\% \\     
+		Igarashi \emph{et al.'s} \cite{igarashi2018parallelGPU}         & HM-16.0   & Hardware & N/A    & N/A    & 2.51\% & N/A    & N/A    & N/A  \\ 
+        \cmidrule[0.75pt]{1-9} 
+        Proposed on HM         & HM-16.15   & Hardware & 0.22\%    & 20.5\%    & 0.15\% & 18.3\%    & 0.16\%    & 17.9\%  \\ 
+		%\cmidrule[0.75pt]{1-9}
+        \midrule[0.25pt] \specialrule{0em}{0.5pt}{0.5pt} \midrule[0.25pt] % \bottomrule
+		Xu \emph{et al.'s} \cite{xu2022hardwarefriendlyforrdoq}   & HPM-4.0 & Hardware & N/A    & N/A    & 0.86\% & 27.6\% & 0.64\% & 30.6\% \\     
 		\cmidrule[0.75pt]{1-9}      
-		Work \cite{zhao2023scanline}                & HPM-4.0 & Hardware & 0.82\% & N/A    & 0.46\% & N/A    &  0.36\%   & N/A \\   
+		Zhao \emph{et al.'s} \cite{zhao2023scanline}                & HPM-4.0 & Hardware & 0.82\% & 30.5\%    & 0.46\% & 26.9\%    &  0.36\%   & 26.5\% \\   
 		\cmidrule[0.75pt]{1-9}  
-		Proposed                                    & HPM-4.0 & Hardware & 0.23\% & 31.4\% & 0.24\% & 28.6\% & 0.26\% & 28.58\%  \\          
+		Proposed on HPM                                   & HPM-4.0 & Hardware & 0.25\% & 31.4\% & 0.26\% & 28.6\% & 0.27\% & 28.5\%  \\          
 		\midrule[0.75pt] \specialrule{0em}{0.35pt}{0.35pt} \midrule[0.75pt] % \bottomrule
 	\end{tabular}
 \end{table*}
+\subsection{Performance Comparison with Other Methods} 
+To further verify the priority of our proposed scheme, the results compared with the five other existing methods are shown in Table \ref{Compare:BD-Rate}. It is worth noting that these methods have been implemented on two different reference software platforms, namely HM (HEVC) and HPM (AVS3). For HM platform comparison, we implement our proposed RDOQ algorithm on HM-16.15 for fair comparison. For HPM platform comparison, work~\cite{xu2022hardwarefriendlyforrdoq} and work~\cite{zhao2023scanline} are re-implemented on the HPM-4.0 platform for fair comparison. 
 
-\begin{table}[!ht]
+% For the work proposed on HM, we implement the proposed parallel algorithm on HM and get the results for comparison. Since the parallel algorithm proposed in this paper is implemented on HPM-4.0, we re-implement the algorithms based on HPM-4.0 platform in works~\cite{xu2022hardwarefriendlyforrdoq} and work~\cite{zhao2023scanline}, and get the results respectively for comparison.
+
+%To further verify the priority of our proposed scheme, the results compared with the five other existing methods are shown in Table \ref{Compare:BD-Rate}. It is worth noting that these methods have been implemented on two different reference software platforms, namely HM (HEVC) and HPM (AVS3). For the work proposed on HM, we use the results from the original work for comparison directly. Since the parallel algorithm proposed in this paper is implemented on HPM-4.0, we re-implement the HPM-4.0 platform-based algorithms and get the results for comparison. 
+
+% In terms of the implementation with the proposed parallel algorithm on HM, a CG-based parallel method is adopted, but the scan order in CG is unchanged. Since context set update is done at the first position in CG for the original RDOQ process, it is suitable for OCL decision with less performance loss. For LSC position decision, the sub last position within the CG scan line is decided in parallel. Finally, the ultimate last position is determined based on the cumulative RD cost. In addition, the parallel algorithm is accelerated based on SIMD. The time savings are decreased compared to AVS3 due to the CG scanning in HEVC and the decision on whether the coefficients in the decision CG are all zero or not. 
+In terms of porting the proposed parallelized RDOQ algorithm on HM, a CG-based parallelized RDOQ method is adopted. The coefficients at different CG scanlines are processed in parallel, and the coefficients in one CG scanline are serially processed. The context for the OCL decision is dependent on one CG scanline. For the LSC position decision, the sub-optimal last position within the CG scanline is decided in parallel following our proposed greedy strategy-based method. The final last position is determined from these sub-optimal last positions based on the accumulative RD cost. In addition, the parallel algorithm is accelerated by adopting SIMD. The time saving on HEVC is not as significant as AVS3 due to the CG scanning in HEVC. 
+
+As shown in Table \ref{Compare:BD-Rate}, work \cite{lee2015fastquantizationmethod} and work \cite{xu2020simplifiedLevelEstimation} both speed up for the software platform, and they can achieve a time-saving ranging from 12.9\% to 15.8\% with a negligible BD-Rate loss. Compared with \cite{lee2015fastquantizationmethod} and \cite{xu2020simplifiedLevelEstimation}, our parallelized algorithm can achieve more time saving with closely matched coding efficiency and focuses on the fully pipelined hardware implementation. Work \cite{igarashi2018parallelGPU} proposed a parallelized RDOQ algorithm for the HEVC encoder. It achieves 4K@60fps real-time encoding on GPU with a significant 2.51\% BD-Rate loss. However, our proposed RDOQ algorithm achieves parallel processing with only 0.25\% BD-Rate loss, which provides a better trade-off between coding efficiency and hardware implementation. Work \cite{xu2022hardwarefriendlyforrdoq} introduces all-zero block skipping and an optimized rate estimation algorithm. It is shown that it obtains 27.6\% and 30.6\% time savings in the RA and LDB configurations with 0.86\% and 0.64\% coding performance loss, respectively. Our coding efficiency loss is smaller than work \cite{xu2022hardwarefriendlyforrdoq}. In addition, we add our previous work \cite{zhao2023scanline} into comparison as well, and it is shown that the improved parallelized algorithm in this paper has better coding performance than in \cite{zhao2023scanline}. 
+
+\subsection{Hardware Implementation Results}
+Currently, there are limited studies focusing on hardware implementations of the RDOQ algorithm for AVS3 encoders. This is primarily due to its strong context dependency and computational complexity. The proposed RDOQ hardware architecture in our research is based on the parallelized algorithm. This implementation allows for parallel processing of multiple TUs with high parallelism, while minimizing resource utilization. 
+
+\begin{table}[!b]
 	%\usepackage{hhline}
-	\caption{Comparasion of FPGA hardware resource consumption.}
+	\caption{Comparison of FPGA hardware resource consumption.}
 	\label{hardware resource consumption}
 	\centering
 	\tabcolsep 10pt  % 
 	\arrayrulewidth 0.75pt
 	\begin{tabular}{c | c  c } 
 		\midrule[0.75pt] \specialrule{0em}{0.35pt}{0.35pt} \midrule[0.75pt] 
-		Design 		& \cite{zhao2023scanline}     & Proposed    \\   
+		Design 		& Zhao \emph{et al.'s} \cite{zhao2023scanline}     & Proposed    \\   
+    	\cmidrule[0.75pt]{1-3}
+		BD-Rate 	& 0.82\% 	& 0.25\%	\\   
 		\cmidrule[0.75pt]{1-3}  
 		LUTs   		& 109759 	& 72017 	\\ 
 		\cmidrule[0.75pt]{1-3}
@@ -699,13 +771,37 @@ Furthermore, the proposed design has been synthesized by Design Compiler with th
 		\cmidrule[0.75pt]{1-3}
 		Frequency  	& 200MHz	& 116MHz	\\       
 		\cmidrule[0.75pt]{1-3}
-		Throughput 	& 4K@45fps 	& 8K@89fps	\\     
+		Throughput 	& 4K@45fps 	& 8K@89fps	\\   
+  		\cmidrule[0.75pt]{1-3}
+		Power 	    & N/A 	    & 3.006W	\\   
 		\midrule[0.75pt] \specialrule{0em}{0.35pt}{0.35pt} \midrule[0.75pt] 
 	\end{tabular}
 \end{table}
+
+Our proposed design was implemented using Verilog Hardware Description Language (HDL) and synthesized using Synplify Pro 2019.03 for the Xilinx UltraScale+ MPSoCs 7ev. 
+During the Verilog HDL simulation, the self-check technique is adopted. 
+Firstly, the input and output test vectors of the RDOQ are dumped from the HPM-4.0 software platform. 
+Then, the input test vector is utilized as the input stimulus for the RDOQ hardware design. 
+Finally, the output of the hardware is compared to the software output to ensure the correctness of the RDOQ design. It means that the results of the hardware are identical to the software ones. 
+A similar self-check flow is performed during the Field-Programmable Gate Array (FPGA) evaluation, where the input and output test vectors are transmitted between the computer and FPGA through the PCI-E interface. 
+
+% In addition, our design incorporates self-check techniques. The input data for the RDOQ module is transmitted from the upper computer via the PCIE interface to the DDR. The RDOQ module reads the input data from the DDR, processes it, and then sends back the RDOQ results to the DDR. Subsequently, the upper computer compares the RDOQ results stored in the DDR with the software-generated ones through the PCIE interface to confirm the accuracy.
+
+To demonstrate the advancements of our work, we conduct a comprehensive comparison on the FPGA platform with Zhao et al.'s \cite{zhao2023scanline}, and the results are tabulated in Table \ref{hardware resource consumption}. 
+%Our proposed design was implemented using Verilog Hardware Description Language (HDL) and synthesized using Synplify Pro 2019.03 for the Xilinx UltraScale+ MPSoCs 7ev. 
+%As shown in Table \ref{hardware resource consumption}, our proposed design achieves a 34.39\% reduction in LUTs $((109759 - 72017) \div 109759)$ and over 50\% reduction in DSPs compared to Zhao et al. \cite{zhao2023scanline}.
+As shown in Table \ref{hardware resource consumption}, the BD-Rate under the AI configuration is given, which shows less performance loss compared to Zhao et al.'s \cite{zhao2023scanline}. Our proposed design achieves a 34.39\% reduction in LUTs $((109759 - 72017) \div 109759)$ and over 50\% reduction in DSPs.
+Apart from minimizing area consumption, our design has a significantly higher processing throughput compared to their design.
+The processing of a TU with the size of 32$\times$32 only requires 40 cycles at a frequency of 116MHz, which can meet the real-time encoding of 8K@89fps $((32\times32\times116\times10^6) \div (7680\times4320\times40))$. 
+While their method operates at a higher frequency of 200MHz, it needs a considerably large number of clock cycles, resulting in lower overall throughput. 
+Moreover, the power consumption is evaluated on the FPGA, which shows 3.006W power consumption. 
+Furthermore, the proposed design has been synthesized by Design Compiler with the UMC 28nm cell library, the gate count is 1,223.2K, the chip area is 0.67$mm^2$, the power consumption is 339.2mW under the operating voltage of 0.81V, and the maximum working frequency is 471.2MHz. 
+
+%As shown in Table \ref{hardware resource consumption}, our proposed design achieves a 34.39\% reduction in LUTs $((109759 - 72017) \div 109759)$ and over 50\% reduction in DSPs compared to Zhao et al.'s \cite{zhao2023scanline}. Moreover, apart from minimizing area consumption, our design has a significantly higher processing throughput compared to their design. The processing of a TU with the size of 32$\times$32 only requires 40 cycles at a frequency of 116MHz, which can meet the real-time encoding of 8K@89fps $((32\times32\times116\times10^6) \div (7680\times4320\times40))$. While their method operates at a higher frequency of 200MHz, it needs a considerably large number of clock cycles, resulting in lower overall throughput. Furthermore, the proposed design has been synthesized by Design Compiler with the UMC 28nm cell library, the gate count is 1,223.2K, the chip area is 0.67$mm^2$, and the maximum working frequency is 471.2MHz. 
+
 \section{Conclusion and Future Work}
 \label{sec:6}
-In this paper, a parallelized RDOQ algorithm and its fully pipelined hardware architecture design are presented for the AVS3 video coding standard. For the parallelized algorithm, the run-level context for the rate estimation is updated in the inner zig-zag scanline and an efficient RD cost form is adopted in the OCL decision step. In the LSC position decision step, a greedy strategy-based algorithm is proposed to achieve the LSC position decision compute in parallel. Moreover, the parallelized algorithm is accelerated based on SIMD. The experimental results show that the BD-rate of the parallelized algorithm is increased by 0.23\%, 0.24\%, and 0.26\% under the AI, RA, and LDB configurations, respectively. The computational time is reduced by 31.42\%, 28.60\%, and 28.58\% compared to the vanilla HPM-4.0, respectively. 
+In this paper, a parallelized RDOQ algorithm and its fully pipelined hardware architecture design are proposed for the AVS3 video coding standard. For the parallelized algorithm, the run-level context for the rate estimation is updated in the inner zig-zag scanline and an efficient RD cost form is adopted in the OCL decision step. In the LSC position decision step, a greedy strategy based algorithm is proposed to achieve the LSC position decision computed in parallel. Moreover, the parallelized algorithm is accelerated based on SIMD. The experimental results show that the BD-Rate of the parallelized algorithm is increased by 0.25\%, 0.26\%, and 0.27\% under the AI, RA, and LDB configurations, respectively. The computational time is reduced by 31.37\%, 28.58\%, and 28.53\% compared to the vanilla HPM-4.0, respectively. 
 For the hardware architecture, we design a nine-stage fully pipelined architecture that achieves 32 coefficients per cycle. It can process multiple TUs when the height is less than 32. The area consumption is 1223.2K gate count (0.67$mm^{2}$) when working at 471.2MHz. It proves that our design achieves a good tradeoff between coding efficiency and hardware throughput. 
 In our future study, we will extend the proposed parallelized algorithm to RDOQ in HEVC and explore novel methods to speed up the dependent quantization computation in VVC. 
 
@@ -729,6 +825,35 @@ In our future study, we will extend the proposed parallelized algorithm to RDOQ 
 
 \bibliographystyle{IEEEtran}
 \bibliography{References}
+
+\begin{IEEEbiography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{figure/Author/Huang Xiaofeng.png}}] {Xiaofeng Huang} received the Ph.D. degree from the School of Electronics Engineering and Computer Science, Peking University, Beijing, China, in 2016. From 2016 to 2018, he was a senior video architecture engineer at Nvidia Company. He joined Hangzhou Dianzi University in 2018. He is currently an Assistant Professor with the Department of Communication Engineering, Hangzhou Dianzi University. His research interests include video coding, VLSI design, digital IC design, and digital signal processing.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{figure/Author/Tang Ran.png}}] {Ran Tang} received the B.E. degree in Electronic and Information Engineering from Henan University of Technology, China, in 2021. Now, he is currently pursuing the M.E. degree at Hangzhou Dianzi University. His research interests include image processing and video coding.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{figure/Author/Pan Rui.png}}] {Rui Pan} is pursuing the M.E. degree from Hangzhou Dianzi University, China, in 2022. His current research interests includes video coding and VLSI design.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{figure/Author/Yin Haibing.png}}] {Haibing Yin} received the Ph.D. degree from Shanghai Jiaotong University, Shanghai, China, in 2006. He is with the School of Communication engineering, Hangzhou Dianzi University, Hangzhou, China. He is a member of IEEE and ACM. His research interests include image and video processing, VLSI architecture design.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{figure/Author/Wang Zhao.png}}] {Zhao Wang} received the B.S. degree in software engineering from Fudan University in 2014 and the Ph.D. degree in computer science from Peking University in 2019.From 2019 to 2022, he was with the DAMO Academy, Alibaba Group, as an Algorithm Expert. He is currently an Associate Researcher with the School of Computer Science, Peking University. His research interests include image/video compression and vision coding for machine. He has proposed more than 40 technical proposals to video coding standards, including H.266/VVC, JVET-NNVC, MPEG-VCM, and AVS. He has published more than 20 papers and received the Best Student Paper Award from the IEEE ICIP 2018.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{figure/Author/Wang Shiqi.png}}] {Shiqi Wang} (Senior Member, IEEE) received the Ph.D. degree in computer application technology from Peking University in 2014.He is currently an Associate Professor with the Department of Computer Science, City University of Hong Kong. He has proposed more than 70 technical proposals to ISO/MPEG, ITU-T, and AVS standards. He has authored or coauthored more than 300 refereed journal articles/conference papers, including more than 100 \textsc{IEEE Transactions}. His research interests include video compression, image/video quality assessment, video coding for machine, and semantic communication. He received the Best Paper Award from IEEE VCIP 2019, ICME 2019, IEEE Multimedia 2018, and PCM 2017.His coauthored article received the Best Student Paper Award in the IEEE ICIP 2018. He served or serves as an Associate Editor for \textsc{IEEE Transactions on Image Processing}, \textsc{IEEE Transactions on Circuits and Systems for Video Technology}, \textsc{IEEE Transactions on Multimedia}, \textsc{IEEE Transactions on Cybernetics}, \textsc{IEEE ACCESS}, and \textit{APSIPA Transactions on Signal and Information Processing}.
+\end{IEEEbiography}
+
+\begin{IEEEbiography}
+[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{figure/Author/Ma Siwei.png}}]{Siwei Ma} (Fellow, IEEE) received the B.S. degree from Shandong Normal University, Jinan, China, in 1999, and the Ph.D. degree in computer science from the Institute of Computing Technology, Chinese Academy of Sciences, Beijing, China, in 2005. He held a postdoctoral position with the University of Southern California, Los Angeles, CA,USA, from 2005 to 2007. He joined the School of Electronics Engineering and Computer Science, Institute of Digital Media, Peking University, Beijing, where he is currently a Professor. He has authored over 300 technical articles in refereed journals and proceedings in image and video coding, video processing, video streaming, and transmission. He served/serves as an Associate Editor for \textsc{IEEE Transactions on Circuits and Systems for Video Technology} and the \textit{Journal of Visual Communication and Image Representation.}
+\end{IEEEbiography}
+
 \end{document}
 
 
