@@ -40,11 +40,11 @@
 
 ​	2.pre_quant优化，减少乘法器位宽
 
-​	3.reconfirm the bit width of each variable
+​	3.Reconfirm the bit width of each variable.
 
-​	4.reduce one array of dCurrCost_tem
+​	4.Reduce the array dCurrCost_tem by half.
 
-​	5.reduce half number of rdoq_est_last, [2 6 12 2]->[1 6 12 2]
+​	5.Reduce the array rdoq_est_lastby half, [2 6 12 2]->[1 6 12 2].
 
 | 时间      | 备注               | LUT   | FF    | RAM(bits) | DSP  | Fmax(MHz)   |
 | --------- | ------------------ | ----- | ----- | --------- | ---- | ----------- |
@@ -53,9 +53,9 @@
 |           | ocd                | 67397 | 12967 | 0         | 320  | 64.11（v）  |
 |           | lnpd               | 2989  | 2427  | 0         | 0    | 189.25（v） |
 
-1.replace the multiplication operation to add and shift operation in "temp_coef_abs_d2" which value is between 2-9
+1.Replace the multiplication operation with addition and shift operations in "temp_coef_abs_d2" for values between 2 and 9.
 
-2.reduce the bit width of "i64Delta" thus reduce half amount of dsp in the calcualtion of "err" 
+2.Reduce the bit width of "i64Delta" to reduce the number of DSPs used in the calculation of "err" by half.
 
 | 时间      | 备注               | LUT   | FF    | RAM(bits) | DSP  | Fmax(MHz)   |
 | --------- | ------------------ | ----- | ----- | --------- | ---- | ----------- |
