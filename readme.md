@@ -72,6 +72,7 @@ The simulation file in this project uses relative paths to read the test vectors
 |           | lnpd               | 2989  | 2427  | 0         | 0   | 189.25（v） |
 
 1.Replace the multiplication operation with addition and shift operations in "temp_coef_abs_d2" for values between 2 and 9.
+
 2.Reduce the bit width of "i64Delta" to reduce the number of DSPs used in the calculation of "err" by half.
 
 | 时间      | 备注               | LUT   | FF    | RAM(bits) | DSP | Fmax(MHz)   |
