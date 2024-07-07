@@ -54,15 +54,15 @@ The simulation file in this project uses relative paths to read the test vectors
 
 ###### v0.1 ，单尺寸流水
 
-    1.ocd优化, 优化计算式,提前计算err值
+1.ocd优化, 优化计算式,提前计算err值
 
-    2.pre_quant优化，减少乘法器位宽
+2.pre_quant优化，减少乘法器位宽
 
-    3.Reconfirm the bit width of each variable.
+3.Reconfirm the bit width of each variable.
 
-    4.Reduce the array dCurrCost_tem by half.
+4.Reduce the array dCurrCost_tem by half.
 
-    5.Reduce the array rdoq_est_lastby half, [2 6 12 2]->[1 6 12 2].
+5.Reduce the array rdoq_est_lastby half, [2 6 12 2]->[1 6 12 2].
 
 | 时间      | 备注               | LUT   | FF    | RAM(bits) | DSP | Fmax(MHz)   |
 | --------- | ------------------ | ----- | ----- | --------- | --- | ----------- |
@@ -89,9 +89,6 @@ The simulation file in this project uses relative paths to read the test vectors
 |           | pre_quant          | 6523  | 7349  | 0         | 32  | 335.6(s)  |
 |           | ocd                | 76350 | 15857 | 0         | 192 | 113.6(s)  |
 |           | lnpd               | 2854  | 2538  | 0         | 0   | 394.1(s)  |
-
-|  |
-| - |
 
 ###### v1.1，多并行流水
 
