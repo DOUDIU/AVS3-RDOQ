@@ -1,12 +1,12 @@
 # AVS3-RDOQ
 
-#### Introduction
+### Introduction
 
 This work presents the non-final edition RTL design from our paper published in the journal **TCSVT**: 'Parallelized RDOQ Algorithm and Fully Pipelined Hardware Architecture for AVS3 Video Coding.'
 
 The algorithm optimization and the original C++ model were completed by **Ran Tang**, while **I** handled all the RTL design and subsequent modifications to the C++ model. The entire project was supervised by Professor **Xiaofeng Huang**.
 
-#### Version Record
+### Version Record
 
 ###### V0.0 ，单尺寸流水
 
@@ -67,7 +67,7 @@ The algorithm optimization and the original C++ model were completed by **Ran Ta
 |           | ocd                | 69714 | 14757 | 0         | 192  |             |
 |           | lnpd               | 2985  | 2427  | 0         | 0    | 189.25（v） |
 
-v1.0 ，多并行流水
+###### v1.0 ，多并行流水
 
 | 时间      | 备注               | LUT   | FF    | RAM(bits) | DSP  | Fmax(MHz) |
 | --------- | ------------------ | ----- | ----- | --------- | ---- | --------- |
@@ -79,7 +79,7 @@ v1.0 ，多并行流水
 |      |
 | ---- |
 
-v1.1，多并行流水
+###### v1.1，多并行流水
 
 Delete unnecessary delay operations in the **PQ** module because there are many unused signals passing through this module. (The deleted signal was provided by the testbench file to the next stage **OCD**.)
 
