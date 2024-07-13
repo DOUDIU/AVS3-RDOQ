@@ -2,9 +2,7 @@
 
 ### Introduction
 
-This work presents the non-final edition RTL design from our paper published in the journal **TCSVT**: 'Parallelized RDOQ Algorithm and Fully Pipelined Hardware Architecture for AVS3 Video Coding.'
-
-The algorithm optimization and the original C++ model were completed by **Ran Tang**, while **I** handled all the RTL design and subsequent modifications to the C++ model. The entire project was supervised by Professor **Xiaofeng Huang**.
+Pending...
 
 ### Project Structure
 
